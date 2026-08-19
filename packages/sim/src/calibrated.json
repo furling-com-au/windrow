@@ -1,0 +1,54 @@
+{
+  "knobs": {
+    "fleetTrucks": 539.0654220730066,
+    "linehaulTrucks": 49.90995339658111,
+    "rateScale": 1.2902421662956476,
+    "matShift": -2.5684216663241384,
+    "harvestRampDays": 5,
+    "retentionShare": 0.1,
+    "portAttractBias": 0.8,
+    "choiceBeta": 1.7494986056117345,
+    "luckyBayBias": 0.7610350114349278
+  },
+  "params": {
+    "fleetTrucks": 539,
+    "linehaulTrucks": 50,
+    "truckPayloadT": 38,
+    "harvestRatePerDay": {
+      "wheat": 0.09676816247217357,
+      "barley": 0.11612179496660828,
+      "canola": 0.09676816247217357,
+      "lentils": 0.12902421662956476,
+      "beans": 0.10321937330365182,
+      "other": 0.10321937330365182
+    },
+    "maturityDayOffset": {
+      "lentils": 19.431578333675862,
+      "barley": 23.431578333675862,
+      "other": 31.431578333675862,
+      "beans": 37.43157833367586,
+      "canola": 43.43157833367586,
+      "wheat": 45.43157833367586
+    },
+    "districtStartOffset": {
+      "WEP": -8,
+      "EEP": 0,
+      "LEP": 8
+    },
+    "harvestRampDays": 5,
+    "choiceBeta": 1.7494986056117345,
+    "portAttractBias": 0.8,
+    "retentionShare": 0.1,
+    "luckyBayBias": 0.7610350114349278,
+    "productionScale": 1,
+    "railReinstated": false,
+    "outage": null,
+    "roadClosure": null
+  },
+  "score": 1.3739583683689838,
+  "parts": {
+    "2023/24": 0.5899563473804655,
+    "2025/26": 0.7840020209885183
+  },
+  "nEvaluations": 150
+}

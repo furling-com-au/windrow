@@ -1,0 +1,58 @@
+{
+  "calSeasons": [
+    "2023/24",
+    "2025/26"
+  ],
+  "holdout": "2024/25",
+  "ranges": {
+    "fleetTrucks": [
+      350,
+      750
+    ],
+    "linehaulTrucks": [
+      25,
+      80
+    ],
+    "rateScale": [
+      0.7,
+      2.2
+    ],
+    "matShift": [
+      -4,
+      16
+    ],
+    "harvestRampDays": [
+      5,
+      22
+    ],
+    "retentionShare": [
+      0.1,
+      0.28
+    ],
+    "portAttractBias": [
+      0.8,
+      2.8
+    ],
+    "choiceBeta": [
+      1.1,
+      2.6
+    ],
+    "luckyBayBias": [
+      0.4,
+      2.2
+    ]
+  },
+  "evaluations": 150,
+  "best": {
+    "fleetTrucks": 539.0654220730066,
+    "linehaulTrucks": 49.90995339658111,
+    "rateScale": 1.2902421662956476,
+    "matShift": -2.5684216663241384,
+    "harvestRampDays": 5,
+    "retentionShare": 0.1,
+    "portAttractBias": 0.8,
+    "choiceBeta": 1.7494986056117345,
+    "luckyBayBias": 0.7610350114349278
+  },
+  "bestScore": 1.3739583683689838
+}

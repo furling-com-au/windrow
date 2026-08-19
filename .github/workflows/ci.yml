@@ -1,0 +1,29 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: typecheck sim
+        run: npx tsc -p packages/sim --noEmit
+      - name: unit tests (invariants, determinism, headless season)
+        run: npm --workspace packages/sim run test
+      - name: calibration smoke (headless 2025/26)
+        run: npx tsx packages/sim/scripts/run_headless.ts 2025/26 42
+      - name: svelte check
+        run: npm --workspace app run check
+      - name: build app
+        run: npm --workspace app run build
+      - name: playwright happy path
+        working-directory: app
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test

@@ -109,6 +109,35 @@ presented as measured data.
   form; ACCC records 21 EP upcountry sites in 2020-21, 25 in 2019-20.
 - **Sensitivity**: small re-routing effects in early seasons.
 
+## A14 — PIRSA district boundaries approximated by LGA composition
+- **Value**: WEP = Ceduna + Streaky Bay + Elliston + Wudinna (+ unincorporated far-west
+  cropping strip); EEP = Kimba + Cleve + Franklin Harbour; LEP = Lower Eyre Peninsula +
+  Tumby Bay + City of Port Lincoln. LGA polygons: data.sa.gov.au (CC-BY).
+- **Used in**: `pipeline/r4_build_demand.py` (district assignment of demand cells).
+- **Reasoning**: PIRSA does not publish machine-readable district boundaries. Validation
+  against PIRSA sown areas: LEP ratio 1.04 (excellent), EEP 1.29, WEP 2.14 — WEP's CLUM
+  cropping mask includes large opportunistically-sown marginal country, consistent with
+  PIRSA sowing about half of WEP arable in a given year; allocation is proportional so
+  totals are conserved exactly.
+- **Sensitivity**: shifts tonnage between adjacent border cells only.
+
+## A15 — T-Ports Lock/Kimba bunkers not operated in 2024/25
+- **Value**: T-Ports inland bunker sites closed in the sim for 2024/25 (and 2025/26,
+  which IS documented).
+- **Reasoning**: 2025/26 closure is published (tports.com/harvest). 2024/25 is
+  unverified; with WEP+EEP production at drought lows (0.41 + 0.57 Mt) and the observed
+  Bunge Western share at 79.8 % of EP production, material T-Ports inland intake is
+  arithmetically implausible.
+- **Sensitivity**: without this, the sim under-delivers Bunge receivals ~8-10 % in
+  2024/25.
+- **Upgrade path**: T-Ports/operator confirmation of 2024/25 site operations.
+
+## A16 — AIS-derived Lucky Bay vessel counts are an upper bound
+- **Value**: "Lucky Bay anchorage stays" in `vessel_calls.parquet` (>24 h, cargo class)
+  include vessels anchored in western Spencer Gulf for other reasons (e.g. awaiting
+  Whyalla berths); they are not used as a calibration anchor.
+- **Used in**: vessels_{season}.json (LB arrival schedule is indicative only).
+
 ## A13 — vessel arrival schedules for seasons before stem coverage
 - **Value**: for seasons where archived stem snapshots are sparse (2021/22–2023/24
   ≈ monthly snapshots), vessel arrivals derive from AIS-observed berth visits instead of

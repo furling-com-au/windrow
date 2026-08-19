@@ -1,0 +1,12 @@
+{
+  "name": "windrow",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/sim",
+    "app"
+  ],
+  "devDependencies": {
+    "wrangler": "^4.124.0"
+  }
+}
