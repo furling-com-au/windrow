@@ -782,7 +782,10 @@ export class Sim {
         tr.legMin = minutes;
         tr.state = T_GO;
         tr.legStart = tick;
-        tr.doneAt = tick + Math.ceil((minutes + 60) / TICK_MIN); // + load/unload handling
+        // handling: ~1 h for a road train; ~4 h combined load/unload for a 1,600 t
+        // trainset (A21) — caps trains at a realistic ~2 cycles/day
+        const handlingMin = isTrain ? 240 : 60;
+        tr.doneAt = tick + Math.ceil((minutes + handlingMin) / TICK_MIN);
         this.truckTravelMin += minutes * 2;
         this.tonneKm += (minutes / 60) * 75 * load;
         const lkey = `s:${src}-${bestPort}`;

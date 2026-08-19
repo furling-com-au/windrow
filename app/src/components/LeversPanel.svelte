@@ -303,7 +303,7 @@
         oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
     </label>
     <div class="toggles">
-      <button class:on={app.levers.rail} title="Bring back two grain trains on the railway closed in 2019 (Cummins–Kimba–Wudinna lines into Port Lincoln)" onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
+      <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, max ~2 cycles/day (assumption A21)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
       <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
       <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>

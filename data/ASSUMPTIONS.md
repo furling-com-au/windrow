@@ -170,6 +170,21 @@ presented as measured data.
 - **Upgrade path**: replace automatically when PIRSA publishes 2026/27 estimates and
   as live receivals/shipments land (re-run the live builder).
 
+## A21 — rail-reinstatement scenario parameters
+- **Value**: 2 trainsets × 1,600 t net, serving only the historically rail-served silos
+  (Cummins, Kimba, Wudinna) into Port Lincoln; no timetable — dispatch is demand-driven
+  like the road shuttle; combined load/unload handling 4 h (≈2 cycles/day ceiling);
+  road line-haul fleet cut by one-third in the scenario.
+- **Used in**: engine `railReinstated`; "Bring back the trains" scenario.
+- **Reasoning**: anchored to the published replacement task — Viterra stated the closed
+  railway's work equalled "48 loaded trucks a day" (~2,100–2,200 t/day; ABC, Feb 2019) —
+  and ACCC's record that rail carried only the Cummins/Kimba/Wudinna lines. Consist
+  size, trainset count, cycle handling time and the absence of track-capacity limits
+  are modelling choices, not citations.
+- **Sensitivity**: affects only the rail scenario's truck-km savings and queue relief.
+- **Upgrade path**: a real reinstatement proposal (consist sizes, timetable, loop
+  lengths) would replace all of this.
+
 ## A13 — vessel arrival schedules for seasons before stem coverage
 - **Value**: for seasons where archived stem snapshots are sparse (2021/22–2023/24
   ≈ monthly snapshots), vessel arrivals derive from AIS-observed berth visits instead of

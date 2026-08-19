@@ -40,13 +40,13 @@
     {
       "id": "rail",
       "label": "Rail reinstated",
-      "receivedMt": 2.189,
-      "receivedLbMt": 0.354,
+      "receivedMt": 2.187,
+      "receivedLbMt": 0.357,
       "shippedPlMt": 1.22,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 190,
-      "truckKmProxy": 13226236,
+      "peakQueue": 185,
+      "truckKmProxy": 13633802,
       "peakWeekKt": 362
     },
     {

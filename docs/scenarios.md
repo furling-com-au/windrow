@@ -10,7 +10,7 @@ they show how the *land side* copes, and where the fixed export program breaks.
 | Baseline replay | 2.18 | 0.36 | 1.22 | 189 | 28.3 h | 16.6 | 366 |
 | Bumper (+30 %) | 2.78 | 0.53 | 1.22 | **285** | 28.3 h | 19.8 | 396 |
 | Drought (−40 %) | 1.40 | 0.13 | 1.03 | 93 | 2,100 h† | 11.2 | 260 |
-| Rail reinstated | 2.19 | 0.35 | 1.22 | 190 | 28.3 h | **13.2** | 362 |
+| Rail reinstated | 2.19 | 0.36 | 1.22 | 185 | 28.3 h | **13.6** | 362 |
 | Lucky Bay share ×2.5 | **2.07** | **0.47** | 1.22 | 165 | 28.3 h | 16.7 | 355 |
 | PL outage (7 d @ day 70) | 2.16 | 0.39 | 1.22 | **241** | 28.8 h | 17.2 | 366 |
 | Tod Hwy closure (×2.5) | 2.17 | 0.37 | 1.22 | 170 | 28.3 h | 18.1 | 363 |
@@ -39,12 +39,12 @@ vessels sit at anchor for weeks waiting for grain before short-loading (the sim'
 5-day starvation guard). This mirrors 2024/25 reality, where the program itself shrank.
 
 **Rail reinstated.** Two 1,600 t trainsets on the old Cummins/Kimba/Wudinna alignments
-(with the road line-haul fleet cut by a third) keep port stocks equally well supplied
-while removing **~3.4 M truck-kilometres** from the roads (16.6 → 13.2 M, −20 %) — at
-the A18 indicative rate that is a freight saving in the low millions of dollars per
-season, against which any reinstatement capital case would have to stack up. Receival
-and shipping outcomes are unchanged, consistent with why the 2019 closure was
-absorbable by ~48 trucks/day.
+(demand-dispatched, ≤~2 cycles/day each — A21; road line-haul fleet cut by a third)
+keep port stocks equally well supplied while removing **~3.0 M truck-kilometres** from
+the roads (16.6 → 13.6 M, −18 %) — at the A18 indicative rate a freight saving in the
+low millions of dollars per season, against which any reinstatement capital case would
+have to stack up. Receival and shipping outcomes are unchanged, consistent with why
+the 2019 closure was absorbable by ~48 trucks/day.
 
 **Lucky Bay share ×2.5.** T-Ports intake grows 0.35 → 0.46 Mt; Bunge Western receivals
 drop ~0.11 Mt, concentrated in eastern-EP clusters (Cowell/Cleve/Kimba catchments), and
