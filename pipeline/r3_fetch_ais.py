@@ -43,8 +43,11 @@ def list_year_keys(year: int) -> list[tuple[str, int]]:
         if token:
             url += f"&continuation-token={token}"
         xml = fetch(url, timeout=60, interval=0.3).decode()
-        for m in re.finditer(r"<Key>([^<]+)</Key>\s*<LastModified>[^<]*</LastModified>\s*<ETag>[^<]*</ETag>\s*<Size>(\d+)</Size>", xml):
-            keys.append((m.group(1), int(m.group(2))))
+        for block in re.finditer(r"<Contents>(.*?)</Contents>", xml, re.DOTALL):
+            k = re.search(r"<Key>([^<]+)</Key>", block.group(1))
+            s = re.search(r"<Size>(\d+)</Size>", block.group(1))
+            if k and s:
+                keys.append((k.group(1), int(s.group(1))))
         if "<IsTruncated>true</IsTruncated>" not in xml:
             break
         t = re.search(r"<NextContinuationToken>([^<]+)</NextContinuationToken>", xml)
@@ -64,7 +67,7 @@ def main():
     total_bytes = 0
     for y, m in MONTHS:
         pat = f"cts_srr_{m:02d}_{y}_pt.parquet"
-        candidates = [(k, s) for k, s in by_year.get(y, []) if pat in k]
+        candidates = [(k, s) for k, s in by_year.get(y, []) if pat in k.lower()]
         if not candidates:
             missing.append(f"{y}-{m:02d}")
             continue

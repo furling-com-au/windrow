@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 
-UA = "WindrowResearch/0.1 (non-commercial grain supply chain research; polite crawler, >=2s interval)"
+UA = "WindrowResearch/0.1"  # note: overpass-api.de 406s UAs containing the word "crawler"
 HOST_INTERVAL = 2.0  # seconds between requests to the same host
 
 _last_hit: dict[str, float] = {}

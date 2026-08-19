@@ -1,0 +1,889 @@
+{
+ "type": "FeatureCollection",
+ "name": "windrow_sites",
+ "metadata": {
+  "generated": "pipeline/r1_build_sites.py",
+  "notes": "EP + far west grain receival sites. Coordinates: operator API (facility) or OSM town nodes (town). Capacities only where published; upcountry Bunge capacities are NOT published (see ASSUMPTIONS.md).",
+  "attribution": [
+   "Site data (c) Bunge/Viterra operator API",
+   "OpenStreetMap contributors (ODbL) for town coordinates"
+  ]
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.5967434,
+     -33.2438181
+    ]
+   },
+   "properties": {
+    "name": "Warramboo",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/01bba3f2-4269-4181-871e-a91301835869 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 143
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.5327607,
+     -32.4057324
+    ]
+   },
+   "properties": {
+    "name": "Wirrulla",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/0959c42a-4921-41e9-b827-a91301835869 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 101
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     133.0114887,
+     -31.931395
+    ]
+   },
+   "properties": {
+    "name": "Penong",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "dormant",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/1436f217-8ded-4bc6-989e-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 131
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.0797535,
+     -34.3635111
+    ]
+   },
+   "properties": {
+    "name": "Tumby Bay",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/21ceaa7d-5267-47fd-bdfe-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "BA",
+     "FB",
+     "CA",
+     "WH",
+     "LE"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 821
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.729119,
+     -34.1393452
+    ]
+   },
+   "properties": {
+    "name": "Yeelanna",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/231abea8-18da-4c77-b770-a91301835869 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "FB"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 186
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.4963057,
+     -34.1363479
+    ]
+   },
+   "properties": {
+    "name": "Kapinnie",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/31c0f72b-6156-4b31-a0e2-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "FB"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 199
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.3396356,
+     -32.2688303
+    ]
+   },
+   "properties": {
+    "name": "Nunjikompita",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "dormant",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/3a5f0288-fe75-42f1-bc2b-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 108
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.4291747,
+     -33.1223249
+    ]
+   },
+   "properties": {
+    "name": "Kimba",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/4424de83-03cc-4482-a28e-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "LE",
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 1906
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.1986788,
+     -33.4682081
+    ]
+   },
+   "properties": {
+    "name": "Darke Peak",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "dormant",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/4a6f63f5-00d4-46e4-9fc8-a9130183585f (retrieved 2026-08-19)",
+    "commodities_2025_26": [],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 166
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.7277442,
+     -34.2713037
+    ]
+   },
+   "properties": {
+    "name": "Cummins",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/62c0060c-1f42-4853-bbfb-a9130183585f (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA",
+     "CA",
+     "LE"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 345
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.7083676,
+     -34.4111499
+    ]
+   },
+   "properties": {
+    "name": "Edillilie",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/68964248-83c7-4285-a7f0-a9130183585f (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "CA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 153
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.835676,
+     -32.7205167
+    ]
+   },
+   "properties": {
+    "name": "Poochera",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/702a6089-ee19-45ae-a7d6-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 219
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.7603113,
+     -33.5743896
+    ]
+   },
+   "properties": {
+    "name": "Lock",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/75a032fe-a959-41d3-9894-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "LE",
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 611
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.5609944,
+     -33.9047546
+    ]
+   },
+   "properties": {
+    "name": "Arno Bay",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/7d570b00-1650-4d79-a7af-a9130183585f (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA",
+     "LE"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 470
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.5918772,
+     -33.0934072
+    ]
+   },
+   "properties": {
+    "name": "Witera",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/8192c9f4-de01-4b6f-ba2b-a91301835869 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 47
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.3019841,
+     -34.1260984
+    ]
+   },
+   "properties": {
+    "name": "Port Neill",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/a03922f7-bac7-43bc-a97e-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "CA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 108
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.2116733,
+     -32.9230596
+    ]
+   },
+   "properties": {
+    "name": "Buckleboo",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "dormant",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/b89e1868-2309-47b6-b26b-a9130183585f (retrieved 2026-08-19)",
+    "commodities_2025_26": [],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 129
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.8842745,
+     -33.6360271
+    ]
+   },
+   "properties": {
+    "name": "Elliston",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "dormant",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/c90de8a9-a1c7-4c0a-91ad-a9130183585f (retrieved 2026-08-19)",
+    "commodities_2025_26": [],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 50
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.45925,
+     -33.047367
+    ]
+   },
+   "properties": {
+    "name": "Wudinna",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/ca3836aa-094c-4d9c-80d0-a91301835869 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA",
+     "LE"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 210
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     133.6533323,
+     -32.1469215
+    ]
+   },
+   "properties": {
+    "name": "Thevenard",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "port",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/cdf8a42b-475a-41af-b80b-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "LE",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": 335925,
+    "capacity_provenance": "ACCC Final Determinations Port Lincoln & Thevenard, 20 Jul 2021, Table 3.1 (https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf); T-Ports: https://tports.com/lucky-bay/ + ACCC ibid.",
+    "region": "western",
+    "nearest_osm_silo_m": 289
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.2836835,
+     -33.7002126
+    ]
+   },
+   "properties": {
+    "name": "Rudall",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/df92fd39-c550-425c-9fdc-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA",
+     "CA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 1586
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.8659241,
+     -34.7221455
+    ]
+   },
+   "properties": {
+    "name": "Port Lincoln",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "port",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/ee8ccbe9-68ed-4769-acd1-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA",
+     "CA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": 395600,
+    "capacity_provenance": "ACCC Final Determinations Port Lincoln & Thevenard, 20 Jul 2021, Table 3.1 (https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf); T-Ports: https://tports.com/lucky-bay/ + ACCC ibid.",
+    "region": "western",
+    "nearest_osm_silo_m": 121
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.2213759,
+     -32.7938981
+    ]
+   },
+   "properties": {
+    "name": "Streaky Bay",
+    "operator": "Bunge (ex-Viterra)",
+    "role": "upcountry",
+    "status": "active_2025_26",
+    "coord_precision": "facility",
+    "coord_source": "operator API mobilews.viterra.com.au/api/Sites/f362da90-a98c-47e1-bfa4-a91301835864 (retrieved 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "nearest_osm_silo_m": 140
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     137.0441998,
+     -33.7057452
+    ]
+   },
+   "properties": {
+    "name": "Lucky Bay (T-Ports port)",
+    "operator": "T-Ports",
+    "role": "port",
+    "status": "active",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM 'Lucky Bay, South Australia' hamlet node (facility adjoins hamlet)",
+    "commodities_2025_26": [
+     "WH",
+     "BA",
+     "LE"
+    ],
+    "commodities_source": "T-Ports 2025/26 segregations via tports.com/harvest (read 2026-08-19)",
+    "capacity_t": 384000,
+    "capacity_provenance": "https://tports.com/lucky-bay/ (24,000 t port silos + 360,000 t bunkers 2 km away); ACCC 2021 Table 3.1 confirms 384,000 t",
+    "region": "western",
+    "sources": [
+     "https://tports.com/lucky-bay/",
+     "https://tports.com/harvest/",
+     "https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf"
+    ],
+    "notes": "Transshipment port opened 2019; no berth for ocean vessels - TSV MV Lucky Eyre shuttles to anchorage",
+    "nearest_osm_silo_m": 11581
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.7555,
+     -33.5673
+    ]
+   },
+   "properties": {
+    "name": "Lock (T-Ports bunker)",
+    "operator": "T-Ports",
+    "role": "upcountry",
+    "status": "closed_2025_26_season",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node; exact pad unpublished",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/",
+    "capacity_t": 140000,
+    "capacity_provenance": "https://tports.com/lucky-bay/ ('Lock bunker site: 140,000 tonnes in six bunkers')",
+    "region": "western",
+    "sources": [
+     "https://tports.com/lucky-bay/",
+     "https://tports.com/harvest/"
+    ],
+    "notes": "'Site closed for 25/26 season' per tports.com/harvest (2026-08-19); operated prior seasons from 2019",
+    "nearest_osm_silo_m": 220
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.4168,
+     -33.1403
+    ]
+   },
+   "properties": {
+    "name": "Kimba (T-Ports bunker)",
+    "operator": "T-Ports",
+    "role": "upcountry",
+    "status": "closed_2025_26_season",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node; facility 'east of Kimba township' per Grain Central",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/",
+    "capacity_t": 150000,
+    "capacity_provenance": "https://tports.com/lucky-bay/ ('Kimba bunker site: 150,000 tonnes in four bunkers')",
+    "region": "western",
+    "sources": [
+     "https://tports.com/lucky-bay/",
+     "https://tports.com/harvest/",
+     "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/"
+    ],
+    "notes": "Built for 2021 harvest",
+    "nearest_osm_silo_m": 440
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.1541,
+     -32.8538
+    ]
+   },
+   "properties": {
+    "name": "Minnipa (closed)",
+    "operator": "ex-Viterra",
+    "role": "closed",
+    "status": "closed_2019",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node",
+    "commodities_2025_26": [],
+    "commodities_source": null,
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "sources": [
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/"
+    ],
+    "notes": "Closed in Viterra's 2019 network rationalisation after EP rail shutdown"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     135.5553,
+     -33.1335
+    ]
+   },
+   "properties": {
+    "name": "Kyancutta (closed)",
+    "operator": "ex-Viterra",
+    "role": "closed",
+    "status": "closed_2019",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node",
+    "commodities_2025_26": [],
+    "commodities_source": null,
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "sources": [
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
+    ],
+    "notes": "Closed 2019"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     134.7098,
+     -32.5854
+    ]
+   },
+   "properties": {
+    "name": "Cungena (closed)",
+    "operator": "ex-Viterra",
+    "role": "closed",
+    "status": "closed_2019",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node",
+    "commodities_2025_26": [],
+    "commodities_source": null,
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "sources": [
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
+    ],
+    "notes": "Closed permanently 2019 (dormant before)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.3227,
+     -33.3495
+    ]
+   },
+   "properties": {
+    "name": "Waddikee (closed)",
+    "operator": "ex-Viterra",
+    "role": "closed",
+    "status": "closed_2019",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node",
+    "commodities_2025_26": [],
+    "commodities_source": null,
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "sources": [
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
+    ],
+    "notes": "Closed permanently 2019; rail-served until May 2019"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.2258,
+     -33.5877
+    ]
+   },
+   "properties": {
+    "name": "Kielpa (closed)",
+    "operator": "ex-Viterra",
+    "role": "closed",
+    "status": "closed_2019",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node",
+    "commodities_2025_26": [],
+    "commodities_source": null,
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "sources": [
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
+    ],
+    "notes": "Closed permanently 2019"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     136.228,
+     -33.9432
+    ]
+   },
+   "properties": {
+    "name": "Wharminda (closed)",
+    "operator": "ex-Viterra",
+    "role": "closed",
+    "status": "closed_2019",
+    "coord_precision": "town",
+    "coord_source": "Nominatim/OSM town node",
+    "commodities_2025_26": [],
+    "commodities_source": null,
+    "capacity_t": null,
+    "capacity_provenance": null,
+    "region": "western",
+    "sources": [
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
+    ],
+    "notes": "Closed permanently 2019"
+   }
+  }
+ ]
+}

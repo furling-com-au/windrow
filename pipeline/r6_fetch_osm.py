@@ -41,19 +41,38 @@ out tags center;
 
 
 def run_query(name: str, query: str, dest: Path):
+    """POST via curl: overpass-api.de returns 406 to httpx's fingerprint but accepts curl."""
+    import subprocess
+    import tempfile
+
     if dest.exists() and dest.stat().st_size > 0:
         print(f"{name}: cached ({dest.stat().st_size/1e6:.1f} MB)")
         return
-    with httpx.Client(headers={"User-Agent": UA}, timeout=1000) as client:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", suffix=".ql", delete=False, encoding="utf-8") as tf:
+        tf.write(query)
+        qfile = tf.name
+    try:
         for attempt in range(4):
-            r = client.post(OVERPASS, data={"data": query})
-            if r.status_code == 200:
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                dest.write_bytes(r.content)
-                print(f"{name}: {len(r.content)/1e6:.1f} MB")
+            proc = subprocess.run(
+                [
+                    "curl", "-sS", "--max-time", "1000", "-A", UA,
+                    "--data-urlencode", f"data@{qfile}",
+                    "-o", str(dest), "-w", "%{http_code}",
+                    OVERPASS,
+                ],
+                capture_output=True,
+                text=True,
+            )
+            code = proc.stdout.strip()
+            if proc.returncode == 0 and code == "200" and dest.exists() and dest.stat().st_size > 0:
+                print(f"{name}: {dest.stat().st_size/1e6:.1f} MB", flush=True)
                 return
-            print(f"{name}: HTTP {r.status_code}, retrying in {30*(attempt+1)} s")
+            print(f"{name}: HTTP {code} (curl rc {proc.returncode}), retrying in {30*(attempt+1)} s", flush=True)
+            dest.unlink(missing_ok=True)
             time.sleep(30 * (attempt + 1))
+    finally:
+        Path(qfile).unlink(missing_ok=True)
     raise RuntimeError(f"overpass failed for {name}")
 
 
