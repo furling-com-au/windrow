@@ -54,6 +54,19 @@ This file is the canonical record of where the project is. Updated as work proce
 - Data quirks handled: AMSA Feb–Apr 2024 half-day coverage (16 h visit merge); May 2024 `_Pt` case; Flinders 3 workbook layouts + duplicate Copy-of/V2 files; Overpass 406 on "crawler" UAs; several hosts 403 non-browser TLS (curl fallback); WebFetch blocked for web.archive.org (curl).
 - All fetch scripts idempotent; raw cache 1.6 GB, 398+ files hashed in MANIFEST.sha256.
 
+### 2026-08-19 (cash-price capture + $/t premium display)
+- Discovered the operator's cash-pricing page is fed by `mobilews.viterra.com.au/api/ActivePurchaseOption`
+  (one record per posted bid; expires next-day noon Adelaide, **no history published**).
+  Today: 150 bids, 24 SA/Vic sites, buyers Inghams + Bunge, **zero EP sites** (off-season).
+- `pipeline/r7_fetch_cash_prices.py` + `.github/workflows/prices.yml` (daily 12:30 ACST):
+  raw snapshot → `data/raw/cash_prices/` (+manifest, local only); compact committed series +
+  `summary.json` → `data/processed/cash_prices/` (app imports it at build time).
+- App: median posted bids shown under the dollar-rate levers ("what grain actually sells
+  for"); Lucky Bay lever now also reads as an equivalent cash premium (A23: attract
+  multiplier ⇄ $/t via the power-law choice equivalence + A18 freight over a 90-min haul).
+- Display-only by design. v2 upgrade path (net-price site choice from the accumulated EP
+  bid series, needs recalibration) registered in A23 — not building without a go-ahead.
+
 ## Key decisions
 
 - Repo root = `C:\Users\justi\grain_simulation` (spec layout §10). `data/raw/` git-ignored, manifest committed.

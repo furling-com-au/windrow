@@ -44,6 +44,25 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   for T-Ports/closed sites + 2025/26 segregations read from the public segregations page).
 - **Local cache**: `data/raw/operator_sites/`
 
+## operator-cash-prices-api
+- **What**: live daily cash bids ("active purchase options") posted by buyers at
+  Bunge/Viterra receival sites — site × commodity × grade × buyer × price × payment
+  terms, with `startDate`/`endDate` (bids expire next-day 12:00, so the feed is
+  **ephemeral**; no history is published). Backs the public page
+  `bunge.com.au/agriculture/delivering-to-sa-vic-sites/cash-pricing`.
+- **URL**: `https://mobilews.viterra.com.au/api/ActivePurchaseOption` (plus
+  `/api/Commodity`, `/api/SiteGrade` for lookups).
+- **Retrieved**: 2026-08-19 (150 bids, 24 sites, buyers Inghams + Bunge; **no Eyre
+  Peninsula sites carried an active bid on this off-season date** — EP sites exist in
+  `/api/Sites` but had no bids). **Licence**: operator-published data backing a public
+  page; indicative prices, attribute Bunge.
+- **Used for**: indicative price display in the app (econ panel context line, A23
+  Lucky Bay premium translation). Never affects sim behaviour (that's the v2 upgrade
+  path in A23). Captured **daily** by `.github/workflows/prices.yml` →
+  `pipeline/r7_fetch_cash_prices.py`, because each day's board cannot be re-fetched
+  later; compact committed series in `data/processed/cash_prices/`.
+- **Format**: JSON. **Local cache**: `data/raw/cash_prices/`
+
 ## amsa-cts-aodn-parquet
 - **What**: AMSA Craft Tracking System vessel positions (speed, course, draught, type,
   length, anonymised per-vessel `craftID`), monthly files, Oct 2023 – May 2026 (32

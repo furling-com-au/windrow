@@ -4,6 +4,8 @@
  * All outputs are labelled "indicative" in the UI — this is a what-if lens, not a
  * costing model.
  */
+import { defaultParams } from "@windrow/sim";
+import priceSummary from "../../../data/processed/cash_prices/summary.json";
 
 /** A$/tonne-km road grain freight (A18). Sanity: x ~144 km avg site->port haul
  *  ≈ A$14/t cartage, consistent with published $60-75/t whole-of-chain at 200 km
@@ -29,6 +31,33 @@ export const FARMGATE_PER_T: Record<string, number> = {
   "2025/26": 380,
   "2026/27": 380,
 };
+
+/** Most recent day's posted cash bids from the operator's public board (site-level
+ *  "active purchase options", mobilews API — see SOURCES.md operator-cash-prices-api).
+ *  Captured daily by .github/workflows/prices.yml into data/processed/cash_prices/ and
+ *  baked in here at build time, so the weekly redeploy refreshes the levels shown.
+ *  epBids = bids at Eyre Peninsula sites: 0 off-season; buyers post there at harvest. */
+export const CASH_BIDS = (() => {
+  const days = Object.entries(priceSummary.days).filter(([, d]) => d.bids > 0);
+  const last = days[days.length - 1];
+  if (!last) return null;
+  const [date, d] = last;
+  return { date, bids: d.bids, sites: d.sites, epBids: d.epBids, medianPerT: d.medianPerT as Record<string, number> };
+})();
+
+/** A23: express a Lucky Bay attractiveness multiplier as an equivalent cash premium.
+ *  Site choice is weight = attract / cost^β (β = calibrated choiceBeta), so multiplying
+ *  attract by m shrinks a farm's generalized cost by the fraction 1 − m^(−1/β); that
+ *  saving is priced with the A18 freight rate over a representative eastern-peninsula
+ *  haul (90 generalized minutes at 80 km/h). Indicative — the sim itself has no money. */
+export const REP_HAUL_MIN = 90;
+export const REP_SPEED_KMH = 80;
+export function biasToPremiumPerT(mult: number, freightPerTKm: number): number {
+  if (mult <= 0) return -Infinity;
+  const beta = defaultParams().choiceBeta;
+  const minutesSaved = REP_HAUL_MIN * (1 - Math.pow(mult, -1 / beta));
+  return minutesSaved * (REP_SPEED_KMH / 60) * freightPerTKm;
+}
 
 export function fmtMoney(aud: number): string {
   const a = Math.abs(aud);

@@ -1,0 +1,33 @@
+name: daily-cash-price-capture
+# The operator's cash-bid feed expires next-day noon and publishes no history —
+# every uncaptured day is lost. This captures the compact series into
+# data/processed/cash_prices/ (the app reads summary.json at build time, so the
+# weekly live-season refresh picks up fresh price levels automatically).
+on:
+  schedule:
+    - cron: "30 2 * * *" # 12:00/13:00 Adelaide — after the morning bids post
+  workflow_dispatch:
+
+concurrency:
+  group: prices
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: capture today's cash-bid board
+        run: uv run --no-project --with httpx --with tzdata python pipeline/r7_fetch_cash_prices.py
+      - name: commit the day's capture
+        run: |
+          git config user.name "windrow-live-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/processed/cash_prices/
+          git diff --cached --quiet || git commit -m "prices: daily cash-bid capture [skip ci]"
+          git pull --rebase origin master
+          git push

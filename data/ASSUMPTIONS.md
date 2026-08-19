@@ -197,6 +197,26 @@ presented as measured data.
   rather than guessed.
 - **Sensitivity**: linear on the displayed holding dollars; labelled indicative.
 
+## A23 — site-attractiveness ⇄ cash-premium translation (economics layer, indicative)
+- **Value**: a Lucky Bay attractiveness multiplier m is displayed as an equivalent cash
+  premium of `90 min × (1 − m^(−1/β)) × (80/60 km/min) × A18 freight rate` A$/t, with
+  β the calibrated choiceBeta (1.965). Default constants: representative eastern-EP
+  haul 90 generalized minutes (drive + queue + service), 80 km/h effective speed.
+  Example: the 2.5× scenario ≈ +$6/t at the default 10¢/t·km rate.
+- **Used in**: app only (Lucky Bay lever readout, scenario story, About). Never affects
+  sim behaviour — site choice stays `attract / cost^β` on minutes.
+- **Reasoning**: in a Huff-style power-law choice, multiplying attractiveness by m is
+  identical to shrinking generalized cost by the factor m^(−1/β); pricing that shrinkage
+  at the road freight rate expresses the fitted bias in the units growers actually see
+  (a $/t site premium). T-Ports' public launch pitch was precisely price/convenience
+  incentives, so the translation direction is meaningful even though the representative
+  haul is a modelling choice.
+- **Sensitivity**: linear in the representative haul and freight rate; only the
+  displayed $/t label changes.
+- **Upgrade path**: v2 net-price site choice using the captured daily cash-bid series
+  (data/processed/cash_prices/) once a harvest of EP bids exists — then premiums are
+  data, not a translation.
+
 ## A13 — vessel arrival schedules for seasons before stem coverage
 - **Value**: for seasons where archived stem snapshots are sparse (2021/22–2023/24
   ≈ monthly snapshots), vessel arrivals derive from AIS-observed berth visits instead of

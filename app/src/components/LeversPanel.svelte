@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FARMGATE_PER_T, fmtMoney } from "../lib/economics";
+  import { CASH_BIDS, FARMGATE_PER_T, biasToPremiumPerT, fmtMoney } from "../lib/economics";
   import { DEFAULT_ASSUMP, DEFAULT_ECON, DEFAULT_LEVERS, SCENARIOS, app } from "../state.svelte";
 
   let showAssump = $state(false);
@@ -192,6 +192,9 @@
   });
 
   /** raw deltas vs the baseline run at the same simulated day */
+  /** Lucky Bay lever expressed as an equivalent cash premium vs today's calibrated pull (A23) */
+  let lbPremium = $derived(biasToPremiumPerT(app.levers.luckyBayBias / DEFAULT_LEVERS.luckyBayBias, app.econ.freightPerTKm));
+
   let deltas = $derived.by(() => {
     const s = app.snap;
     const b = app.baseline;
@@ -361,8 +364,8 @@
       <input type="range" min="300" max="800" step="10" value={app.levers.fleetTrucks}
         oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="How strongly the competing T-Ports Lucky Bay system attracts nearby farmers (price incentives, service). Push it up and eastern-peninsula grain drains away from the main network.">
-      <span>Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, 0.651)}</b></span>
+    <label title="How strongly the competing T-Ports Lucky Bay system attracts nearby farmers (price incentives, service). Push it up and eastern-peninsula grain drains away from the main network. The $/t figure translates the pull into an equivalent cash premium for a typical eastern-peninsula farm (90 min generalized haul, priced at the freight rate — A23).">
+      <span>Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, 0.651)}{Math.abs(lbPremium) >= 0.5 ? ` ≈ ${lbPremium > 0 ? "+" : "−"}$${Math.abs(lbPremium).toFixed(0)}/t premium` : ""}</b></span>
       <input type="range" min="0.2" max="3" step="0.1" value={app.levers.luckyBayBias}
         oninput={(e) => set("luckyBayBias", parseFloat(e.currentTarget.value))} />
     </label>
@@ -428,6 +431,13 @@
           <span>On-farm holding <b>{(app.econ.holdingPerTDay * 100).toFixed(0)}¢ /t/day</b></span>
           <input type="range" min="0.05" max="0.15" step="0.005" value={app.econ.holdingPerTDay} oninput={(e) => setE("holdingPerTDay", parseFloat(e.currentTarget.value))} />
         </label>
+        {#if CASH_BIDS}
+          <div class="fine" title="Median of the buyers' posted site bids on the operator's public cash-pricing board (captured daily — see About). Off-season these are mid-north SA / Mallee / Vic sites; buyers post at Eyre Peninsula sites around harvest.">
+            What grain actually sells for — posted cash bids, {CASH_BIDS.date}
+            ({CASH_BIDS.bids} bids{CASH_BIDS.epBids > 0 ? `, ${CASH_BIDS.epBids} at EP sites` : ", none at EP sites off-season"}):
+            {Object.entries(CASH_BIDS.medianPerT).map(([c, v]) => `${c.toLowerCase()} ~$${Math.round(v)}/t`).join(" · ")}.
+          </div>
+        {/if}
         <div class="fine">Not adjustable (baked into the data): district boundaries (A14), climate source (A6), demand spreading (A3), AIS geofences (A8) — see ASSUMPTIONS.md.</div>
       </div>
     {/if}

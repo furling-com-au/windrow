@@ -45,6 +45,18 @@
       published seasonal totals. They are meant for comparing scenarios, not for costing
       anything (assumptions A18–A19, A22 in the repository).
     </p>
+    <p>
+      For a reality anchor, the assumptions panel also shows the median of the <b>real cash
+      bids</b> buyers post daily on the operator's public site-pricing board (per site,
+      commodity and grade). Those bids expire the next day and no history is published, so
+      this project captures the board once a day into its open dataset. Off-season the
+      bids cover mid-north SA and Victorian sites only; buyers post at Eyre Peninsula
+      sites around harvest. The "Lucky Bay pull" lever is also translated into an
+      equivalent cash premium: making a site more attractive in the model works like
+      shortening a farm's effective trip, and that saving is priced at the freight rate
+      over a typical 90-minute eastern-peninsula haul (A23). Indicative only — the
+      simulation itself moves tonnes, not money.
+    </p>
     <h3>Key data sources</h3>
     <ul>
       <li>Weekly harvest reports — Viterra/Bunge (2016/17–2025/26, via the Internet Archive)</li>
