@@ -287,13 +287,13 @@
   {#if app.snap}
     <div class="kpis">
       <div class="kpi" title="Grain delivered into silos and ports so far (simulated). 'actual' = the operator's published figure to this date.">
-        <span class="v">{fmtMt(app.snap.kpi.receivedT)}</span>
-        <span class="l">grain delivered (sim)</span>
-        {#if obsCumAtDay != null}<span class="o">actual {fmtMt(obsCumAtDay)}</span>{/if}
+        <span class="v">{(app.snap.kpi.receivedT / 1e6).toFixed(2)}</span>
+        <span class="l">million t delivered (sim)</span>
+        {#if obsCumAtDay != null}<span class="o">actual {(obsCumAtDay / 1e6).toFixed(2)}</span>{/if}
       </div>
       <div class="kpi" title="Grain loaded onto ships so far (simulated)">
-        <span class="v">{fmtMt(app.snap.kpi.shippedT)}</span>
-        <span class="l">shipped out</span>
+        <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
+        <span class="l">million t shipped out</span>
       </div>
       <div class="kpi" title="Trucks waiting to unload across all sites right now">
         <span class="v">{app.snap.kpi.queueTrucks}</span>

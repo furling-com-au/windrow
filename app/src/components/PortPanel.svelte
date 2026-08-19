@@ -52,14 +52,14 @@
       <div class="port" class:major={i === 0}>
         <div class="phead">
           <span class="pname">{p.short}</span>
-          <span class="pstock" title="{Math.round(p.stockT).toLocaleString()} tonnes in storage at this port">{(p.stockT / 1000).toFixed(0)} kt stored</span>
+          <span class="pstock" title="tonnes of grain in storage at this port">{Math.round(p.stockT / 1000) * 1000 >= 1000 ? (Math.round(p.stockT / 1000) * 1000).toLocaleString() : Math.round(p.stockT).toLocaleString()} t stored</span>
           {#if p.waiting > 0}<span class="wait">{p.waiting} at anchor</span>{/if}
         </div>
         {#each p.berthed as v}
           <div class="vessel">
             <span class="vname">{v.name}</span>
             <div class="bar"><div class="fill" style="width:{v.pct}%"></div></div>
-            <span class="vt">{(v.loadedT / 1000).toFixed(0)}/{(v.targetT / 1000).toFixed(0)} kt</span>
+            <span class="vt" title="loaded / planned cargo, thousand tonnes">{(v.loadedT / 1000).toFixed(0)}k / {(v.targetT / 1000).toFixed(0)}k t</span>
           </div>
         {:else}
           <div class="idle">berth idle</div>

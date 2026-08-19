@@ -25,6 +25,14 @@
       Site storage capacities for upcountry sites and truck cycle parameters are assumptions —
       see ASSUMPTIONS.md in the repository.
     </p>
+    <h3>How the dollar figures are estimated</h3>
+    <p>
+      The "what this changes" figures are rough, order-of-magnitude estimates: trucking at
+      ~10¢ per tonne-kilometre, ship waiting at ~A$30,000 per vessel-day, and farm-gate
+      value at ~$375–405 per tonne derived from PIRSA's published seasonal totals. They are
+      meant for comparing scenarios, not for costing anything (assumptions A18–A19 in the
+      repository).
+    </p>
     <h3>Key data sources</h3>
     <ul>
       <li>Weekly harvest reports — Viterra/Bunge (2016/17–2025/26, via the Internet Archive)</li>

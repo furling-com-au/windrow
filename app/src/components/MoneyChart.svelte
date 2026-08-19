@@ -57,8 +57,9 @@
 </script>
 
 <div class="chart">
-  <div class="title" title="Cumulative grain delivered into the network's Eyre Peninsula sites (million tonnes)">
+  <div class="title" title="Cumulative grain delivered into the network's Eyre Peninsula sites">
     Grain delivered — <span class="sim">simulated</span> vs <span class="obs">actual</span>
+    <span class="unit">million tonnes</span>
   </div>
   <svg viewBox="0 0 {W} {H}">
     {#each [0.25, 0.5, 0.75, 1] as g}
@@ -109,6 +110,11 @@
   .title .obs {
     color: #e8c568;
     font-weight: 600;
+  }
+  .title .unit {
+    float: right;
+    color: #64788c;
+    font-size: 9px;
   }
   svg {
     width: 100%;

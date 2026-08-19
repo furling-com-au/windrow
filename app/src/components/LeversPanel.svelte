@@ -27,60 +27,126 @@
     dir: "up" | "down" | "flat";
   }
 
-  let takeaways = $derived.by((): Takeaway[] => {
+  /** raw deltas vs the baseline run at the same simulated day */
+  let deltas = $derived.by(() => {
     const s = app.snap;
     const b = app.baseline;
-    if (!s || !b || b.receivedByDay.length === 0) return [];
+    if (!s || !b || b.receivedByDay.length === 0) return null;
     const i = Math.max(0, Math.min(s.day - 1, b.receivedByDay.length - 1));
-    const out: Takeaway[] = [];
-    const kt = (t: number) => `${t > 0 ? "+" : "−"}${Math.abs(t / 1000).toFixed(0)} kt`;
-
-    const dRec = s.kpi.receivedT - (b.receivedByDay[i] ?? 0);
-    if (Math.abs(dRec) > 20000)
-      out.push({ text: `Grain delivered ${kt(dRec)} vs the real season`, dir: dRec > 0 ? "up" : "down" });
-
+    const baseRec = b.receivedByDay[i] ?? 0;
+    const dRec = s.kpi.receivedT - baseRec;
     const dLb = s.kpi.receivedLbT - (b.lbByDay[i] ?? 0);
-    if (Math.abs(dLb) > 10000)
-      out.push({ text: `Lucky Bay (T-Ports) intake ${kt(dLb)}`, dir: dLb > 0 ? "up" : "down" });
-
     const dShip = s.kpi.shippedT - (b.shippedByDay[i] ?? 0);
-    if (Math.abs(dShip) > 20000)
-      out.push({ text: `Shipped out ${kt(dShip)}`, dir: dShip > 0 ? "up" : "down" });
-
     const dTkm = s.kpi.tonneKm - (b.tonneKmByDay[i] ?? 0);
     const freight = dTkm * FREIGHT_PER_T_KM;
-    if (Math.abs(freight) > 150000)
-      out.push({
-        text: `Trucking task ${dTkm > 0 ? "+" : "−"}${Math.abs(dTkm / 1e6).toFixed(1)}M tonne-km`,
-        money: `${freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(freight))} freight`,
-        dir: freight > 0 ? "up" : "down",
-      });
-
-    const q0 = b.queueByDay[i] ?? 0;
-    if (Math.abs(s.kpi.peakQueue - q0) > 15)
-      out.push({ text: `Worst truck queue ${s.kpi.peakQueue} vs ${q0}`, dir: s.kpi.peakQueue > q0 ? "up" : "down" });
-
+    const baseQ = b.queueByDay[i] ?? 0;
+    const dQrel = baseQ > 20 ? (s.kpi.peakQueue - baseQ) / baseQ : 0;
     const waitDays = (s.kpi.meanWaitH * s.kpi.vesselsArrived) / 24;
     const baseWaitDays = ((b.waitByDay[i] ?? 0) * (b.arrivedByDay[i] ?? 0)) / 24;
     const demurrage = (waitDays - baseWaitDays) * DEMURRAGE_PER_DAY;
-    if (Math.abs(demurrage) > 200000)
-      out.push({
-        text: `Ships waiting ${s.kpi.meanWaitH.toFixed(0)} h each vs ${(b.waitByDay[i] ?? 0).toFixed(0)} h`,
-        money: `${demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(demurrage))} waiting cost`,
-        dir: demurrage > 0 ? "up" : "down",
-      });
-
+    let farmgate = 0;
     if (app.levers.productionScale !== 1.0 && app.observed) {
       const prod = Object.values(app.observed.district_production_t ?? {}).reduce((a, v) => a + v, 0);
-      if (prod > 0) {
-        const dv = (app.levers.productionScale - 1) * prod * (FARMGATE_PER_T[app.season] ?? 380);
-        out.push({
-          text: `Crop ${app.levers.productionScale > 1 ? "+" : "−"}${Math.abs((app.levers.productionScale - 1) * 100).toFixed(0)}%`,
-          money: `${dv > 0 ? "+" : "−"}${fmtMoney(Math.abs(dv))} farm-gate value`,
-          dir: dv > 0 ? "up" : "down",
-        });
-      }
+      farmgate = (app.levers.productionScale - 1) * prod * (FARMGATE_PER_T[app.season] ?? 380);
     }
+    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0 };
+  });
+
+  const tonnes = (t: number) => {
+    const a = Math.abs(t);
+    if (a >= 950000) return `${(a / 1e6).toFixed(1)} million tonnes`;
+    return `${(Math.round(a / 1000) * 1000).toLocaleString()} tonnes`;
+  };
+  const pct = (f: number) => `${Math.abs(f * 100).toFixed(Math.abs(f) < 0.02 ? 1 : 0)}%`;
+
+  /** plain-English sentences for Simple mode, most important first */
+  let sentences = $derived.by((): { verdict: string; lines: string[] } | null => {
+    const d = deltas;
+    if (!d || app.scenario === "baseline") return null;
+    const lines: string[] = [];
+
+    if (d.farmgate !== 0) {
+      lines.push(
+        `A crop ${pct(app.levers.productionScale - 1)} ${app.levers.productionScale > 1 ? "bigger" : "smaller"} is worth about ${fmtMoney(Math.abs(d.farmgate))} ${d.farmgate > 0 ? "more" : "less"} to farmers at the gate.`,
+      );
+    }
+    if (Math.abs(d.relRec) >= 0.02 && Math.abs(d.dRec) > 20000) {
+      lines.push(`${tonnes(d.dRec)} ${d.dRec > 0 ? "more" : "less"} grain reaches the silos and ports (${d.dRec > 0 ? "+" : "−"}${pct(d.relRec)}).`);
+    }
+    if (Math.abs(d.dLb) > 10000) {
+      lines.push(
+        d.dLb > 0
+          ? `${tonnes(d.dLb)} of deliveries shift to the rival Lucky Bay port instead.`
+          : `${tonnes(d.dLb)} of deliveries shift away from Lucky Bay back to the main network.`,
+      );
+    }
+    if (Math.abs(d.freight) > 300000) {
+      lines.push(`Trucks travel ${d.freight > 0 ? "further" : "less"} overall — roughly ${fmtMoney(Math.abs(d.freight))} ${d.freight > 0 ? "extra" : "saved"} in freight.`);
+    }
+    if (Math.abs(d.dQrel) >= 0.15) {
+      lines.push(`Queues at the busiest silo peak about ${pct(d.dQrel)} ${d.dQrel > 0 ? "longer" : "shorter"} than the real season.`);
+    }
+    if (Math.abs(d.demurrage) > 500000) {
+      lines.push(
+        `Ships wait about ${Math.round(d.waitNow)} hours each at anchor (normally ~${Math.round(d.waitBase)}) — roughly ${fmtMoney(Math.abs(d.demurrage))} in ${d.demurrage > 0 ? "extra" : "avoided"} waiting costs.`,
+      );
+    }
+    if (Math.abs(d.dShip) > 50000) {
+      lines.push(`${tonnes(d.dShip)} ${d.dShip > 0 ? "more" : "less"} grain gets shipped out by season's end.`);
+    }
+
+    // verdict: lead with the shape of the outcome, not a number
+    let verdict: string;
+    if (d.farmgate !== 0) {
+      verdict =
+        app.levers.productionScale > 1
+          ? "A bigger crop gets through — but watch the queues and where the surplus goes."
+          : "A smaller crop: the pain is in what farmers don't harvest, not in moving it.";
+    } else if (Math.abs(d.relRec) < 0.02) {
+      const costs: string[] = [];
+      if (d.dQrel >= 0.15) costs.push("longer queues");
+      if (d.freight > 300000) costs.push("extra trucking");
+      if (d.demurrage > 500000) costs.push("ships waiting");
+      verdict = costs.length
+        ? `The system absorbs this: almost the same grain gets through — the price is ${costs.join(" and ")}.`
+        : "Barely any difference from the real season.";
+    } else if (d.relRec <= -0.02) {
+      verdict = `The main network handles ${pct(d.relRec)} less grain${d.dLb > 10000 ? " — much of it goes to Lucky Bay instead" : ""}.`;
+    } else {
+      verdict = `The network handles ${pct(d.relRec)} more grain than the real season.`;
+    }
+    return { verdict, lines: lines.slice(0, 4) };
+  });
+
+  /** compact metric rows for Advanced mode */
+  let takeaways = $derived.by((): Takeaway[] => {
+    const d = deltas;
+    if (!d) return [];
+    const out: Takeaway[] = [];
+    const kt = (t: number) => `${t > 0 ? "+" : "−"}${Math.abs(t / 1000).toFixed(0)} kt`;
+    if (Math.abs(d.dRec) > 20000) out.push({ text: `Grain delivered ${kt(d.dRec)} vs baseline`, dir: d.dRec > 0 ? "up" : "down" });
+    if (Math.abs(d.dLb) > 10000) out.push({ text: `Lucky Bay (T-Ports) intake ${kt(d.dLb)}`, dir: d.dLb > 0 ? "up" : "down" });
+    if (Math.abs(d.dShip) > 20000) out.push({ text: `Shipped out ${kt(d.dShip)}`, dir: d.dShip > 0 ? "up" : "down" });
+    if (Math.abs(d.freight) > 150000)
+      out.push({
+        text: `Trucking task ${d.dTkm > 0 ? "+" : "−"}${Math.abs(d.dTkm / 1e6).toFixed(1)}M tonne-km`,
+        money: `${d.freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.freight))} freight`,
+        dir: d.freight > 0 ? "up" : "down",
+      });
+    if (app.snap && Math.abs(app.snap.kpi.peakQueue - d.baseQ) > 15)
+      out.push({ text: `Peak site queue ${app.snap.kpi.peakQueue} vs ${d.baseQ} trucks`, dir: app.snap.kpi.peakQueue > d.baseQ ? "up" : "down" });
+    if (Math.abs(d.demurrage) > 200000)
+      out.push({
+        text: `Vessel wait ${Math.round(d.waitNow)} h vs ${Math.round(d.waitBase)} h`,
+        money: `${d.demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.demurrage))} demurrage-equiv.`,
+        dir: d.demurrage > 0 ? "up" : "down",
+      });
+    if (d.farmgate !== 0)
+      out.push({
+        text: `Crop ${app.levers.productionScale > 1 ? "+" : "−"}${pct(app.levers.productionScale - 1)}`,
+        money: `${d.farmgate > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.farmgate))} farm-gate`,
+        dir: d.farmgate > 0 ? "up" : "down",
+      });
     return out;
   });
 </script>
@@ -122,7 +188,20 @@
     <div class="fine hint">Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself.</div>
   {/if}
 
-  {#if takeaways.length}
+  {#if app.viewMode === "simple"}
+    {#if sentences && (sentences.lines.length || sentences.verdict)}
+      <div class="tk">
+        <div class="tkt">What this changes</div>
+        <p class="verdict">{sentences.verdict}</p>
+        <ul class="plain">
+          {#each sentences.lines as l}<li>{l}</li>{/each}
+        </ul>
+        <div class="fine">Dollar figures are rough, order-of-magnitude estimates — see “About” for how they're worked out.</div>
+      </div>
+    {:else if app.scenario !== "baseline" && app.baseline}
+      <div class="tk"><div class="fine">Let the season play — what this scenario changes will be summed up here.</div></div>
+    {/if}
+  {:else if takeaways.length}
     <div class="tk">
       <div class="tkt">What changed{app.snap && app.snap.day < 360 ? ` (to ${app.snap.dateIso})` : ""}</div>
       {#each takeaways as t}
@@ -134,7 +213,7 @@
       <div class="fine">Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (assumptions A18–A19).</div>
     </div>
   {:else if app.scenario !== "baseline" && app.baseline}
-    <div class="tk"><div class="fine">Play the season — differences from the normal season appear here.</div></div>
+    <div class="tk"><div class="fine">Play the season — deltas vs baseline appear here.</div></div>
   {/if}
 </div>
 
@@ -239,5 +318,24 @@
   }
   .hint b {
     color: #9db1c5;
+  }
+  .verdict {
+    margin: 2px 0 6px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #ffe9c2;
+    font-weight: 600;
+  }
+  ul.plain {
+    margin: 0;
+    padding-left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  ul.plain li {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #c8d4e0;
   }
 </style>

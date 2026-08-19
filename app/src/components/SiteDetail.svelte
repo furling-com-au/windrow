@@ -35,8 +35,8 @@
     </div>
 
     <div class="row">
-      <span>storage {Math.round(view.stockT / 1000)} / {Math.round(capT / 1000)} kt {capAssumed ? "(capacity assumed, A4)" : ""}</span>
-      <span class="q" class:hot={view.queue > 15}>{view.queue} queued</span>
+      <span title="grain in storage / storage capacity">{(Math.round(view.stockT / 100) * 100).toLocaleString()} t of {capT.toLocaleString()} t {capAssumed ? "(capacity assumed)" : ""}</span>
+      <span class="q" class:hot={view.queue > 15}>{view.queue} trucks queued</span>
     </div>
     <div class="stack">
       {#each view.stockByC as t, i}
@@ -47,11 +47,11 @@
     </div>
     <div class="cl">
       {#each view.stockByC as t, i}
-        {#if t > 500}<span><i style="background:{C_COLORS[i]}"></i>{COMMODITIES[i]} {Math.round(t / 1000)}kt</span>{/if}
+        {#if t > 500}<span><i style="background:{C_COLORS[i]}"></i>{COMMODITIES[i]} {Math.round(t / 1000)}k t</span>{/if}
       {/each}
     </div>
 
-    <div class="row2">season received (sim): <b>{(view.cumReceivedT / 1000).toFixed(0)} kt</b></div>
+    <div class="row2">delivered here this season (sim): <b>{view.cumReceivedT.toLocaleString()} t</b></div>
     {#if spark}
       <svg viewBox="0 0 220 34"><polyline points={spark} fill="none" stroke="#6fd3a0" stroke-width="1.6" /></svg>
       <div class="fine">cumulative receivals over the season (simulated)</div>
