@@ -57,7 +57,7 @@
       app.playing = false; // worker pauses itself on init; keep the UI in sync
       resetHistories();
       const dataBase = new URL(import.meta.env.BASE_URL + "data/", location.href).toString();
-      post({ type: "init", season: app.season, paramsPatch: leversToPatch(app.levers), seed: 42, dataBase });
+      post({ type: "init", season: app.season, paramsPatch: leversToPatch(app.levers, app.assump), seed: 42, dataBase });
     }, debounceMs);
   }
 

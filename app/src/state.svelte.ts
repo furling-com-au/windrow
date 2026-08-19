@@ -41,7 +41,35 @@ export const SCENARIOS: { id: ScenarioId; label: string; story: string; levers: 
   { id: "roadclosure", label: "Tod Highway closed", story: "The peninsula's central spine is impassable (detours = 2.5× travel time). Trucks re-sort toward Lincoln Highway sites.", levers: { roadClosure: true } },
 ];
 
-export function leversToPatch(l: Levers): Partial<Params> {
+/** assumption levers: defaults = the registered assumptions (A1/A2/A5/A7/A12/A17/A4) */
+export interface AssumpLevers {
+  payloadT: number; // A1
+  serviceMin: number; // A2
+  travelScale: number; // A5
+  rainStopMm: number; // A7
+  retention: number; // A12 (fitted, but a model guess growers may dispute)
+  carryInScale: number; // A17
+  capScale: number; // A4
+}
+export const DEFAULT_ASSUMP: AssumpLevers = {
+  payloadT: 38,
+  serviceMin: 12,
+  travelScale: 1.0,
+  rainStopMm: 5,
+  retention: 0.1,
+  carryInScale: 1.0,
+  capScale: 1.0,
+};
+
+/** dollar-rate levers (display-only; never affect the sim) */
+export interface EconLevers {
+  freightPerTKm: number; // A18
+  shipDayCost: number; // A19
+  holdingPerTDay: number; // A22
+}
+export const DEFAULT_ECON: EconLevers = { freightPerTKm: 0.1, shipDayCost: 30000, holdingPerTDay: 0.09 };
+
+export function leversToPatch(l: Levers, a: AssumpLevers): Partial<Params> {
   const p: Partial<Params> = {};
   if (l.productionScale !== 1.0) p.productionScale = l.productionScale;
   if (l.luckyBayBias !== DEFAULT_LEVERS.luckyBayBias) p.luckyBayBias = l.luckyBayBias;
@@ -53,6 +81,13 @@ export function leversToPatch(l: Levers): Partial<Params> {
   }
   if (l.outage) p.outage = { port: "Lincoln", fromDay: 70, days: 7 };
   if (l.roadClosure) p.roadClosure = { corridor: "tod", factor: 2.5 };
+  if (a.payloadT !== DEFAULT_ASSUMP.payloadT) p.truckPayloadT = a.payloadT;
+  if (a.serviceMin !== DEFAULT_ASSUMP.serviceMin) p.siteServiceMin = a.serviceMin;
+  if (a.travelScale !== DEFAULT_ASSUMP.travelScale) p.travelTimeScale = a.travelScale;
+  if (a.rainStopMm !== DEFAULT_ASSUMP.rainStopMm) p.rainStopMm = a.rainStopMm;
+  if (a.retention !== DEFAULT_ASSUMP.retention) p.retentionShare = a.retention;
+  if (a.carryInScale !== DEFAULT_ASSUMP.carryInScale) p.carryInScale = a.carryInScale;
+  if (a.capScale !== DEFAULT_ASSUMP.capScale) p.upcountryCapScale = a.capScale;
   return p;
 }
 
@@ -81,6 +116,8 @@ class AppState {
   season = $state("2025/26");
   scenario = $state<ScenarioId>("baseline");
   levers = $state<Levers>({ ...DEFAULT_LEVERS });
+  assump = $state<AssumpLevers>({ ...DEFAULT_ASSUMP });
+  econ = $state<EconLevers>({ ...DEFAULT_ECON });
   viewMode = $state<ViewMode>(
     typeof localStorage !== "undefined" && localStorage.getItem("windrow_mode") === "advanced" ? "advanced" : "simple",
   );

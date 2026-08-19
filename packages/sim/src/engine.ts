@@ -216,12 +216,13 @@ export class Sim {
         const rain = w.rain_mm[i] ?? 0;
         const rain2 = (w.rain_mm[i - 1] ?? 0) + rain;
         const tmax = w.tmax_c[i] ?? 25;
+        const rs = params.rainStopMm ?? 5; // A7 threshold (assumption lever)
         let f = 1.0;
-        if (rain >= 5 || rain2 >= 10) f = 0; // A7
-        else if (rain >= 2) f = 0.5;
+        if (rain >= rs || rain2 >= 2 * rs) f = 0;
+        else if (rain >= 0.4 * rs) f = 0.5;
         // hangover: paddocks stay wet after a heavy fall (A7)
-        if ((w.rain_mm[i - 1] ?? 0) >= 8) f *= 0.3;
-        else if ((w.rain_mm[i - 2] ?? 0) >= 8) f *= 0.5;
+        if ((w.rain_mm[i - 1] ?? 0) >= 1.6 * rs) f *= 0.3;
+        else if ((w.rain_mm[i - 2] ?? 0) >= 1.6 * rs) f *= 0.5;
         if (tmax >= 38) f *= 0.75;
         this.weatherFactor[di * 370 + day] = f;
       }
@@ -270,7 +271,7 @@ export class Sim {
       const name = s.name;
       const capacityT =
         s.capacity_t ??
-        (isTports ? 145000 : 120000); // A4: unpublished upcountry capacity (assumed)
+        (isTports ? 145000 : 120000) * (params.upcountryCapScale ?? 1); // A4 assumed (lever-scalable)
       const st: SiteState = {
         idx: this.sites.length,
         name,
@@ -283,7 +284,7 @@ export class Sim {
         bays: isPort ? 4 : 2,
         bayBusyUntil: [],
         queue: [],
-        serviceMin: 12, // A2
+        serviceMin: params.siteServiceMin ?? 12, // A2 (assumption lever)
         accepts,
         cumReceivedT: 0,
         intakeTph: isPort ? (name.includes("Lincoln") ? 4000 : name.includes("Thevenard") ? 1400 : 1000) : 600,
@@ -304,7 +305,9 @@ export class Sim {
         [COMMODITIES.indexOf("barley"), 0.3],
         [COMMODITIES.indexOf("lentils"), 0.15],
       ];
-      const seed = (siteIdx: number, tonnes: number) => {
+      const ciScale = params.carryInScale ?? 1; // A17 (assumption lever)
+      const seed = (siteIdx: number, tonnes0: number) => {
+        const tonnes = tonnes0 * ciScale;
         if (siteIdx < 0 || tonnes <= 0) return;
         const s = this.sites[siteIdx]!;
         for (const [c, share] of SPLIT) s.stock[c] = s.stock[c]! + tonnes * share;
@@ -358,6 +361,13 @@ export class Sim {
           const s = bundle.matrix.sites[cand.site]!;
           if (near(c.lon, c.lat, s.lon, s.lat)) cand.minutes *= params.roadClosure.factor;
         }
+      }
+    }
+    // A5 assumption lever: global travel-time scale
+    const tts = params.travelTimeScale ?? 1;
+    if (tts !== 1) {
+      for (let cl = 0; cl < this.nClusters; cl++) {
+        for (const cand of this.clusterCand[cl]!) cand.minutes *= tts;
       }
     }
 
@@ -774,7 +784,7 @@ export class Sim {
           }
         }
         if (src < 0 || srcT < 100) return;
-        const minutes = this.bundle.matrix.site_minutes[src]![bestPort]!;
+        const minutes = this.bundle.matrix.site_minutes[src]![bestPort]! * (this.params.travelTimeScale ?? 1);
         if (minutes <= 0) return;
         const load = Math.min(tr.payloadT, srcT); // road train ~45 t net; trainset 1,600 t
         const s = this.sites[src]!;

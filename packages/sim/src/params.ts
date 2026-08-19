@@ -34,6 +34,11 @@ export function defaultParams(): Params {
     },
     districtStartOffset: { WEP: -8, EEP: 0, LEP: 8 }, // far west starts first
     harvestRampDays: 7, // *
+    siteServiceMin: 12, // A2 (assumed)
+    travelTimeScale: 1.0, // A5 speeds as built into the matrix
+    rainStopMm: 5, // A7 (assumed threshold)
+    carryInScale: 1.0, // A17 as measured from Oct-Nov shipments
+    upcountryCapScale: 1.0, // A4 assumed capacities as-is
     choiceBeta: 1.965, // * Huff travel-time decay
     portAttractBias: 0.8, // * direct-to-port pull (A9)
     retentionShare: 0.1, // * on-farm retention + non-network channels

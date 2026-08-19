@@ -1,6 +1,21 @@
 <script lang="ts">
-  import { DEMURRAGE_PER_DAY, FARMGATE_PER_T, FREIGHT_PER_T_KM, HOLDING_PER_T_DAY, fmtMoney } from "../lib/economics";
-  import { DEFAULT_LEVERS, SCENARIOS, app } from "../state.svelte";
+  import { FARMGATE_PER_T, fmtMoney } from "../lib/economics";
+  import { DEFAULT_ASSUMP, DEFAULT_ECON, DEFAULT_LEVERS, SCENARIOS, app } from "../state.svelte";
+
+  let showAssump = $state(false);
+
+  function setA<K extends keyof typeof app.assump>(k: K, v: (typeof app.assump)[K]) {
+    app.assump = { ...app.assump, [k]: v };
+    onchange();
+  }
+  function setE<K extends keyof typeof app.econ>(k: K, v: (typeof app.econ)[K]) {
+    app.econ = { ...app.econ, [k]: v }; // display-only: no re-run needed
+  }
+  function resetAssump() {
+    app.assump = { ...DEFAULT_ASSUMP };
+    app.econ = { ...DEFAULT_ECON };
+    onchange();
+  }
 
   let { onchange }: { onchange: () => void } = $props();
 
@@ -19,6 +34,11 @@
   let story = $derived(
     SCENARIOS.find((s) => s.id === app.scenario)?.story ??
       "Custom what-if — you moved the levers. The takeaways below compare your version of the season against the normal one.",
+  );
+
+  /** true when any assumption lever deviates from its registered default */
+  let assumpDirty = $derived(
+    (Object.keys(DEFAULT_ASSUMP) as (keyof typeof DEFAULT_ASSUMP)[]).some((k) => app.assump[k] !== DEFAULT_ASSUMP[k]),
   );
 
   // human-readable lever readouts (raw multipliers mean nothing to a reader)
@@ -54,6 +74,14 @@
     if (l.rail) parts.push("trains running");
     if (l.outage) parts.push("Port Lincoln closed 1 wk (mid-Dec)");
     if (l.roadClosure) parts.push("Tod Hwy closed");
+    const a = app.assump;
+    if (a.payloadT !== DEFAULT_ASSUMP.payloadT) parts.push(`payload ${a.payloadT} t`);
+    if (a.serviceMin !== DEFAULT_ASSUMP.serviceMin) parts.push(`unload ${a.serviceMin} min`);
+    if (a.travelScale !== DEFAULT_ASSUMP.travelScale) parts.push(`travel ×${a.travelScale.toFixed(2)}`);
+    if (a.rainStopMm !== DEFAULT_ASSUMP.rainStopMm) parts.push(`rain stops harvest at ${a.rainStopMm} mm`);
+    if (a.retention !== DEFAULT_ASSUMP.retention) parts.push(`${Math.round(a.retention * 100)}% kept on farm`);
+    if (a.carryInScale !== DEFAULT_ASSUMP.carryInScale) parts.push(`carry-over ×${a.carryInScale.toFixed(1)}`);
+    if (a.capScale !== DEFAULT_ASSUMP.capScale) parts.push(`silo capacity ×${a.capScale.toFixed(1)}`);
     return parts.join(" · ");
   });
 
@@ -174,12 +202,12 @@
     const dLb = s.kpi.receivedLbT - (b.lbByDay[i] ?? 0);
     const dShip = s.kpi.shippedT - (b.shippedByDay[i] ?? 0);
     const dTkm = s.kpi.tonneKm - (b.tonneKmByDay[i] ?? 0);
-    const freight = dTkm * FREIGHT_PER_T_KM;
+    const freight = dTkm * app.econ.freightPerTKm;
     const baseQ = b.queueByDay[i] ?? 0;
     const dQrel = baseQ > 20 ? (s.kpi.peakQueue - baseQ) / baseQ : 0;
     const waitDays = (s.kpi.meanWaitH * s.kpi.vesselsArrived) / 24;
     const baseWaitDays = ((b.waitByDay[i] ?? 0) * (b.arrivedByDay[i] ?? 0)) / 24;
-    const demurrage = (waitDays - baseWaitDays) * DEMURRAGE_PER_DAY;
+    const demurrage = (waitDays - baseWaitDays) * app.econ.shipDayCost;
     let farmgate = 0;
     if (app.levers.productionScale !== 1.0 && app.observed) {
       const prod = Object.values(app.observed.district_production_t ?? {}).reduce((a, v) => a + v, 0);
@@ -193,7 +221,7 @@
       paceLagDays = s.day - j; // positive = behind the real season
     }
     const dOnFarmTd = s.kpi.onFarmTd - (b.onFarmTdByDay?.[i] ?? 0);
-    const holding = dOnFarmTd * HOLDING_PER_T_DAY;
+    const holding = dOnFarmTd * app.econ.holdingPerTDay;
     return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays, dOnFarmTd, holding };
   });
 
@@ -207,7 +235,7 @@
   /** plain-English sentences for Simple mode, most important first */
   let sentences = $derived.by((): { verdict: string; lines: string[] } | null => {
     const d = deltas;
-    if (!d || app.scenario === "baseline") return null;
+    if (!d || (app.scenario === "baseline" && !assumpDirty)) return null;
     const lines: string[] = [];
 
     if (d.farmgate !== 0) {
@@ -348,11 +376,66 @@
       <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
       <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>
+
+    <button class="assump-toggle" onclick={() => (showAssump = !showAssump)}>
+      {showAssump ? "▾" : "▸"} Model assumptions — stress-test them
+    </button>
+    {#if showAssump}
+      <div class="assump">
+        <div class="fine">
+          These don't change the world — they change the model's <i>guesses</i>. If a conclusion
+          flips when you nudge one, treat it with care. Defaults are the registered assumptions
+          (A-numbers in ASSUMPTIONS.md). <button class="reset mini" onclick={resetAssump}>reset all</button>
+        </div>
+        <label title="A1: average net tonnes per farm-truck load. Not published — built from industry mass-limit charts and load-size studies.">
+          <span>Average truck load <b>{app.assump.payloadT} t</b></span>
+          <input type="range" min="28" max="48" step="1" value={app.assump.payloadT} oninput={(e) => setA("payloadT", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A2: minutes to sample, weigh and tip one truck at a silo bay. Nowhere published — the single most influential guess behind queue numbers.">
+          <span>Silo unload cycle <b>{app.assump.serviceMin} min</b></span>
+          <input type="range" min="6" max="25" step="1" value={app.assump.serviceMin} oninput={(e) => setA("serviceMin", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A5: scales every drive time (default speeds: 90 km/h highways down to 60 on minor roads).">
+          <span>Travel times <b>×{app.assump.travelScale.toFixed(2)}</b></span>
+          <input type="range" min="0.8" max="1.3" step="0.05" value={app.assump.travelScale} oninput={(e) => setA("travelScale", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A7: daily rain that halts harvest (and, scaled, the day-after hangover).">
+          <span>Rain that stops harvest <b>{app.assump.rainStopMm} mm</b></span>
+          <input type="range" min="2" max="10" step="0.5" value={app.assump.rainStopMm} oninput={(e) => setA("rainStopMm", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A12 (fitted): share of the crop that never enters this network — seed, feed, on-farm storage, other buyers.">
+          <span>Crop kept on farm / sold elsewhere <b>{Math.round(app.assump.retention * 100)}%</b></span>
+          <input type="range" min="0.05" max="0.25" step="0.01" value={app.assump.retention} oninput={(e) => setA("retention", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A17: opening stocks measured from Oct-Nov shipments; scale them to test sensitivity.">
+          <span>Last season's carry-over <b>×{app.assump.carryInScale.toFixed(1)}</b></span>
+          <input type="range" min="0" max="2" step="0.1" value={app.assump.carryInScale} oninput={(e) => setA("carryInScale", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A4: country silo capacities are unpublished (assumed ~120,000 t each). Published port and T-Ports capacities are NOT scaled.">
+          <span>Assumed silo capacities <b>×{app.assump.capScale.toFixed(1)}</b></span>
+          <input type="range" min="0.5" max="1.5" step="0.1" value={app.assump.capScale} oninput={(e) => setA("capScale", parseFloat(e.currentTarget.value))} />
+        </label>
+        <div class="econ-head">Dollar rates (display only — the sim doesn't use money)</div>
+        <label title="A18: road grain freight rate.">
+          <span>Freight <b>{(app.econ.freightPerTKm * 100).toFixed(0)}¢ /t·km</b></span>
+          <input type="range" min="0.07" max="0.13" step="0.005" value={app.econ.freightPerTKm} oninput={(e) => setE("freightPerTKm", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A19: cost of a ship waiting per day (demurrage-equivalent).">
+          <span>Ship waiting <b>A${(app.econ.shipDayCost / 1000).toFixed(0)}k /day</b></span>
+          <input type="range" min="15000" max="45000" step="1000" value={app.econ.shipDayCost} oninput={(e) => setE("shipDayCost", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A22: financing cost of harvested grain waiting on farm.">
+          <span>On-farm holding <b>{(app.econ.holdingPerTDay * 100).toFixed(0)}¢ /t/day</b></span>
+          <input type="range" min="0.05" max="0.15" step="0.005" value={app.econ.holdingPerTDay} oninput={(e) => setE("holdingPerTDay", parseFloat(e.currentTarget.value))} />
+        </label>
+        <div class="fine">Not adjustable (baked into the data): district boundaries (A14), climate source (A6), demand spreading (A3), AIS geofences (A8) — see ASSUMPTIONS.md.</div>
+      </div>
+    {/if}
   {:else}
     <div class="fine hint">Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself.</div>
   {/if}
 
-  {#if app.scenario === "baseline"}
+  {#if app.scenario === "baseline" && !assumpDirty}
     <div class="tk">
       <div class="tkt">Reality check</div>
       {#if simVsActual?.ready}
@@ -400,7 +483,7 @@
         {#if app.levers.fleetTrucks < DEFAULT_LEVERS.fleetTrucks * 0.92 && (deltas?.freight ?? 0) < -200000}
           <div class="fine">Why cheaper with fewer trucks? Shorter queues mean trucks stop driving past the nearest silo — fewer kilometres. The cost moved into time: see “Delivery pace” and “Grain waiting on farm” (which prices the financing, but not the weather/quality risk).</div>
         {/if}
-        <div class="fine">Values keep updating as the season plays. Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (A18–A19).</div>
+        <div class="fine">Values keep updating as the season plays. Indicative dollars: {(app.econ.freightPerTKm * 100).toFixed(0)}¢/t·km cartage, ~A${(app.econ.shipDayCost / 1000).toFixed(0)}k per ship-day, {(app.econ.holdingPerTDay * 100).toFixed(0)}¢/t/day holding, ~$380/t farm-gate (A18–A19, A22 — adjustable under “Model assumptions”).</div>
       {/if}
     </div>
   {/if}
@@ -541,6 +624,41 @@
   }
   .how {
     margin: 0 0 6px;
+  }
+  .assump-toggle {
+    width: 100%;
+    margin-top: 10px;
+    background: #0d1826;
+    border: 1px dashed #31465e;
+    color: #9db1c5;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 11px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .assump {
+    border: 1px dashed #31465e;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 8px 10px;
+    background: #0d1826;
+  }
+  .assump label {
+    margin-top: 7px;
+  }
+  .econ-head {
+    margin-top: 10px;
+    font-size: 10.5px;
+    color: #8fa3b8;
+    font-weight: 700;
+    border-top: 1px solid #223650;
+    padding-top: 7px;
+  }
+  .reset.mini {
+    font-size: 9px;
+    padding: 1px 6px;
+    margin-left: 4px;
   }
   .verdict {
     margin: 2px 0 6px;
