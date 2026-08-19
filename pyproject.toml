@@ -10,5 +10,7 @@ dependencies = [
     "pdfplumber>=0.11.10",
     "polars>=1.43.2",
     "pyarrow>=25.0.1",
+    "rasterio>=1.5.1",
+    "shapely>=2.1.2",
     "tqdm>=4.70.0",
 ]

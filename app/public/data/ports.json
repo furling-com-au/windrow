@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "what": "Port physics parameters for the three EP grain export gateways (R7). Curated compilation from published sources; every value carries source + year. provenance: published | assumed (assumed values are ALSO listed in data/ASSUMPTIONS.md).",
+    "compiled": "2026-08-19",
+    "shipping_year": "1 Oct - 30 Sep (Bunge Port Loading Protocols, effective 14 Oct 2025)",
+    "key_sources": {
+      "ACCC2021": "ACCC Final Determinations - Port Lincoln & Thevenard exemption assessment, 20 Jul 2021, https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf",
+      "BUNGE_SHIP": "https://www.bunge.com.au/en/agriculture/client-storage-and-handling-information/shipping (read 2026-08)",
+      "BUNGE_PLP": "Bunge Port Loading Protocols, effective 14 Oct 2025, https://www.viterra.com.au/dam/jcr:900fcacc-573b-41f7-8c6c-82723631e458/Bunge-Port-Loading-Protocols.pdf",
+      "FPH_PL": "https://www.flindersportholdings.com.au/port-lincoln/ (read 2026-08)",
+      "FPH_THE": "https://www.flindersportholdings.com.au/thevenard/ (read 2026-08)",
+      "TPORTS_PLP": "T-Ports Port Loading Protocols 2024/25, issued 21 Mar 2024, https://tports.com/wp-content/uploads/2024/09/12.INF_.10-Port-Loading-Protocols_2425_PUBLIC-ISSUE.pdf",
+      "TPORTS_LB": "https://tports.com/lucky-bay/ (read 2026-08)",
+      "ESCOSA2019": "ESCOSA Inquiry into bulk grain export supply chain costs, Final Report Jan 2019, https://www.escosa.sa.gov.au/ArticleDocuments/1076/20190129-Inquiry-BulkGrainExportSupplyChainCosts-FinalReport.pdf.aspx"
+    }
+  },
+  "port_lincoln": {
+    "operator": "Bunge (ex-Viterra); port authority Flinders Ports",
+    "grain_berths": {"value": ["PLO 4", "PLO 5"], "year": "2025/26", "source": "FPH_PL", "provenance": "published"},
+    "declared_depth_m": {"value": 15.2, "year": "2021+2025/26", "source": "ACCC2021 p.24; FPH_PL", "provenance": "published"},
+    "channel_depth_m": {"value": 14.6, "note": "Boston Bay channel maintained depth", "source": "FPH_PL", "provenance": "published"},
+    "max_loa_m": {"value": 270, "year": "2025/26", "source": "FPH_PL", "provenance": "published", "confidence": "medium-high"},
+    "air_draft_limit_m": {"value": 22.3, "year": "2025", "source": "BUNGE_SHIP", "provenance": "published"},
+    "shiploader_tph": {"value": 3000, "year": "2021 and 2025", "source": "ACCC2021 p.24; BUNGE_SHIP", "provenance": "published"},
+    "storage_t": {"value": 395600, "year": "2020/21", "source": "ACCC2021 p.24 (Viterra submission 13 Feb 2020)", "provenance": "published", "note": "no newer public figure under Bunge"},
+    "road_receival_tph": {"value": 4000, "hoppers": 14, "year": "2021", "source": "ACCC2021 p.24", "provenance": "published"},
+    "rail_receival": {"value": null, "note": "none since EP rail closure 31 May 2019", "source": "ACCC2021 p.24", "provenance": "published"},
+    "panamax": {"value": "fully loads Panamax", "source": "ACCC2021 p.26", "provenance": "published"},
+    "max_available_capacity_mt_yr": {"value": 2.71, "year": "2021/22", "source": "ACCC2021 Table 3.2", "provenance": "published"},
+    "max_season_exports_mt": {"value": 2.42, "year": "to 2021", "source": "ACCC2021 Table 3.2", "provenance": "published"},
+    "typical_season_shipped_mt": {"value": 1.5, "range": [0.9, 2.4], "source": "Viterra 2016 news (~1.5 Mt); 2022/23 1.8 Mt, drought 2024/25 >0.9 Mt (Stock Journal/Viterra statements, see CALIBRATION.md)", "provenance": "published"},
+    "maintenance_shutdown": {"value": "September (observed: stem lists Port Lincoln closed 1-30 Sep 2026; AIS shows near-zero berth visits Aug-Oct)", "source": "Bunge shipping stem 17 Aug 2026; AIS-derived vessel_calls.parquet", "provenance": "published"},
+    "berth_stay_hours_median": {"value": 55.0, "year": "Oct 2023 - May 2026", "source": "derived from AMSA CTS AIS (vessel_calls.parquet), 190 cargo berth visits", "provenance": "derived"}
+  },
+  "thevenard": {
+    "operator": "Bunge (ex-Viterra); port authority Flinders Ports",
+    "berths": {"value": ["THE N", "THE S"], "year": "2025/26", "source": "FPH_THE", "provenance": "published"},
+    "declared_depth_m": {"value": 9.8, "year": "2021+2025/26", "source": "ACCC2021 p.24; FPH_THE", "provenance": "published"},
+    "approach": {"value": "Yatala Channel 8.2 m; daylight berthing only without bow thrusters", "source": "FPH_THE", "provenance": "published"},
+    "max_loa_m": {"value": 180, "beam_m": 28, "year": "2025/26", "source": "FPH_THE; ESCOSA2019 p.29", "provenance": "published"},
+    "air_draft_limit_m": {"value": 14, "year": "2025", "source": "BUNGE_SHIP", "provenance": "published"},
+    "shiploader_tph": {"value": 1000, "year": "2021 and 2025", "source": "ACCC2021 p.24; BUNGE_SHIP", "provenance": "published"},
+    "storage_t": {"value": 335925, "connected_to_quay_t": 172000, "year": "2020/21", "source": "ACCC2021 pp.24-25", "provenance": "published"},
+    "road_receival_tph": {"value": 1400, "hoppers": 6, "year": "2021", "source": "ACCC2021 p.24", "provenance": "published"},
+    "panamax": {"value": "cannot fully load Panamax (draft-limited)", "source": "ACCC2021 p.26", "provenance": "published"},
+    "max_available_capacity_mt_yr": {"value": 0.88, "year": "2021/22", "source": "ACCC2021 Table 3.2", "provenance": "published"},
+    "max_season_exports_mt": {"value": 0.52, "year": "to 2021", "source": "ACCC2021 Table 3.2", "provenance": "published"},
+    "other_commodities": {"value": ["gypsum", "salt", "mineral sands"], "source": "FPH_THE", "provenance": "published", "note": "AIS berth visits at Thevenard include non-grain vessels; grain share must come from stem/receivals"}
+  },
+  "lucky_bay": {
+    "operator": "T-Ports (transshipment port, opened 2019)",
+    "berth": {"value": "120 m wharf, 5.5 m berth draft, TSV only (no ocean vessels alongside)", "year": "2024/25", "source": "TPORTS_PLP p.3", "provenance": "published"},
+    "wharf_to_tsv_tph": {"value": 1500, "basis": "wheat", "year": "2021+2024/25", "source": "ACCC2021 p.24; TPORTS_PLP", "provenance": "published"},
+    "tsv": {"value": "MV Lucky Eyre: 87 m self-propelled self-discharging, 3,200 t/cycle (wheat), 12 kn", "year": "2024/25", "source": "TPORTS_PLP", "provenance": "published"},
+    "tsv_to_ship_tph": {"value": 1200, "basis": "wheat", "year": "2021+2024/25", "source": "ACCC2021; TPORTS_PLP", "provenance": "published"},
+    "effective_loading_t_per_weather_working_day": {"value": 10000, "design": 13250, "observed_mean": 10800, "year": "2019-2021", "source": "T-Ports exemption application quoted in ACCC2021 pp.33-34", "provenance": "published"},
+    "anchorages": {"value": "TP5 16.0 m, TP6 17.1 m declared; ~5.5 nm offshore", "year": "2024/25", "source": "TPORTS_PLP p.4", "provenance": "published"},
+    "weather_limits": {"value": "transshipment suspended above wind 21 kn / swell 2.5 m", "year": "2024/25", "source": "TPORTS_PLP", "provenance": "published"},
+    "max_vessel": {"value": "Panamax; hatch-coaming height above waterline <= 14.5 m", "source": "TPORTS_PLP", "provenance": "published"},
+    "storage_t": {"value": 384000, "split": "24,000 port silos + 360,000 bunkers 2 km inland", "source": "TPORTS_LB; ACCC2021 Table 3.1", "provenance": "published"},
+    "road_receival_tph": {"value": 1000, "hoppers": 2, "source": "ACCC2021 p.24", "provenance": "published"},
+    "notional_capacity_t_yr": {"value": 600000, "note": "ACCC best estimate for Lucky Bay alone (2020/21); 2024/25 PLP states 1.1 Mt combined Lucky Bay + Wallaroo sharing one TSV", "source": "ACCC2021 pp.33-36; TPORTS_PLP p.1", "provenance": "published"},
+    "observed_throughput": {"value": "0.36 Mt / 20 shipments Mar 2020 - May 2021; best month 67,000 t (Mar 2021); >3 Mt cumulative to Jul 2025", "source": "ACCC2021 pp.35-36; graincentral.com sites-with-a-ship-for-sale (Jul 2025)", "provenance": "published"},
+    "status_2026": {"value": "closed for shipping 15 Aug - 31 Oct 2026 (maintenance); business listed for sale Jul 2025", "source": "T-Ports shipping stem 5 Aug 2026; Grain Central Jul 2025", "provenance": "published"}
+  }
+}
