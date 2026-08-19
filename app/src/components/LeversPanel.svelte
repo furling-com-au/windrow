@@ -27,6 +27,21 @@
     dir: "up" | "down" | "flat";
   }
 
+  /** how the simulation tracks the published actuals (shown on the baseline) */
+  let simVsActual = $derived.by(() => {
+    const s = app.snap;
+    const o = app.observed;
+    if (!s || !o) return null;
+    const start = Date.UTC(parseInt(app.season.slice(0, 4), 10), 9, 1);
+    let act: number | null = null;
+    for (const w of o.weekly_receivals) {
+      const d = Math.round((Date.parse(w.week_ending + "T00:00:00Z") - start) / 86400000);
+      if (d <= s.day && w.western?.cum_t != null) act = w.western.cum_t;
+    }
+    if (act == null || act < 5000) return { ready: false as const };
+    return { ready: true as const, sim: s.kpi.receivedT, act, rel: (s.kpi.receivedT - act) / act };
+  });
+
   /** raw deltas vs the baseline run at the same simulated day */
   let deltas = $derived.by(() => {
     const s = app.snap;
@@ -188,32 +203,54 @@
     <div class="fine hint">Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself.</div>
   {/if}
 
-  {#if app.viewMode === "simple"}
-    {#if sentences && (sentences.lines.length || sentences.verdict)}
-      <div class="tk">
-        <div class="tkt">What this changes</div>
+  {#if app.scenario === "baseline"}
+    <div class="tk">
+      <div class="tkt">Reality check</div>
+      {#if simVsActual?.ready}
+        <p class="verdict">
+          The model has delivered {(simVsActual.sim / 1e6).toFixed(2)} million t so far, vs
+          {(simVsActual.act / 1e6).toFixed(2)} actually reported — {Math.abs(simVsActual.rel * 100).toFixed(0)}%
+          {simVsActual.rel > 0 ? "ahead of" : "behind"} reality.
+        </p>
+      {:else}
+        <p class="verdict soft">You're watching the season as it really ran. Weekly "actual" figures appear once harvest starts (mid-October).</p>
+      {/if}
+      <div class="fine">Pick a scenario above{app.viewMode === "advanced" ? ", or drag a lever," : ""} to ask "what if?".</div>
+    </div>
+  {:else if app.viewMode === "simple"}
+    <div class="tk">
+      <div class="tkt">What this changes</div>
+      {#if !app.baseline}
+        <p class="verdict soft">Working out the normal season to compare against…</p>
+      {:else if sentences}
         <p class="verdict">{sentences.verdict}</p>
-        <ul class="plain">
-          {#each sentences.lines as l}<li>{l}</li>{/each}
-        </ul>
-        <div class="fine">Dollar figures are rough, order-of-magnitude estimates — see “About” for how they're worked out.</div>
-      </div>
-    {:else if app.scenario !== "baseline" && app.baseline}
-      <div class="tk"><div class="fine">Let the season play — what this scenario changes will be summed up here.</div></div>
-    {/if}
-  {:else if takeaways.length}
+        {#if sentences.lines.length}
+          <ul class="plain">
+            {#each sentences.lines as l}<li>{l}</li>{/each}
+          </ul>
+          <div class="fine">Dollar figures are rough, order-of-magnitude estimates — see “About” for how they're worked out.</div>
+        {:else}
+          <div class="fine">No meaningful differences yet — most appear once harvest gets going (mid-October to January).</div>
+        {/if}
+      {/if}
+    </div>
+  {:else}
     <div class="tk">
       <div class="tkt">What changed{app.snap && app.snap.day < 360 ? ` (to ${app.snap.dateIso})` : ""}</div>
-      {#each takeaways as t}
-        <div class="row {t.dir}">
-          <span>{t.text}</span>
-          {#if t.money}<span class="money">{t.money}</span>{/if}
-        </div>
-      {/each}
-      <div class="fine">Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (assumptions A18–A19).</div>
+      {#if !app.baseline}
+        <div class="fine">Computing baseline…</div>
+      {:else if takeaways.length}
+        {#each takeaways as t}
+          <div class="row {t.dir}">
+            <span>{t.text}</span>
+            {#if t.money}<span class="money">{t.money}</span>{/if}
+          </div>
+        {/each}
+        <div class="fine">Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (assumptions A18–A19).</div>
+      {:else}
+        <div class="fine">No significant deltas vs baseline yet — most emerge from harvest onward.</div>
+      {/if}
     </div>
-  {:else if app.scenario !== "baseline" && app.baseline}
-    <div class="tk"><div class="fine">Play the season — deltas vs baseline appear here.</div></div>
   {/if}
 </div>
 
@@ -325,6 +362,13 @@
     line-height: 1.45;
     color: #ffe9c2;
     font-weight: 600;
+  }
+  .verdict.soft {
+    color: #9db1c5;
+    font-weight: 400;
+  }
+  label input {
+    accent-color: #3e73b3;
   }
   ul.plain {
     margin: 0;

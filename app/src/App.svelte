@@ -9,7 +9,12 @@
   import LeversPanel from "./components/LeversPanel.svelte";
   import SiteDetail from "./components/SiteDetail.svelte";
   import Tour from "./components/Tour.svelte";
+  import Intro from "./components/Intro.svelte";
+  import { narrate } from "./lib/narrator";
   import SimWorker from "./worker/sim.worker?worker";
+
+  let showIntro = $state(false);
+  let userTouchedSpeed = false;
 
   let mapEl: HTMLDivElement;
   let map: DeckMap | null = null;
@@ -63,6 +68,12 @@
         resetHistories();
         lastDay = snap.day - 1;
       }
+      // once harvest is over, quietly fast-forward the shipping months (unless the
+      // viewer chose a speed themselves)
+      if (!userTouchedSpeed && app.speed === 86400 && snap.day >= 130) {
+        const recent = snap.kpi.receivedT - (dailyReceived[Math.max(0, snap.day - 7)] ?? 0);
+        if (recent < 8000) setSpeed(345600, false); // 4 d/s through the quiet months
+      }
       for (let d = Math.max(0, lastDay + 1); d <= snap.day; d++) {
         dailyReceived[d] = snap.kpi.receivedT;
         dailyShipped[d] = snap.kpi.shippedT;
@@ -84,7 +95,8 @@
     post({ type: app.playing ? "play" : "pause" });
   }
 
-  function setSpeed(v: number) {
+  function setSpeed(v: number, fromUser = true) {
+    if (fromUser) userTouchedSpeed = true;
     app.speed = v;
     post({ type: "speed", value: v });
   }
@@ -199,14 +211,11 @@
         }
       };
       initSim();
-      setSpeed(app.speed);
+      setSpeed(app.speed, false);
       heatTimer = setInterval(() => {
         if (app.heatmapOn) post({ type: "heatmap" });
       }, 1500);
-      if (!localStorage.getItem("windrow_tour")) {
-        app.tourStep = 0;
-        app.showTour = true;
-      }
+      if (!localStorage.getItem("windrow_intro")) showIntro = true;
     })();
     return () => {
       if (heatTimer) clearInterval(heatTimer);
@@ -216,6 +225,15 @@
   });
 
   const fmtMt = (t: number) => (t / 1e6).toFixed(2) + " Mt";
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let prettyDate = $derived.by(() => {
+    if (!app.snap) return "…";
+    const d = new Date(app.snap.dateIso + "T00:00:00Z");
+    return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  });
+  let narratorText = $derived(
+    app.snap && !app.loading ? narrate(app.snap, app.observed, app.sites, dailyReceived) : "",
+  );
   let obsCumAtDay = $derived.by(() => {
     if (!app.observed || !app.snap) return null;
     const start = Date.UTC(parseInt(app.season.slice(0, 4)), 9, 1);
@@ -274,14 +292,17 @@
   </div>
 
   <div class="row date-row">
-    <span class="date">{app.snap?.dateIso ?? "…"}</span>
-    <input
-      type="range"
-      min="0"
-      max="364"
-      value={app.snap?.day ?? 0}
-      oninput={(e) => seek(parseInt(e.currentTarget.value))}
-    />
+    <span class="date">{prettyDate}</span>
+    <div class="scrub">
+      <input
+        type="range"
+        min="0"
+        max="364"
+        value={app.snap?.day ?? 0}
+        oninput={(e) => seek(parseInt(e.currentTarget.value))}
+      />
+      <div class="phases"><span class="ph h">harvest</span><span class="ph s">shipping</span></div>
+    </div>
   </div>
 
   {#if app.snap}
@@ -291,18 +312,25 @@
         <span class="l">million t delivered (sim)</span>
         {#if obsCumAtDay != null}<span class="o">actual {(obsCumAtDay / 1e6).toFixed(2)}</span>{/if}
       </div>
-      <div class="kpi" title="Grain loaded onto ships so far (simulated)">
-        <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
-        <span class="l">million t shipped out</span>
-      </div>
-      <div class="kpi" title="Trucks waiting to unload across all sites right now">
-        <span class="v">{app.snap.kpi.queueTrucks}</span>
-        <span class="l">trucks queued</span>
-      </div>
-      <div class="kpi" title="Ships at anchor waiting for a berth or for grain">
-        <span class="v">{app.snap.kpi.vesselsWaiting}</span>
-        <span class="l">ships waiting</span>
-      </div>
+      {#if app.viewMode === "simple"}
+        <div class="kpi" title="Trucks currently loading, driving or queued in the simulation">
+          <span class="v">{app.snap.trucks.length}</span>
+          <span class="l">trucks on the road now</span>
+        </div>
+      {:else}
+        <div class="kpi" title="Grain loaded onto ships so far (simulated)">
+          <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
+          <span class="l">million t shipped out</span>
+        </div>
+        <div class="kpi" title="Trucks waiting to unload across all sites right now">
+          <span class="v">{app.snap.kpi.queueTrucks}</span>
+          <span class="l">trucks queued</span>
+        </div>
+        <div class="kpi" title="Ships at anchor waiting for a berth or for grain">
+          <span class="v">{app.snap.kpi.vesselsWaiting}</span>
+          <span class="l">ships waiting</span>
+        </div>
+      {/if}
     </div>
     <MoneyChart {dailyReceived} observed={app.observed} season={app.season} day={app.snap.day} />
   {/if}
@@ -325,9 +353,14 @@
   </footer>
 </div>
 
+{#if narratorText}
+  <div class="narrator" class:shift={app.viewMode === "advanced"}>{narratorText}</div>
+{/if}
+
 <PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} />
 <SiteDetail {siteHistory} />
 <Tour />
+{#if showIntro}<Intro onwatch={() => (showIntro = false)} />{/if}
 
 <div class="legend">
   <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: unharvested → harvested</div>
@@ -450,10 +483,60 @@
   .date {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
-    min-width: 84px;
+    min-width: 88px;
+  }
+  .scrub {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
   input[type="range"] {
-    flex: 1;
+    width: 100%;
+    accent-color: #3e73b3;
+  }
+  .phases {
+    display: flex;
+    font-size: 8.5px;
+    color: #64788c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ph.h {
+    width: 34%;
+    border-top: 2px solid #3d8a5c;
+    text-align: center;
+  }
+  .ph.s {
+    width: 66%;
+    border-top: 2px solid #31465e;
+    text-align: center;
+  }
+  .narrator {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: min(560px, 55vw);
+    background: rgba(13, 22, 34, 0.9);
+    border: 1px solid #2a3b50;
+    border-radius: 10px;
+    padding: 8px 16px;
+    color: #e8eef5;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+    z-index: 4;
+  }
+  @media (max-width: 1100px) {
+    .narrator {
+      left: auto;
+      right: 12px;
+      transform: none;
+      max-width: 300px;
+      text-align: left;
+    }
   }
   .kpis {
     display: grid;
