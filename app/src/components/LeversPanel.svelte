@@ -74,6 +74,7 @@
     "Shipped out": "Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay).",
     Trucking: "Loaded truck travel. When grain can't go straight to port it gets double-handled — farm to silo now, silo to port later — which adds kilometres and cost (10¢/t·km, A18).",
     "Worst silo queue": "The most trucks waiting to unload at any ONE silo at any single moment this season, this what-if vs the real season. The absolute number rests on an assumed unloading time (A2) — read it as relative.",
+    "Delivery pace": "How many days earlier or later this what-if reaches the same delivered tonnage as the real season. Slower logistics (e.g. fewer trucks) shows up here — grain waits on farm, a cost the freight dollars don't price.",
     "Ships waiting": "Average hours each ship spends at anchor waiting for a berth or for grain, costed at a demurrage-like ~A$30k per ship-day (A19).",
     "Crop value (farm gate)": "The changed harvest tonnage valued at PIRSA-derived farm-gate prices (~$380/t).",
   };
@@ -105,6 +106,15 @@
         val: `${s.kpi.peakQueue} vs ${d.baseQ} trucks`,
         dim: Math.abs(s.kpi.peakQueue - d.baseQ) <= 15,
         dir: Math.abs(s.kpi.peakQueue - d.baseQ) <= 15 ? "flat" : s.kpi.peakQueue > d.baseQ ? "up" : "down",
+      },
+      {
+        label: "Delivery pace",
+        val:
+          Math.abs(d.paceLagDays) < 2
+            ? "keeping pace"
+            : `~${Math.abs(d.paceLagDays)} days ${d.paceLagDays > 0 ? "behind" : "ahead of"} the real season`,
+        dim: Math.abs(d.paceLagDays) < 2,
+        dir: Math.abs(d.paceLagDays) < 2 ? "flat" : d.paceLagDays > 0 ? "up" : "down",
       },
       mk(
         "Ships waiting",
@@ -167,7 +177,14 @@
       const prod = Object.values(app.observed.district_production_t ?? {}).reduce((a, v) => a + v, 0);
       farmgate = (app.levers.productionScale - 1) * prod * (FARMGATE_PER_T[app.season] ?? 380);
     }
-    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0 };
+    // delivery pace: how many days ahead/behind the baseline reached this cumulative tonnage
+    let paceLagDays = 0;
+    if (s.kpi.receivedT > 80000) {
+      let j = 0;
+      while (j < b.receivedByDay.length && (b.receivedByDay[j] ?? 0) < s.kpi.receivedT) j++;
+      paceLagDays = s.day - j; // positive = behind the real season
+    }
+    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays };
   });
 
   const tonnes = (t: number) => {
@@ -207,6 +224,13 @@
     }
     if (Math.abs(d.dQrel) >= 0.15) {
       lines.push(`Queues at the busiest silo peak about ${pct(d.dQrel)} ${d.dQrel > 0 ? "longer" : "shorter"} than the real season.`);
+    }
+    if (Math.abs(d.paceLagDays) >= 3) {
+      lines.push(
+        d.paceLagDays > 0
+          ? `Deliveries run about ${d.paceLagDays} days behind the real season — grain waits longer on farm (a cost the freight dollars don't price).`
+          : `Deliveries run about ${-d.paceLagDays} days ahead of the real season.`,
+      );
     }
     if (Math.abs(d.demurrage) > 500000) {
       lines.push(
@@ -356,6 +380,9 @@
             <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
+        {#if app.levers.fleetTrucks < DEFAULT_LEVERS.fleetTrucks * 0.92 && (deltas?.freight ?? 0) < -200000}
+          <div class="fine">Why cheaper with fewer trucks? Shorter queues mean trucks stop driving past the nearest silo — fewer kilometres. The cost moved into time instead: see “Delivery pace”. Slower service and grain waiting on farm aren't priced.</div>
+        {/if}
         <div class="fine">Values keep updating as the season plays. Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (A18–A19).</div>
       {/if}
     </div>
