@@ -25,6 +25,9 @@ jobs:
         run: npm --workspace app run build
       - name: playwright happy path
         working-directory: app
+        # no --with-deps: the ubuntu-latest image already carries chromium's OS libs,
+        # and --with-deps runs apt-get, which hung 24 min on a bad mirror (run 32231116155)
+        timeout-minutes: 10
         run: |
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
           npx playwright test

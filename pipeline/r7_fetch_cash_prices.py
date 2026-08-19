@@ -84,32 +84,43 @@ def main() -> int:
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    body = fetch(FEED, timeout=60.0)
-    if body is None or not body:
-        print("fetch returned nothing; leaving existing captures untouched", file=sys.stderr)
-        return 1
+    # The board changes intraday (observed 2026-08-19: Bunge's own bids withdrawn by
+    # evening), so a day's canonical capture is the FIRST one — ideally the midday cron.
+    # Raw snapshot (local only; data/raw is git-ignored so a CI runner's copy would
+    # evaporate) is immutable and replayed if present; the committed compact file is
+    # first-capture-wins so a later re-run can't overwrite a fuller morning board.
+    raw_path = raw_dir / f"active_purchase_option_{adelaide_today}.json"
+    out_path = out_dir / f"{adelaide_today}.json"
+    replayed = raw_path.exists()
+    if replayed:
+        body = raw_path.read_bytes()  # replay: processed stays derived from the archive
+    elif out_path.exists() and "--force" not in sys.argv:
+        print(f"{out_path.name} already captured today; use --force to refetch/overwrite")
+        return 0
+    else:
+        body = fetch(FEED, timeout=60.0)
+        if body is None or not body:
+            print("fetch returned nothing; leaving existing captures untouched", file=sys.stderr)
+            return 1
+        if not in_ci:
+            raw_path.write_bytes(body)
+            update_manifest([raw_path])
     feed = json.loads(body)
     print(f"{adelaide_today}: {len(feed)} active bids")
-
-    # raw snapshot: immutable, first capture of the day wins; local runs only (data/raw
-    # is git-ignored, so a CI runner's copy would evaporate — CI keeps the compact file).
-    raw_path = raw_dir / f"active_purchase_option_{adelaide_today}.json"
-    if not in_ci and not raw_path.exists():
-        raw_path.write_bytes(body)
-        update_manifest([raw_path])
 
     day = {
         "_meta": {
             "date": adelaide_today,
-            "fetched_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            # on replay this is the regeneration time, not the capture time — the
+            # capture time lives in the raw file's manifest entry / bid startDates
+            "written_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "replayed_from_raw": replayed,
             "source": FEED,
             "bids": len(feed),
         },
         "bids": [compact(r) for r in feed],
     }
-    (out_dir / f"{adelaide_today}.json").write_text(
-        json.dumps(day, indent=1, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    out_path.write_text(json.dumps(day, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
     summary = rebuild_summary(out_dir)
     (out_dir / "summary.json").write_text(

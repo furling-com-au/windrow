@@ -3,16 +3,17 @@
  "note": "Median posted cash bid (A$/t) per commodity per capture day. Bids expire next-day 12:00 Adelaide; epBids counts bids at Eyre Peninsula sites (0 off-season).",
  "days": {
   "2026-08-19": {
-   "bids": 137,
+   "bids": 150,
    "sites": 24,
    "buyers": [
+    "Bunge Australia",
     "Inghams Enterprises"
    ],
    "epBids": 0,
    "medianPerT": {
-    "Barley": 235.9,
+    "Barley": 238.3,
     "Canola": 622.33,
-    "Wheat": 268.07
+    "Wheat": 268.41
    }
   }
  }
