@@ -44,15 +44,15 @@
   },
   "evaluations": 150,
   "best": {
-    "fleetTrucks": 539.0654220730066,
-    "linehaulTrucks": 49.90995339658111,
-    "rateScale": 1.2902421662956476,
-    "matShift": -2.5684216663241384,
-    "harvestRampDays": 5,
+    "fleetTrucks": 588.5757317915559,
+    "linehaulTrucks": 47.6405342544429,
+    "rateScale": 0.7233743029925971,
+    "matShift": -4,
+    "harvestRampDays": 6.907598016988485,
     "retentionShare": 0.1,
     "portAttractBias": 0.8,
-    "choiceBeta": 1.7494986056117345,
-    "luckyBayBias": 0.7610350114349278
+    "choiceBeta": 1.9654354340909055,
+    "luckyBayBias": 0.6506237802132964
   },
-  "bestScore": 1.3739583683689838
+  "bestScore": 1.2995461081363957
 }

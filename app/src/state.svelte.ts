@@ -19,7 +19,10 @@ export const SCENARIOS: { id: ScenarioId; label: string; desc: string; patch: Pa
   { id: "roadclosure", label: "Tod Hwy closure", desc: "Tod Highway corridor impassable through harvest (detour factor 2.5x).", patch: { roadClosure: { corridor: "tod", factor: 2.5 } } },
 ];
 
-export const SEASONS = ["2022/23", "2023/24", "2024/25", "2025/26"];
+// 2022/23 exists in the data bundle but is excluded from the UI: it pre-dates AIS
+// coverage and its bumper volumes sit outside the calibrated fleet envelope (see
+// docs/calibration_report.md).
+export const SEASONS = ["2023/24", "2024/25", "2025/26"];
 
 class AppState {
   season = $state("2025/26");

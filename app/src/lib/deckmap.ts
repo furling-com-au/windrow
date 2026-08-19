@@ -44,16 +44,15 @@ interface PathCache {
 }
 
 export class DeckMap {
-  private deck: Deck<MapView[]>;
+  private deck: Deck<MapView>;
   private data: StaticData;
   private pathCache = new Map<string, PathCache>();
-  private hoverText = "";
 
   constructor(container: HTMLDivElement, data: StaticData) {
     this.data = data;
-    this.deck = new Deck({
+    this.deck = new Deck<MapView>({
       parent: container,
-      views: [new MapView({ repeat: false, controller: { dragRotate: false, touchRotate: false } })],
+      views: new MapView({ repeat: false, controller: { dragRotate: false, touchRotate: false } }),
       initialViewState: {
         longitude: 135.6,
         latitude: -33.6,

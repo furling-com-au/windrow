@@ -15,6 +15,7 @@
     "@windrow/sim": "*"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.0",
     "svelte": "^5.0.0",

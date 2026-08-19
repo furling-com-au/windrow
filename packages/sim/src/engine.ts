@@ -11,11 +11,10 @@
  * params + seed => byte-identical event log (hashed in RunResult).
  */
 import { Rng } from "./rng";
-import {
+import { COMMODITIES, NC } from "./types";
+import type {
   Bundle,
-  COMMODITIES,
   Commodity,
-  NC,
   Params,
   RunResult,
   SimEvent,
@@ -216,7 +215,7 @@ export class Sim {
         else if (rain >= 2) f = 0.5;
         // hangover: paddocks stay wet after a heavy fall (A7)
         if ((w.rain_mm[i - 1] ?? 0) >= 8) f *= 0.3;
-        else if ((w.rain_mm[i - 2] ?? 0) >= 12) f *= 0.6;
+        else if ((w.rain_mm[i - 2] ?? 0) >= 8) f *= 0.5;
         if (tmax >= 38) f *= 0.75;
         this.weatherFactor[di * 370 + day] = f;
       }
@@ -341,7 +340,8 @@ export class Sim {
     for (let p = 0; p < this.nParcels; p++) {
       let t = 0;
       for (let c = 0; c < NC; c++) t += this.parcelInitial[p * NC + c]!;
-      clusterSeasonT[this.parcelCluster[p]!] += t;
+      const ci = this.parcelCluster[p]!;
+      clusterSeasonT[ci] = clusterSeasonT[ci]! + t;
       totalT += t;
     }
     let id = 0;
@@ -410,6 +410,7 @@ export class Sim {
           loadedT: 0,
           waitTicks: 0,
           berthedAt: -1,
+          lastDrawTick: 0,
           name: v.name_candidate ?? null,
           rateTph: 0,
         });
@@ -495,7 +496,7 @@ export class Sim {
         this.harvestedRawT += h;
         const retained = h * p.retentionShare;
         this.retainedT += retained;
-        this.clusterOnFarm[cl * NC + c] += h - retained;
+        this.clusterOnFarm[cl * NC + c] = this.clusterOnFarm[cl * NC + c]! + h - retained;
       }
     }
   }
@@ -625,10 +626,12 @@ export class Sim {
     switch (tr.state) {
       case T_IDLE: {
         if (!sitesOpenNow) return;
-        // rain days suppress deliveries too (wet paddocks/tracks): 70% of dispatch
-        // attempts skipped when the district's weather factor is 0
+        // rain suppresses deliveries too (EP harvest is largely header-direct to site,
+        // so receivals track weather with little on-farm buffering): dispatch attempts
+        // are skipped with probability 0.75 x (1 - weather factor)
         const cdist = this.clusterDistrict[tr.cluster] ?? 1;
-        if (this.weatherFactor[cdist * 370 + this.day]! === 0 && this.rng.next() < 0.7) return;
+        const wf = this.weatherFactor[cdist * 370 + this.day]!;
+        if (wf < 1 && this.rng.next() < 0.75 * (1 - wf)) return;
         // pick largest on-farm commodity in home cluster
         let best = -1,
           bestT = 0;

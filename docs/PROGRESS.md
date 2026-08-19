@@ -14,11 +14,20 @@ This file is the canonical record of where the project is. Updated as work proce
   - [x] R7 ports → `data/processed/ports.json` (per-value citations; PL 3,000 t/h + 395.6 kt verified)
   - [x] R8 `data/CALIBRATION.md` complete (targets + tolerances + quirks)
   - [x] `SOURCES.md` (14 sources + rejected list), `ASSUMPTIONS.md` (A1–A13)
-- [ ] **§9 operator questions — ASKED, awaiting answers (gate before Phase 2)**
-- [ ] Phase 2 — Data pipeline → `app/public/data/` bundle (travel-time matrix, demand parcels, observed overlays, vessel schedules; CLUM clip; stem PDF bulk parse)
-- [ ] Phase 3 — Sim core (`packages/sim/`)
-- [ ] Phase 4 — Browser app (`app/`)
-- [ ] Phase 5 — Validation, scenarios, write-up
+- [x] **§9 operator answers (2026-08-19)**: seasons 2023/24–2025/26 with drought 2024/25 held out & visible for comparison · district-level demand OK · **public deploy on Cloudflare** · no paid data
+- [x] Phase 2 — Data pipeline → `app/public/data/` bundle (4.9 MB total: parcels+demand, cluster matrix + route polylines, observed overlays, AIS vessel schedules w/ stem names, weather, self-contained basemap). One command: `uv run python pipeline/build_all.py`
+- [x] Phase 3 — Sim core (`packages/sim/`): 5-min tick, sfc32 seeded, mass-conservation invariants, 3 unit tests, full season in ~0.8 s headless. Calibrated: 9 knobs, random search + refine (313 s, deterministic), fitted on 2023/24+2025/26
+- [x] Phase 4 — Browser app: Svelte 5 + deck.gl standalone (no tile server), sim in Web Worker, KPI strip, sim-vs-observed money chart, 7 scenarios, port panels, About/attribution. Build 222 kB gz. Playwright happy-path passes
+- [x] Phase 5 — `docs/calibration_report.md` (+SVG charts), `docs/scenarios.md`, README
+- [x] **DEPLOYED: https://windrow.justinjywong.workers.dev** (Cloudflare Workers static assets, `npx wrangler deploy`)
+
+## Validation headline (see docs/calibration_report.md)
+
+- Held-out 2024/25: season total **−1.9 %** (spec ±5 % ✓); weekly RMSE 65 % of mean weekly
+  (timing-dominated; the late-Nov 2024 rain collapse is missing from ERA5 at the A6
+  points — documented). Vessel counts = AIS schedule by construction.
+- 2023/24 +0.7 %, 2025/26 −2.5 % (calibration seasons).
+- 2022/23 bumper replays at −31 % (outside calibrated fleet envelope; excluded from UI).
 
 ## Phase 1 acceptance criteria — status
 

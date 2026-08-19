@@ -1,0 +1,89 @@
+{
+  "season": "2025/26",
+  "scenarios": [
+    {
+      "id": "baseline",
+      "label": "Baseline replay",
+      "receivedMt": 2.191,
+      "receivedLbMt": 0.352,
+      "shippedPlMt": 1.22,
+      "vesselCount": 51,
+      "meanVesselWaitH": 0,
+      "peakQueue": 195,
+      "truckKmProxy": 16933839,
+      "peakWeekKt": 366
+    },
+    {
+      "id": "bumper",
+      "label": "Bumper (+30%)",
+      "receivedMt": 2.797,
+      "receivedLbMt": 0.51,
+      "shippedPlMt": 1.22,
+      "vesselCount": 51,
+      "meanVesselWaitH": 0,
+      "peakQueue": 223,
+      "truckKmProxy": 20393926,
+      "peakWeekKt": 396
+    },
+    {
+      "id": "drought",
+      "label": "Drought (-40%)",
+      "receivedMt": 1.398,
+      "receivedLbMt": 0.126,
+      "shippedPlMt": 0.991,
+      "vesselCount": 45,
+      "meanVesselWaitH": 2455.7,
+      "peakQueue": 93,
+      "truckKmProxy": 11456124,
+      "peakWeekKt": 260
+    },
+    {
+      "id": "rail",
+      "label": "Rail reinstated",
+      "receivedMt": 2.194,
+      "receivedLbMt": 0.35,
+      "shippedPlMt": 1.22,
+      "vesselCount": 51,
+      "meanVesselWaitH": 0,
+      "peakQueue": 178,
+      "truckKmProxy": 13630388,
+      "peakWeekKt": 366
+    },
+    {
+      "id": "luckybay",
+      "label": "Lucky Bay share shift",
+      "receivedMt": 2.079,
+      "receivedLbMt": 0.464,
+      "shippedPlMt": 1.22,
+      "vesselCount": 51,
+      "meanVesselWaitH": 0,
+      "peakQueue": 152,
+      "truckKmProxy": 17197108,
+      "peakWeekKt": 355
+    },
+    {
+      "id": "outage",
+      "label": "Port Lincoln outage (7 d @ day 70)",
+      "receivedMt": 2.171,
+      "receivedLbMt": 0.372,
+      "shippedPlMt": 1.22,
+      "vesselCount": 51,
+      "meanVesselWaitH": 0.5,
+      "peakQueue": 235,
+      "truckKmProxy": 17540564,
+      "peakWeekKt": 366
+    },
+    {
+      "id": "roadclosure",
+      "label": "Tod Hwy closure (x2.5)",
+      "receivedMt": 2.178,
+      "receivedLbMt": 0.365,
+      "shippedPlMt": 1.22,
+      "vesselCount": 51,
+      "meanVesselWaitH": 0,
+      "peakQueue": 164,
+      "truckKmProxy": 18462264,
+      "peakWeekKt": 363
+    }
+  ]
+}
