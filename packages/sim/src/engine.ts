@@ -154,6 +154,9 @@ export class Sim {
   peakQueue = 0;
   truckTravelMin = 0; // loaded+empty travel minutes (truck-km proxy for corridor analysis)
   tonneKm = 0; // loaded tonne-km (economics layer)
+  /** farm trucks currently en route to each site: growers can see site status/wait
+   *  before committing, so the choice model must not ignore committed traffic. */
+  private siteInbound: Int32Array = new Int32Array(0);
   carryInT = 0; // opening stocks seeded from observed Oct-Nov shipments (A17)
   onFarmTonneDays = 0; // harvested grain waiting on farm x days (holding-cost basis, A22)
   /** cumulative loaded tonnes per rendered path ("cid-sid" farm, "si-pj" line-haul) */
@@ -281,7 +284,7 @@ export class Sim {
         open,
         capacityT,
         stock: new Float64Array(NC),
-        bays: isPort ? 4 : 2,
+        bays: isPort ? Math.max(1, Math.round(params.portBays ?? 4)) : Math.max(1, Math.round(params.countryBays ?? 2)),
         bayBusyUntil: [],
         queue: [],
         serviceMin: params.siteServiceMin ?? 12, // A2 (assumption lever)
@@ -295,6 +298,8 @@ export class Sim {
       st.bayBusyUntil = new Array(st.bays).fill(0);
       this.sites.push(st);
     }
+    this.siteInbound = new Int32Array(this.sites.length);
+
     // scenario: port outage handled in step()
 
     // ---- carry-in stocks (A17): seed opening stocks from observed Oct-Nov shipments ----
@@ -578,6 +583,29 @@ export class Sim {
     const cand = this.clusterCand[cl]!;
     const weights: number[] = [];
     const opts: { site: number; minutes: number }[] = [];
+    // Growers deliver to a site they can realistically reach, or cart direct to port.
+    // Without this window a shallow power-law over ~21 candidates sends most traffic to
+    // mid-distance sites (measured: 62 min mean leg against a 24 min nearest-accepting
+    // floor), which inflates cycle times, truck-km and the fitted fleet. Ports are always
+    // candidates so the direct-to-port share (A9) stays governed by portAttractBias.
+    let nearest = Infinity;
+    for (const cd of cand) {
+      const s = this.sites[cd.site]!;
+      if (!s.open || !s.accepts[c]) continue;
+      if (this.portOutageActive(s) && s.isPort) continue;
+      let st = 0;
+      for (let k = 0; k < NC; k++) st += s.stock[k]!;
+      if (st >= s.capacityT * 0.995) continue;
+      if (cd.minutes < nearest) nearest = cd.minutes;
+    }
+    if (!Number.isFinite(nearest)) return null;
+    const window = nearest * (p.choiceRadius ?? 1.5) + 10;
+
+    let balking = false;
+    for (let pass = 0; pass < 2; pass++) {
+    balking = pass === 1; // second pass: every option was over the balk threshold
+    weights.length = 0;
+    opts.length = 0;
     for (const cd of cand) {
       const s = this.sites[cd.site]!;
       if (!s.open || !s.accepts[c]) continue;
@@ -585,13 +613,21 @@ export class Sim {
       let stockTotal = 0;
       for (let k = 0; k < NC; k++) stockTotal += s.stock[k]!;
       if (stockTotal >= s.capacityT * 0.995) continue; // full
-      const queueMin = (s.queue.length * s.serviceMin) / s.bays;
+      if (cd.minutes > window && !s.isPort) continue; // out of realistic reach
+      const queueMin = ((s.queue.length + (this.siteInbound[cd.site] ?? 0)) * s.serviceMin) / s.bays;
+      // growers balk rather than join an unbounded queue: the worst turnaround ever
+      // reported on EP is ~4 h (Port Lincoln, Nov 2018 rail-outage congestion), so treat
+      // that as the tolerance. Without it a big season can pile an unphysical queue onto
+      // one site (2022/23 tripped the engine's own QUEUE INSANE guard at Lucky Bay).
+      if (queueMin > (p.queueBalkMin ?? 240) && !balking) continue;
       let attract = 1.0;
       if (s.isPort) attract *= p.portAttractBias;
       if (s.isTports) attract *= p.luckyBayBias;
       const cost = cd.minutes + queueMin + s.serviceMin;
       weights.push(attract / Math.pow(cost, p.choiceBeta));
       opts.push(cd);
+    }
+    if (opts.length) break;
     }
     if (!opts.length) return null;
     return opts[this.rng.weighted(weights)]!;
@@ -696,6 +732,7 @@ export class Sim {
         tr.commodity = best;
         tr.loadT = load;
         tr.site = choice.site;
+        this.siteInbound[choice.site] = (this.siteInbound[choice.site] ?? 0) + 1;
         tr.legMin = choice.minutes;
         tr.state = T_LOAD;
         tr.doneAt = tick + Math.ceil((30 * this.rng.range(0.8, 1.3)) / TICK_MIN);
@@ -716,6 +753,7 @@ export class Sim {
       case T_GO:
         if (tick >= tr.doneAt) {
           const s = this.sites[tr.site]!;
+          this.siteInbound[tr.site] = Math.max(0, (this.siteInbound[tr.site] ?? 1) - 1);
           tr.state = T_QUEUE;
           s.queue.push(tr.id);
         }

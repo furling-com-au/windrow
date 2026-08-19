@@ -124,6 +124,10 @@ export interface Params {
   districtStartOffset: Record<"WEP" | "LEP" | "EEP", number>;
   harvestRampDays: number; // days for a parcel to ramp 0->full harvest rate after maturity
   choiceBeta: number; // Huff decay exponent on (travel+queue) minutes
+  choiceRadius: number; // candidate window: sites within nearest*r + 10 min (ports always eligible)
+  countryBays: number; // A2: tipping bays at an upcountry site
+  portBays: number; // A2: tipping bays at a port terminal
+  queueBalkMin: number; // A2: queue wait (min) beyond which growers pick elsewhere
   // --- assumption levers (defaults = the registered assumptions; exposed for sensitivity testing) ---
   siteServiceMin: number; // A2: sample+weigh+tip cycle per truck per bay, minutes
   travelTimeScale: number; // A5: multiplier on all drive times (1 = matrix as built)

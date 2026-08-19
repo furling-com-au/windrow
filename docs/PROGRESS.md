@@ -23,11 +23,16 @@ This file is the canonical record of where the project is. Updated as work proce
 
 ## Validation headline (see docs/calibration_report.md)
 
-- Held-out 2024/25: season total **−1.9 %** (spec ±5 % ✓); weekly RMSE 65 % of mean weekly
+- Held-out 2024/25: season total **−0.4 %** (spec ±5 % ✓); weekly RMSE 63 % of mean weekly
   (timing-dominated; the late-Nov 2024 rain collapse is missing from ERA5 at the A6
   points — documented). Vessel counts = AIS schedule by construction.
-- 2023/24 +0.7 %, 2025/26 −2.5 % (calibration seasons).
-- 2022/23 bumper replays at −31 % (outside calibrated fleet envelope; excluded from UI).
+- 2023/24 **−1.6 %**, 2025/26 **−1.0 %** (calibration seasons; 2026-08-19 recalibration —
+  all three seasons now inside ±2 %, against −2.5 %…+0.7 % before).
+- Port Lincoln peak day 14,458 t vs published record 13,148–13,675 t — now reproducible
+  (the pre-2026-08-19 bay settings topped out at 10,285 t, 24 % below the record).
+- Mean vessel wait 28.3 h vs 26.8 h AIS-observed; peak network queue 139 trucks.
+- 2022/23 bumper now exceeds the validity envelope entirely (A4 capacities fill; queue
+  guard fires). Already excluded from the UI; recorded as skipped in the report.
 
 ## Phase 1 acceptance criteria — status
 
@@ -93,6 +98,40 @@ This file is the canonical record of where the project is. Updated as work proce
   Loaded tonne-km (and the A18 dollars) barely move.
 - New open question (data/trucks.md #7): is the EP trunk network on SA's pre-approved
   53.5 m Type 2 road-train network?
+
+### 2026-08-19 (recalibration: bay capacity was the defect, not fleet size)
+- Chasing "is 589 trucks too many?" to its root: the calibrator's objective is **monotone
+  in fleet size** — more trucks always scored better, past 900, until the engine's own
+  `QUEUE INSANE` invariant (>400 at one site) aborted the search. Fleet size is therefore
+  **not identifiable** from weekly regional receivals; it must be pinned physically.
+- Root cause found by checking a published number we had never used: the **Port Lincoln
+  daily receival record (13,148–13,675 t)**. With the old 2 upcountry / 4 port tipping
+  bays the model peaked at **10,285 t/day** — it could not reproduce a documented day. The
+  calibration had been buying that missing site throughput with imaginary trucks.
+- Fix: bays are now parameters (`countryBays`, `portBays`) defaulting to **4 / 6**, the
+  band that reproduces the record (13,224 t at 589 trucks). A2 corrected accordingly —
+  its own arithmetic had always implied ≥5 bays, but the model was given 4.
+- Also added `choiceRadius` (candidate window; growers deliver near or cart to port) after
+  measuring a 62 min mean leg against a 24 min nearest-accepting floor. NOTE: the fit chose
+  a wide window (2.11), so this did **not** shorten legs much — tonne-km fell only 258M
+  → 250M, not the ~30 % I first projected from a fixed-fleet probe.
+- Recalibrated (11 knobs, 200+100 evals, fleet range widened to [300,900]): **fleet 731**
+  (interior, not bound-pinned), line-haul 60, bays 4/6, choiceBeta 2.20, choiceRadius 2.11.
+  Season totals (after the queue fixes below) 2023/24 −1.6 %, 2025/26 −1.0 %, holdout
+  −0.4 % — all three inside ±2 % for the first time.
+- Two further engine fixes followed from the same investigation: growers **balk** past a
+  ~4 h queue (the worst turnaround ever reported on EP), and site choice is **aware of
+  trucks already en route** (operators publish live site status; the old model let every
+  truck commit to a site that only *looked* free). Together these cut the peak queue from
+  283 to **139** while keeping season fits tight.
+- Costs: the headless season went 5.0 → 5.5 s (24 % more agents), so the perf budget was
+  widened 5 → 8 s locally with the reason recorded in the test. **2022/23 now exceeds the
+  model's validity envelope** — assumed upcountry capacities (A4) fill and the engine's
+  QUEUE INSANE guard fires at Lucky Bay. It was already excluded from the UI and previously
+  replayed at −31 %; the model now fails loudly instead of answering quietly. report.ts
+  records it as skipped rather than crashing.
+- App now derives every displayed default from `defaultParams()` instead of hardcoding
+  copies, so a future recalibration cannot leave stale numbers in the UI.
 
 ## Key decisions
 

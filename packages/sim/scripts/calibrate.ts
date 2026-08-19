@@ -1,5 +1,5 @@
 /**
- * Headless calibration (spec Phase 3): random search over 9 free scalars, fitted
+ * Headless calibration (spec Phase 3): random search over 11 free scalars, fitted
  * against data/CALIBRATION.md targets on 2023/24 + 2025/26; 2024/25 is HELD OUT.
  *
  *   npx tsx scripts/calibrate.ts [nSamples]
@@ -32,6 +32,9 @@ interface Knobs {
   retentionShare: number;
   portAttractBias: number;
   choiceBeta: number;
+  choiceRadius: number;
+  countryBays: number;
+  portBays: number;
   luckyBayBias: number;
 }
 
@@ -49,6 +52,9 @@ function applyKnobs(k: Knobs): Params {
   p.retentionShare = k.retentionShare;
   p.portAttractBias = k.portAttractBias;
   p.choiceBeta = k.choiceBeta;
+  p.choiceRadius = k.choiceRadius;
+  p.countryBays = Math.round(k.countryBays);
+  p.portBays = Math.round(k.portBays);
   p.luckyBayBias = k.luckyBayBias;
   return p;
 }
@@ -77,14 +83,17 @@ function score(bundles: Bundle[], k: Knobs): { total: number; parts: Record<stri
 const bundles = CAL_SEASONS.map((s) => loadBundle(s));
 const rng = new Rng(2026);
 const ranges: Record<keyof Knobs, [number, number]> = {
-  fleetTrucks: [350, 750],
+  fleetTrucks: [300, 900],
   linehaulTrucks: [25, 80],
   rateScale: [0.7, 2.2],
   matShift: [-4, 16],
   harvestRampDays: [5, 22],
   retentionShare: [0.1, 0.28],
   portAttractBias: [0.8, 2.8],
-  choiceBeta: [1.1, 2.6],
+  choiceBeta: [1.1, 3.5],
+  choiceRadius: [1.05, 3.0],
+  countryBays: [3, 5],
+  portBays: [5, 7],
   luckyBayBias: [0.4, 2.2],
 };
 

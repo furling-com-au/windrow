@@ -1,6 +1,6 @@
 <script lang="ts">
   import { CASH_BIDS, FARMGATE_PER_T, biasToPremiumPerT, fmtMoney } from "../lib/economics";
-  import { DEFAULT_ASSUMP, DEFAULT_ECON, DEFAULT_LEVERS, SCENARIOS, app } from "../state.svelte";
+  import { DEFAULT_ASSUMP, DEFAULT_ECON, DEFAULT_LEVERS, FLEET_MAX, FLEET_MIN, SCENARIOS, app } from "../state.svelte";
 
   let showAssump = $state(false);
 
@@ -56,7 +56,7 @@
   };
   let fleetDesc = $derived.by(() => {
     const d = app.levers.fleetTrucks / DEFAULT_LEVERS.fleetTrucks - 1;
-    if (Math.abs(d) < 0.03) return "our best estimate of the real fleet";
+    if (Math.abs(d) < 0.03) return "the fitted fleet (weakly identified — see About)";
     return `${Math.abs(d * 100).toFixed(0)}% ${d > 0 ? "more trucks than" : "fewer trucks than"} that estimate`;
   });
 
@@ -360,18 +360,18 @@
       <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
         oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="Nobody publishes the real fleet size. 589 is FITTED: it's the fleet that makes the simulated weekly deliveries match the published ones (av. load ~38 t, from industry mass limits — see About). Fewer trucks = grain waits on farm; more = longer silo queues.">
+    <label title="Nobody publishes the real fleet size. ~730 is FITTED: the fleet that makes simulated weekly deliveries match the published ones at an assumed ~38 t average load. It is only WEAKLY identified — fleet size and load size trade off, so ~900 small trucks or ~500 road trains fit the same data equally well. What is really pinned down is the flow: ~1,850 loads/day at the peak. Fewer trucks = grain waits on farm; more = longer silo queues.">
       <span>How many trucks working the harvest? <b>{Math.round(app.levers.fleetTrucks)} — {fleetDesc}</b></span>
-      <input type="range" min="300" max="800" step="10" value={app.levers.fleetTrucks}
+      <input type="range" min={FLEET_MIN} max={FLEET_MAX} step="10" value={app.levers.fleetTrucks}
         oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
     </label>
     <label title="How strongly the competing T-Ports Lucky Bay system attracts nearby farmers (price incentives, service). Push it up and eastern-peninsula grain drains away from the main network. The $/t figure translates the pull into an equivalent cash premium for a typical eastern-peninsula farm (90 min generalized haul, priced at the freight rate — A23).">
-      <span>Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, 0.651)}{Math.abs(lbPremium) >= 0.5 ? ` ≈ ${lbPremium > 0 ? "+" : "−"}$${Math.abs(lbPremium).toFixed(0)}/t premium` : ""}</b></span>
+      <span>Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, DEFAULT_LEVERS.luckyBayBias)}{Math.abs(lbPremium) >= 0.5 ? ` ≈ ${lbPremium > 0 ? "+" : "−"}$${Math.abs(lbPremium).toFixed(0)}/t premium` : ""}</b></span>
       <input type="range" min="0.2" max="3" step="0.1" value={app.levers.luckyBayBias}
         oninput={(e) => set("luckyBayBias", parseFloat(e.currentTarget.value))} />
     </label>
     <label title="How willing farmers are to drive past their local silo and cart directly to the port. More direct carting = longer farm trips but less double-handling.">
-      <span>Carting straight to port: <b>{strength(app.levers.portAttractBias, 0.8)}</b></span>
+      <span>Carting straight to port: <b>{strength(app.levers.portAttractBias, DEFAULT_LEVERS.portAttractBias)}</b></span>
       <input type="range" min="0.4" max="2.5" step="0.1" value={app.levers.portAttractBias}
         oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
     </label>

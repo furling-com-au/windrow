@@ -1,4 +1,9 @@
+import { defaultParams } from "@windrow/sim";
 import type { BundleCluster, BundleSite, ObservedFile, Params, Snapshot } from "@windrow/sim";
+
+/** the calibrated parameter set is the single source of truth for every default the
+ *  UI shows: hardcoding copies here let them drift silently after a re-calibration. */
+const CAL = defaultParams();
 
 export type ScenarioId =
   | "baseline"
@@ -23,19 +28,23 @@ export interface Levers {
 
 export const DEFAULT_LEVERS: Levers = {
   productionScale: 1.0,
-  luckyBayBias: 0.651,
-  fleetTrucks: 589,
-  portAttractBias: 0.8,
+  luckyBayBias: CAL.luckyBayBias,
+  fleetTrucks: CAL.fleetTrucks,
+  portAttractBias: CAL.portAttractBias,
   rail: false,
   outage: false,
   roadClosure: false,
 };
 
+/** slider bounds that always bracket the calibrated value */
+export const FLEET_MIN = Math.max(50, Math.round((CAL.fleetTrucks * 0.5) / 10) * 10);
+export const FLEET_MAX = Math.round((CAL.fleetTrucks * 1.6) / 10) * 10;
+
 export const SCENARIOS: { id: ScenarioId; label: string; story: string; levers: Partial<Levers> }[] = [
   { id: "baseline", label: "The season as it happened", story: "Real crop sizes, the real shipping program, and the network as it ran. The gold dashed line on the chart is what farmers actually delivered.", levers: {} },
   { id: "bumper", label: "Bumper harvest (+30%)", story: "A big year. Watch silos fill toward their limits, truck queues build at the peak, and surplus grain spill toward Lucky Bay.", levers: { productionScale: 1.3 } },
   { id: "drought", label: "Drought (−40%)", story: "A small crop against an unchanged shipping program: the roads and silos relax, but ships sit at anchor waiting for grain that never comes.", levers: { productionScale: 0.6 } },
-  { id: "rail", label: "Bring back the trains", story: "Two trainsets return to the old Cummins–Kimba–Wudinna lines and take over part of the silo-to-port shuttle. How much trucking that saves depends on how big the trucks it replaces are: about 2.5 million truck-km against 45 t loads, but only ~0.9 million against the 85 t road trains SA law actually permits. Either way, the figures below count only the trucking saved — NOT what rebuilding and running a railway would cost, which is why the real line closed in 2019.", levers: { rail: true } },
+  { id: "rail", label: "Bring back the trains", story: "Two trainsets return to the old Cummins–Kimba–Wudinna lines and take over part of the silo-to-port shuttle. How much trucking that saves depends on how big the trucks it replaces are: about 2.5 million truck-km against 45 t loads, but only ~1.0 million against the 85 t road trains SA law actually permits. Either way, the figures below count only the trucking saved — NOT what rebuilding and running a railway would cost, which is why the real line closed in 2019.", levers: { rail: true } },
   { id: "luckybay", label: "More grain to Lucky Bay", story: "T-Ports' Lucky Bay made 2.5× more attractive — like posting roughly a $6/t cash premium at a typical eastern-peninsula farm (A23). Grain drains away from the main network.", levers: { luckyBayBias: 2.5 } },
   { id: "outage", label: "Port Lincoln closed a week", story: "The port terminal shuts for a week at harvest peak. Deliveries redirect to country silos — the system holds, at a queueing price.", levers: { outage: true } },
   { id: "roadclosure", label: "Tod Highway closed", story: "The peninsula's central spine is impassable (detours = 2.5× travel time). Trucks re-sort toward Lincoln Highway sites.", levers: { roadClosure: true } },
@@ -53,14 +62,14 @@ export interface AssumpLevers {
   capScale: number; // A4
 }
 export const DEFAULT_ASSUMP: AssumpLevers = {
-  payloadT: 38,
-  lhPayloadT: 45,
-  serviceMin: 12,
-  travelScale: 1.0,
-  rainStopMm: 5,
-  retention: 0.1,
-  carryInScale: 1.0,
-  capScale: 1.0,
+  payloadT: CAL.truckPayloadT,
+  lhPayloadT: CAL.linehaulPayloadT,
+  serviceMin: CAL.siteServiceMin,
+  travelScale: CAL.travelTimeScale,
+  rainStopMm: CAL.rainStopMm,
+  retention: CAL.retentionShare,
+  carryInScale: CAL.carryInScale,
+  capScale: CAL.upcountryCapScale,
 };
 
 /** dollar-rate levers (display-only; never affect the sim) */

@@ -34,15 +34,29 @@ presented as measured data.
 - **Upgrade path**: operator turnaround/weighbridge data; truck-spec tare sheets; RAVnet
   53.5 m network coverage for EP.
 
-## A2 — receival site service times
-- **Value**: sample + weigh + tip cycle 12 min/truck/bay baseline; sites have 2 tipping
-  bays (4 at Port Lincoln, per its 14 hoppers & 4,000 t/h intake).
-- **Reasoning**: not published anywhere in minutes. Bounded by physics: Port Lincoln site
-  record 13,512 t/day ⇒ at ~40 t avg load ≈ 340 trucks/day ≈ 24/h over 14 h. A 12-min
-  cycle × multiple bays reproduces observed records. The 4-hour 2018 anecdote is
-  congestion queueing, not service time.
-- **Sensitivity**: drives queue lengths at peak — a headline output; must be marked
-  assumed in UI tooltips.
+## A2 — receival site service times and bay counts
+- **Value**: sample + weigh + tip cycle 12 min/truck/bay; **4 tipping bays at an upcountry
+  site, 6 at a port terminal** (`countryBays`, `portBays`).
+- **Reasoning**: not published anywhere in minutes. Bounded by physics against the one
+  published throughput anchor — the Port Lincoln site record of **13,148/13,512 t/day
+  (Nov 2020) and 13,675 t/day (2022/23)**: at ~40 t average load that is ~340 truck
+  visits/day, ~24/h across a 14 h receival day, and a 12-min cycle serves 5 trucks/bay/h,
+  so **at least 5 bays** are required to reach the record at all.
+- **CORRECTED 2026-08-19 (was 2 bays upcountry / 4 at ports)**: the earlier values were
+  never checked against that record. Measured, the 2/4 configuration peaks at
+  **10,285 t/day** at Port Lincoln — 24 % below the published record, i.e. the model
+  physically could not reproduce a documented day. At 4/6 it reaches **13,224 t/day**,
+  inside the published band. Under-provisioned bays inflated queues (mean 120 min,
+  peak 189 trucks), which in turn inflated truck cycle times and therefore the fitted
+  fleet size: the calibrator was buying missing site throughput with imaginary trucks.
+- **Sensitivity**: drives queue lengths at peak — a headline output — and, indirectly,
+  the fitted fleet. Bay counts are now calibrated within a band that keeps the modelled
+  Port Lincoln peak day inside the published record; must stay marked assumed in the UI.
+- **Related finding**: with bays under-provisioned the calibration objective is monotone
+  in fleet size (more trucks always scored better, to 900+), and only the engine's own
+  `QUEUE INSANE` invariant (>400 trucks at one site) bounded it. Fleet size is therefore
+  **not identifiable from the weekly regional receivals alone** — it is pinned by site
+  throughput and queue plausibility. See docs/calibration_report.md.
 - **Upgrade path**: operator site-cycle statistics (Viterra used to publish average site
   turnaround minutes in some harvest communications — none found archived).
 

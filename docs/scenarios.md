@@ -50,11 +50,11 @@ question 7). Measured on 2025/26:
 
 | silo→port load | road truck-km | with rail | rail saves |
 |---|---|---|---|
-| **45 t** (default; Viterra's 2019 rail-replacement statement) | 16.62 M | 14.13 M | **2.49 M** (−15 %) |
-| 72 t (ACCC's EP *permitted* load size) | 14.88 M | 13.62 M | **1.27 M** (−8 %) |
-| 85 t (SA Type 2 road train at CML 132.83 t) | 14.41 M | 13.47 M | **0.94 M** (−7 %) |
+| **45 t** (default; Viterra's 2019 rail-replacement statement) | 17.64 M | 15.15 M | **2.49 M** (−14 %) |
+| 72 t (ACCC's EP *permitted* load size) | 16.03 M | 14.70 M | **1.34 M** (−8 %) |
+| 85 t (SA Type 2 road train at CML 132.83 t) | 15.60 M | 14.56 M | **1.04 M** (−7 %) |
 
-So the headline saving falls by roughly **half to two-thirds** if EP line-haul runs the
+So the headline saving falls by **more than half** if EP line-haul runs the
 heavier road trains SA law permits — i.e. the case for rail is *weakest* under the most
 permissive road rules, and the earlier single-figure "−3.0 M truck-km" overstated it.
 Loaded tonne-km (and therefore the A18 freight dollars) barely move across this range,

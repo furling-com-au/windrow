@@ -6,8 +6,8 @@
   "holdout": "2024/25",
   "ranges": {
     "fleetTrucks": [
-      350,
-      750
+      300,
+      900
     ],
     "linehaulTrucks": [
       25,
@@ -35,24 +35,39 @@
     ],
     "choiceBeta": [
       1.1,
-      2.6
+      3.5
+    ],
+    "choiceRadius": [
+      1.05,
+      3
+    ],
+    "countryBays": [
+      3,
+      5
+    ],
+    "portBays": [
+      5,
+      7
     ],
     "luckyBayBias": [
       0.4,
       2.2
     ]
   },
-  "evaluations": 150,
+  "evaluations": 300,
   "best": {
-    "fleetTrucks": 588.5757317915559,
-    "linehaulTrucks": 47.6405342544429,
-    "rateScale": 0.7233743029925971,
+    "fleetTrucks": 731.4261843189597,
+    "linehaulTrucks": 59.7716456927359,
+    "rateScale": 0.7,
     "matShift": -4,
-    "harvestRampDays": 6.907598016988485,
+    "harvestRampDays": 8.474589382279664,
     "retentionShare": 0.1,
     "portAttractBias": 0.8,
-    "choiceBeta": 1.9654354340909055,
-    "luckyBayBias": 0.6506237802132964
+    "choiceBeta": 2.1988918587714443,
+    "choiceRadius": 2.105491730625741,
+    "countryBays": 4.404088321160525,
+    "portBays": 5.698792750816793,
+    "luckyBayBias": 0.4
   },
-  "bestScore": 1.2995461081363957
+  "bestScore": 1.1332627961153459
 }

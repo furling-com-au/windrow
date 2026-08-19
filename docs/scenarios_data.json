@@ -4,86 +4,86 @@
     {
       "id": "baseline",
       "label": "Baseline replay",
-      "receivedMt": 2.18,
-      "receivedLbMt": 0.363,
-      "shippedPlMt": 1.22,
+      "receivedMt": 2.228,
+      "receivedLbMt": 0.326,
+      "shippedPlMt": 1.206,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 189,
-      "truckKmProxy": 16618856,
-      "peakWeekKt": 366
+      "peakQueue": 139,
+      "truckKmProxy": 17636975,
+      "peakWeekKt": 433
     },
     {
       "id": "bumper",
       "label": "Bumper (+30%)",
-      "receivedMt": 2.776,
-      "receivedLbMt": 0.53,
+      "receivedMt": 2.786,
+      "receivedLbMt": 0.536,
       "shippedPlMt": 1.22,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 285,
-      "truckKmProxy": 19826020,
-      "peakWeekKt": 396
+      "peakQueue": 450,
+      "truckKmProxy": 20275705,
+      "peakWeekKt": 432
     },
     {
       "id": "drought",
       "label": "Drought (-40%)",
-      "receivedMt": 1.396,
-      "receivedLbMt": 0.129,
-      "shippedPlMt": 1.028,
+      "receivedMt": 1.404,
+      "receivedLbMt": 0.127,
+      "shippedPlMt": 1.032,
       "vesselCount": 46,
-      "meanVesselWaitH": 2100.4,
-      "peakQueue": 93,
-      "truckKmProxy": 11242428,
-      "peakWeekKt": 260
+      "meanVesselWaitH": 1504.5,
+      "peakQueue": 59,
+      "truckKmProxy": 11771892,
+      "peakWeekKt": 262
     },
     {
       "id": "rail",
       "label": "Rail reinstated",
-      "receivedMt": 2.187,
-      "receivedLbMt": 0.357,
+      "receivedMt": 2.231,
+      "receivedLbMt": 0.323,
       "shippedPlMt": 1.22,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 185,
-      "truckKmProxy": 13633802,
-      "peakWeekKt": 362
+      "peakQueue": 119,
+      "truckKmProxy": 15148467,
+      "peakWeekKt": 431
     },
     {
       "id": "luckybay",
       "label": "Lucky Bay share shift",
-      "receivedMt": 2.07,
-      "receivedLbMt": 0.474,
+      "receivedMt": 2.089,
+      "receivedLbMt": 0.466,
       "shippedPlMt": 1.22,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 165,
-      "truckKmProxy": 16688905,
-      "peakWeekKt": 355
+      "peakQueue": 123,
+      "truckKmProxy": 18211025,
+      "peakWeekKt": 412
     },
     {
       "id": "outage",
       "label": "Port Lincoln outage (7 d @ day 70)",
-      "receivedMt": 2.157,
-      "receivedLbMt": 0.386,
+      "receivedMt": 2.2,
+      "receivedLbMt": 0.354,
       "shippedPlMt": 1.22,
       "vesselCount": 51,
       "meanVesselWaitH": 28.8,
-      "peakQueue": 241,
-      "truckKmProxy": 17226274,
-      "peakWeekKt": 366
+      "peakQueue": 182,
+      "truckKmProxy": 18485589,
+      "peakWeekKt": 433
     },
     {
       "id": "roadclosure",
       "label": "Tod Hwy closure (x2.5)",
-      "receivedMt": 2.169,
-      "receivedLbMt": 0.374,
-      "shippedPlMt": 1.22,
+      "receivedMt": 2.224,
+      "receivedLbMt": 0.33,
+      "shippedPlMt": 1.21,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 170,
-      "truckKmProxy": 18060183,
-      "peakWeekKt": 363
+      "peakQueue": 140,
+      "truckKmProxy": 19018196,
+      "peakWeekKt": 431
     }
   ]
 }

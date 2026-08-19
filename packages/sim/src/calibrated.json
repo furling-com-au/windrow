@@ -1,54 +1,66 @@
 {
   "knobs": {
-    "fleetTrucks": 588.5757317915559,
-    "linehaulTrucks": 47.6405342544429,
-    "rateScale": 0.7233743029925971,
+    "fleetTrucks": 731.4261843189597,
+    "linehaulTrucks": 59.7716456927359,
+    "rateScale": 0.7,
     "matShift": -4,
-    "harvestRampDays": 6.907598016988485,
+    "harvestRampDays": 8.474589382279664,
     "retentionShare": 0.1,
     "portAttractBias": 0.8,
-    "choiceBeta": 1.9654354340909055,
-    "luckyBayBias": 0.6506237802132964
+    "choiceBeta": 2.1988918587714443,
+    "choiceRadius": 2.105491730625741,
+    "countryBays": 4.404088321160525,
+    "portBays": 5.698792750816793,
+    "luckyBayBias": 0.4
   },
   "params": {
-    "fleetTrucks": 589,
-    "linehaulTrucks": 48,
+    "fleetTrucks": 731,
+    "linehaulTrucks": 60,
     "truckPayloadT": 38,
+    "linehaulPayloadT": 45,
     "harvestRatePerDay": {
-      "wheat": 0.05425307272444478,
-      "barley": 0.06510368726933373,
-      "canola": 0.05425307272444478,
-      "lentils": 0.07233743029925971,
-      "beans": 0.05786994423940777,
-      "other": 0.05786994423940777
+      "wheat": 0.037939999999999995,
+      "barley": 0.04557,
+      "canola": 0.037939999999999995,
+      "lentils": 0.05061,
+      "beans": 0.040459999999999996,
+      "other": 0.040459999999999996
     },
     "maturityDayOffset": {
-      "lentils": 18,
-      "barley": 22,
-      "other": 30,
-      "beans": 36,
-      "canola": 42,
-      "wheat": 44
+      "lentils": 14,
+      "barley": 18,
+      "other": 26,
+      "beans": 32,
+      "canola": 38,
+      "wheat": 40
     },
     "districtStartOffset": {
       "WEP": -8,
       "EEP": 0,
       "LEP": 8
     },
-    "harvestRampDays": 6.907598016988485,
-    "choiceBeta": 1.9654354340909055,
+    "harvestRampDays": 8.474589382279664,
+    "siteServiceMin": 12,
+    "travelTimeScale": 1,
+    "rainStopMm": 5,
+    "carryInScale": 1,
+    "upcountryCapScale": 1,
+    "choiceBeta": 2.1988918587714443,
+    "choiceRadius": 2.105491730625741,
+    "countryBays": 4,
+    "portBays": 6,
     "portAttractBias": 0.8,
     "retentionShare": 0.1,
-    "luckyBayBias": 0.6506237802132964,
+    "luckyBayBias": 0.4,
     "productionScale": 1,
     "railReinstated": false,
     "outage": null,
     "roadClosure": null
   },
-  "score": 1.2995461081363957,
+  "score": 1.1332627961153459,
   "parts": {
-    "2023/24": 0.6799194725510894,
-    "2025/26": 0.6196266355853062
+    "2023/24": 0.6115751229316829,
+    "2025/26": 0.521687673183663
   },
-  "nEvaluations": 150
+  "nEvaluations": 300
 }
