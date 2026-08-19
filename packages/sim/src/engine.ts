@@ -984,6 +984,7 @@ export class Sim {
         meanWaitH: Math.round(this.meanVesselWaitHNow() * 10) / 10,
         peakQueue: this.peakQueue,
         vesselsArrived: this.vessels.reduce((a, v) => a + (v.state !== V_PENDING ? 1 : 0), 0),
+        carryInT: Math.round(this.carryInT),
       },
     };
   }

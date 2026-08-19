@@ -159,6 +159,7 @@ export interface Snapshot {
     meanWaitH: number; // mean vessel anchorage wait so far (h/vessel arrived)
     peakQueue: number; // worst single-site truck queue so far
     vesselsArrived: number;
+    carryInT: number; // opening stocks carried over from the prior season (A17)
   };
 }
 

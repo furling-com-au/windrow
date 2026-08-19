@@ -307,7 +307,7 @@
 
   {#if app.snap}
     <div class="kpis">
-      <div class="kpi" title="Grain delivered into silos and ports so far (simulated). 'actual' = the operator's published figure to this date.">
+      <div class="kpi" title="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published figure to this date. Deliveries to T-Ports Lucky Bay are counted separately.">
         <span class="v">{(app.snap.kpi.receivedT / 1e6).toFixed(2)}</span>
         <span class="l">million t delivered (sim)</span>
         {#if obsCumAtDay != null}<span class="o">actual {(obsCumAtDay / 1e6).toFixed(2)}</span>{/if}
@@ -318,9 +318,13 @@
           <span class="l">trucks on the road now</span>
         </div>
       {:else}
-        <div class="kpi" title="Grain loaded onto ships so far (simulated)">
+        <div
+          class="kpi"
+          title="Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay). Ships also load stock carried over from last season, so this can exceed this season's deliveries."
+        >
           <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
           <span class="l">million t shipped out</span>
+          {#if app.snap.kpi.carryInT > 10000}<span class="o">incl. {(app.snap.kpi.carryInT / 1e6).toFixed(2)} carry-over</span>{/if}
         </div>
         <div class="kpi" title="Trucks waiting to unload across all sites right now">
           <span class="v">{app.snap.kpi.queueTrucks}</span>
