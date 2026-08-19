@@ -65,7 +65,18 @@
     money?: string;
     dim: boolean;
     dir: "up" | "down" | "flat";
+    tip?: string;
   }
+
+  const ROW_TIPS: Record<string, string> = {
+    "Grain delivered": "Grain farmers delivered into the main network's silos and ports this season, vs the real season at the same date.",
+    "→ to Lucky Bay instead": "Deliveries that went to the competing T-Ports Lucky Bay system — grain that left the main network.",
+    "Shipped out": "Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay).",
+    Trucking: "Loaded truck travel. When grain can't go straight to port it gets double-handled — farm to silo now, silo to port later — which adds kilometres and cost (10¢/t·km, A18).",
+    "Worst silo queue": "The most trucks waiting to unload at any ONE silo at any single moment this season, this what-if vs the real season. The absolute number rests on an assumed unloading time (A2) — read it as relative.",
+    "Ships waiting": "Average hours each ship spends at anchor waiting for a berth or for grain, costed at a demurrage-like ~A$30k per ship-day (A19).",
+    "Crop value (farm gate)": "The changed harvest tonnage valued at PIRSA-derived farm-gate prices (~$380/t).",
+  };
   let fixedRows = $derived.by((): Row[] => {
     const d = deltas;
     const s = app.snap;
@@ -188,7 +199,11 @@
       );
     }
     if (Math.abs(d.freight) > 300000) {
-      lines.push(`Trucks travel ${d.freight > 0 ? "further" : "less"} overall — roughly ${fmtMoney(Math.abs(d.freight))} ${d.freight > 0 ? "extra" : "saved"} in freight.`);
+      lines.push(
+        d.freight > 0
+          ? `Trucks travel further overall — grain gets double-handled (farm to silo now, silo to port later) — roughly ${fmtMoney(Math.abs(d.freight))} extra in freight.`
+          : `Trucks travel less overall — roughly ${fmtMoney(Math.abs(d.freight))} saved in freight.`,
+      );
     }
     if (Math.abs(d.dQrel) >= 0.15) {
       lines.push(`Queues at the busiest silo peak about ${pct(d.dQrel)} ${d.dQrel > 0 ? "longer" : "shorter"} than the real season.`);
@@ -336,8 +351,8 @@
         <div class="fine">Computing the real-season baseline…</div>
       {:else}
         {#each fixedRows as r}
-          <div class="row {r.dir}" class:dim={r.dim}>
-            <span>{r.label}</span>
+          <div class="row {r.dir}" class:dim={r.dim} title={ROW_TIPS[r.label] ?? ""}>
+            <span class="rl">{r.label}<span class="q">?</span></span>
             <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
@@ -456,6 +471,20 @@
   .row .money {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+  .row .q {
+    display: inline-block;
+    margin-left: 4px;
+    width: 11px;
+    height: 11px;
+    line-height: 11px;
+    text-align: center;
+    border-radius: 50%;
+    background: #223650;
+    color: #7d93a9;
+    font-size: 8px;
+    vertical-align: 1px;
+    cursor: help;
   }
   .fine {
     color: #64788c;
