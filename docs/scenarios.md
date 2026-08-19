@@ -40,11 +40,28 @@ vessels sit at anchor for weeks waiting for grain before short-loading (the sim'
 
 **Rail reinstated.** Two 1,600 t trainsets on the old Cummins/Kimba/Wudinna alignments
 (demand-dispatched, ≤~2 cycles/day each — A21; road line-haul fleet cut by a third)
-keep port stocks equally well supplied while removing **~3.0 M truck-kilometres** from
-the roads (16.6 → 13.6 M, −18 %) — at the A18 indicative rate a freight saving in the
-low millions of dollars per season, against which any reinstatement capital case would
-have to stack up. Receival and shipping outcomes are unchanged, consistent with why
-the 2019 closure was absorbable by ~48 trucks/day.
+keep port stocks equally well supplied while removing truck-kilometres from the roads.
+Receival and shipping outcomes are unchanged, consistent with why the 2019 closure was
+absorbable by ~48 trucks/day.
+
+**How big that saving is depends entirely on how big the trucks it displaces are** — the
+single most consequential open assumption in this scenario (A1; data/trucks.md open
+question 7). Measured on 2025/26:
+
+| silo→port load | road truck-km | with rail | rail saves |
+|---|---|---|---|
+| **45 t** (default; Viterra's 2019 rail-replacement statement) | 16.62 M | 14.13 M | **2.49 M** (−15 %) |
+| 72 t (ACCC's EP *permitted* load size) | 14.88 M | 13.62 M | **1.27 M** (−8 %) |
+| 85 t (SA Type 2 road train at CML 132.83 t) | 14.41 M | 13.47 M | **0.94 M** (−7 %) |
+
+So the headline saving falls by roughly **half to two-thirds** if EP line-haul runs the
+heavier road trains SA law permits — i.e. the case for rail is *weakest* under the most
+permissive road rules, and the earlier single-figure "−3.0 M truck-km" overstated it.
+Loaded tonne-km (and therefore the A18 freight dollars) barely move across this range,
+because the same grain travels the same distance regardless of how it is split across
+trucks; it is the vehicle-kilometre count — and with it road wear, emissions and driver
+demand — that changes. Against any of these figures, a reinstatement capital case would
+still have to stack up.
 
 **Lucky Bay share ×2.5.** T-Ports intake grows 0.35 → 0.46 Mt; Bunge Western receivals
 drop ~0.11 Mt, concentrated in eastern-EP clusters (Cowell/Cleve/Kimba catchments), and

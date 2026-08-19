@@ -412,7 +412,7 @@ export class Sim {
         destPort: -1,
         commodity: -1,
         loadT: 0,
-        payloadT: 45,
+        payloadT: params.linehaulPayloadT ?? 45,
         doneAt: 0,
         legMin: 0,
         legStart: 0,

@@ -11,7 +11,10 @@ export function defaultParams(): Params {
   return {
     fleetTrucks: 589, // * regional farm-truck fleet at harvest peak
     linehaulTrucks: 48, // * site->port outloading fleet
-    truckPayloadT: 38, // A1 blended net payload
+    truckPayloadT: 38, // A1 blended net payload (farm -> site)
+    linehaulPayloadT: 45, // A1 line-haul net payload; anchored to Viterra's 2019 rail
+    //   replacement statement (48 loaded trucks/day ~ 2,100-2,200 t/day => ~45 t/load).
+    //   SA permits far heavier road trains (Type 2, up to 142.28 t HML) - see data/trucks.md.
     harvestRatePerDay: {
       // * per-commodity daily harvest fraction of a parcel (good-weather day); prior
       //   ratios scaled by the fitted rateScale 0.723

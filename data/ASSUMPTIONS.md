@@ -6,15 +6,33 @@ presented as measured data.
 
 ## A1 — truck net payloads per configuration
 - **Value**: semi-trailer 28 t; 9-axle B-double 42 t; A-double road train 55 t;
-  AB-triple 68 t (net grain tonnes).
-- **Used in**: truck agents (Phase 3 params).
-- **Reasoning**: GTSN publishes gross combination masses only (42.5–110 t); tares are not
-  published. Net ≈ 62–66 % of GCM matches the two published anchors: AEGIC "72 t load
-  size on EP" (≈ AB-triple at HML 107.5 t ⇒ tare ~35 t) and SA average delivered load
-  >29 t in 2016-17 (mixed fleet incl. farm semis).
-- **Sensitivity**: linear on truck counts; fleet size is a calibrated free parameter, so
-  payload error is partly absorbed by calibration.
-- **Upgrade path**: operator turnaround/weighbridge data; truck-spec tare sheets.
+  AB-triple 68 t (net grain tonnes). Model blends: **farm→site 38 t**
+  (`truckPayloadT`), **site→port line-haul 45 t** (`linehaulPayloadT`).
+- **Used in**: truck agents (Phase 3 params). Both blends are exposed as assumption
+  levers in the app.
+- **Reasoning**: GTSN publishes gross combination masses only; tares are not published.
+  Net ≈ 62–66 % of GCM. The two published anchors pull in different directions and are
+  reconciled as follows:
+  - ACCC FD p.67 records 72 t loads "being **allowed**" on EP — a *permitted ceiling*
+    (≈ Type 1 AB-triple at HML), not an average.
+  - Viterra's 2019 rail-replacement statement (48 loaded trucks/day moving
+    ~2,100–2,200 t/day) implies **~45 t per line-haul load** in actual operation — this
+    is the line-haul default.
+  - SA average delivered load >29 t in 2016-17 (all regions, incl. small farm semis)
+    bounds the farm→site blend from below; 38 t reflects EP's better road-train access.
+- **Known gap (added after review)**: the GTSN **Truck Book** also lists **Type 2** road
+  trains (53.5 m) that SA permits to **132.83 t CML / 142.28 t HML** — roughly 85 t net,
+  nearly double the line-haul default. Whether EP highways are on SA's pre-approved
+  53.5 m network is unresolved (data/trucks.md open question 7). Until it is, 45 t is
+  the *operationally anchored* figure and 85 t the *legal ceiling*.
+- **Sensitivity**: farm→site payload is linear on truck counts and largely absorbed by
+  the fitted fleet size (see A1 note in docs/calibration_report.md). Line-haul payload is
+  NOT absorbed: it drives truck-km directly, and the rail scenario's headline saving
+  falls from ~2.5 M truck-km (45 t) to ~1.3 M (72 t) to ~0.9 M (85 t) on 2025/26. Loaded
+  tonne-km — and therefore the freight dollar figures — barely move, since the same
+  grain travels the same distance either way.
+- **Upgrade path**: operator turnaround/weighbridge data; truck-spec tare sheets; RAVnet
+  53.5 m network coverage for EP.
 
 ## A2 — receival site service times
 - **Value**: sample + weigh + tip cycle 12 min/truck/bay baseline; sites have 2 tipping
@@ -181,7 +199,9 @@ presented as measured data.
   and ACCC's record that rail carried only the Cummins/Kimba/Wudinna lines. Consist
   size, trainset count, cycle handling time and the absence of track-capacity limits
   are modelling choices, not citations.
-- **Sensitivity**: affects only the rail scenario's truck-km savings and queue relief.
+- **Sensitivity**: affects only the rail scenario's truck-km savings and queue relief —
+  and those are dominated by the line-haul payload the trains displace (A1): the saving
+  falls from ~2.5 M truck-km at 45 t/load to ~0.9 M at 85 t. Report it as a range.
 - **Upgrade path**: a real reinstatement proposal (consist sizes, timetable, loop
   lengths) would replace all of this.
 

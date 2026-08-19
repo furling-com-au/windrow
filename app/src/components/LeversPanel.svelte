@@ -75,7 +75,8 @@
     if (l.outage) parts.push("Port Lincoln closed 1 wk (mid-Dec)");
     if (l.roadClosure) parts.push("Tod Hwy closed");
     const a = app.assump;
-    if (a.payloadT !== DEFAULT_ASSUMP.payloadT) parts.push(`payload ${a.payloadT} t`);
+    if (a.payloadT !== DEFAULT_ASSUMP.payloadT) parts.push(`farm payload ${a.payloadT} t`);
+    if (a.lhPayloadT !== DEFAULT_ASSUMP.lhPayloadT) parts.push(`silo→port load ${a.lhPayloadT} t`);
     if (a.serviceMin !== DEFAULT_ASSUMP.serviceMin) parts.push(`unload ${a.serviceMin} min`);
     if (a.travelScale !== DEFAULT_ASSUMP.travelScale) parts.push(`travel ×${a.travelScale.toFixed(2)}`);
     if (a.rainStopMm !== DEFAULT_ASSUMP.rainStopMm) parts.push(`rain stops harvest at ${a.rainStopMm} mm`);
@@ -375,7 +376,7 @@
         oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
     </label>
     <div class="toggles">
-      <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, max ~2 cycles/day (assumption A21)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
+      <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, max ~2 cycles/day (assumption A21). How much trucking this saves depends strongly on the silo-to-port load assumption (see Model assumptions)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
       <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
       <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>
@@ -393,6 +394,10 @@
         <label title="A1: average net tonnes per farm-truck load. Not published — built from industry mass-limit charts and load-size studies.">
           <span>Average truck load <b>{app.assump.payloadT} t</b></span>
           <input type="range" min="28" max="48" step="1" value={app.assump.payloadT} oninput={(e) => setA("payloadT", parseFloat(e.currentTarget.value))} />
+        </label>
+        <label title="A1: average net tonnes per silo-to-port road-train load. Our 45 t is anchored to Viterra's 2019 rail-replacement statement (48 loaded trucks/day for ~2,100-2,200 t/day). SA law permits much heavier: Type 2 road trains run to 142 t gross (~85 t net) where highways are on the pre-approved 53.5 m network. Raising this shrinks the trucking a railway would save.">
+          <span>Silo-to-port road-train load <b>{app.assump.lhPayloadT} t</b></span>
+          <input type="range" min="40" max="90" step="5" value={app.assump.lhPayloadT} oninput={(e) => setA("lhPayloadT", parseFloat(e.currentTarget.value))} />
         </label>
         <label title="A2: minutes to sample, weigh and tip one truck at a silo bay. Nowhere published — the single most influential guess behind queue numbers.">
           <span>Silo unload cycle <b>{app.assump.serviceMin} min</b></span>

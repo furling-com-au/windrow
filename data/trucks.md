@@ -20,6 +20,28 @@ Gross combination masses (t) under General / Concessional / Higher Mass Limits:
 | 14-axle AB-triple + 2-axle dolly (88) | 36.5 m | 99.0 | 101.0 | 107.5 |
 | 15-axle AB-triple + 3-axle dolly (96) | 36.5 m | 102.5 | 104.5 | 110.0 (113.0 with NHVR permit) |
 
+The table above is the one-page GTSN **truck chart**, which covers **Type 1** road trains
+(36.5 m). The full GTSN **Truck Book** (v5.0, Sept 2025, section 4.10) also lists **Type 2**
+road trains (53.5 m), which SA permits at materially higher masses:
+
+| Type 2 combination (Truck Book §4.10) | SA GML | SA CML | SA HML |
+|---|---|---|---|
+| 18-axle road train + 3-axle dolly (89) | 118.13 | 132.83 | **142.28** |
+| 17-axle road train (90) | 124.95 | 128.10 | 136.50 |
+| 16-axle road train + 2-axle dolly (74) | — | 124.43 | 130.73 |
+| 15-axle road train (80) | — | 120.75 | 124.95 |
+| 14-axle road train (78) | — | 121.28 | 119.18 |
+
+- Truck Book footnotes 240/242: "**South Australia requires a NHVR permit unless operating
+  on the pre-approved 53.5 m network.**" Whether EP trunk highways are on that network is
+  **unresolved** — see open question 7 below.
+- Type 2 **quads** (ABB-/BAB-quad, up to 135.50 t) are listed **Queensland-only**; the SA
+  rows are blank, so they are not evidence for EP operations.
+- Nothing in the GTSN grain sources reaches 155 t. Above 142.28 t in SA would require a
+  PBS (Performance Based Standards) Level 4 combination running on an individual NHVR
+  Vehicle Approval, which by construction does not appear in a generic mass chart — so
+  such vehicles may exist without being verifiable from published grain-industry sources.
+
 - **SA harvest concession**: Farm Gate Grain Transport Mass Exemption Notice 2025 — up to
   **105 %** of the mass limit for the first and second loads from a paddock each day,
   farm → receiver (expires Feb 2030). Source: GTSN Truck Book v5.0 Sept 2025 §3.17.5,
@@ -27,8 +49,12 @@ Gross combination masses (t) under General / Concessional / Higher Mass Limits:
 
 ## Payloads (published evidence)
 
-- EP **load size ~72 t** vs ~44 t in the Adelaide region — AEGIC (2018), quoted in ACCC
-  Final Determinations p.67. Implies road trains / AB-triples dominate EP line-haul.
+- Trucks "with a load size of **72 tonnes** being **allowed** on the Eyre Peninsula, versus
+  44" — ACCC Final Determinations p.67 (verbatim; listed among reasons EP freight rates run
+  below eastern SA). NOTE: this is a **permitted maximum**, not an observed average load —
+  earlier drafts of this file read it as a typical load. 72 t net ≈ a Type 1 AB-triple at
+  HML (110-113 t gross at ~65 % net), so it is good evidence for the *class* of vehicle EP
+  line-haul can use, not for what an average load weighs.
 - Average SA delivered load grew from ~24.5 t (2009-10) to **>29 t** (2016-17) — AEGIC via
   ACCC FD p.68 (state-wide average across all deliveries incl. small farm trucks).
 - Tare masses are **not published** in the GTSN chart → net payloads are an assumption
@@ -74,3 +100,9 @@ Gross combination masses (t) under General / Concessional / Higher Mass Limits:
 4. Trucks-per-day counts at sites (only tonnage records).
 5. Tare masses / net payloads per configuration.
 6. Machine-readable RAV route list (RAVnet is interactive-only).
+7. **Is the EP trunk network (Lincoln/Tod/Eyre Hwy) on SA's pre-approved 53.5 m Type 2
+   road-train network?** This decides whether silo->port line-haul runs at ~45 t net
+   (Viterra's 2019 rail-replacement statement: 48 loaded trucks/day for ~2,100-2,200 t/day)
+   or at ~85 t net (Type 2 at SA CML 132.83 t). The simulation's rail scenario is highly
+   sensitive to it: the truck-km a railway would save falls from ~2.5 M (at 45 t) to
+   ~0.9 M (at 85 t) - see ASSUMPTIONS A1/A21 and docs/scenarios.md.

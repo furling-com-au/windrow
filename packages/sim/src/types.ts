@@ -117,7 +117,8 @@ export interface Bundle {
 export interface Params {
   fleetTrucks: number; // farm truck fleet across the region
   linehaulTrucks: number;
-  truckPayloadT: number; // average net payload (A1 blended)
+  truckPayloadT: number; // average net payload, farm->site (A1 blended)
+  linehaulPayloadT: number; // average net payload, site->port line-haul (A1; road-train class)
   harvestRatePerDay: Record<Commodity, number>; // fraction of a parcel's remaining crop harvestable per good day
   maturityDayOffset: Record<Commodity, number>; // days after season start when harvest can begin (base)
   districtStartOffset: Record<"WEP" | "LEP" | "EEP", number>;

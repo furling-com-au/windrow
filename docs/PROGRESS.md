@@ -67,6 +67,33 @@ This file is the canonical record of where the project is. Updated as work proce
 - Display-only by design. v2 upgrade path (net-price site choice from the accumulated EP
   bid series, needs recalibration) registered in A23 — not building without a go-ahead.
 
+### 2026-08-19 (truck-number audit + SA Type 2 road trains)
+- **Fleet audit** (`packages/sim/scripts/truck_audit.ts`, `fleet_identifiability.ts`,
+  `fleet_profile.ts`): the fitted 589 is only weakly identified. Equal-capacity points
+  (799@28 t, 589@38 t, 497@45 t, 407@55 t, 329@68 t) all fit to within 1.5 pp of weekly
+  RMSE - the data pins the tonnage flow (~22,400 t of fleet capacity), not the truck
+  count. The calibrator's objective also falls monotonically across its whole search
+  range (350->1.543, 589->1.347, 750->1.265, 1000->1.181), so 589 is a point on a slope
+  inside an assumed prior box, not an optimum. Trucks run 1.5 trips/active-day at ~50-57 %
+  of the 12 h receival window: harvest rate and weather bind, not the fleet.
+- **Known open defect**: per-cluster `Math.round` over 324 clusters instantiates 573-585
+  trucks against the 589 parameter (-0.7 % to -2.7 %, season-dependent). Largest-remainder
+  allocation would fix it. NOT yet applied.
+- **SA Type 2 road trains**: the GTSN *Truck Book* (S4.10) lists 53.5 m Type 2 combinations
+  SA permits at **GML 118.13 / CML 132.83 / HML 142.28 t** - our notes had stopped at the
+  one-page truck *chart* (Type 1, 36.5 m, 110-113 t). Quads (<=135.5 t) are Queensland-only.
+  Nothing in the grain sources reaches 155 t; above 142.28 t needs a PBS Level 4 vehicle
+  approval, which never appears in generic charts.
+- ACCC's "72 t" is a **permitted ceiling** ("being allowed"), not an average load -
+  data/trucks.md corrected.
+- **Line-haul payload is now a parameter** (`linehaulPayloadT`, was hardcoded 45 t) and an
+  app assumption lever. Default unchanged, so calibration is untouched (holdout still
+  -2.1 %). It matters: rail's truck-km saving falls 2.49 M (45 t) -> 1.27 M (72 t) ->
+  0.94 M (85 t); docs/scenarios.md now states the range instead of a single "-3.0 M".
+  Loaded tonne-km (and the A18 dollars) barely move.
+- New open question (data/trucks.md #7): is the EP trunk network on SA's pre-approved
+  53.5 m Type 2 road-train network?
+
 ## Key decisions
 
 - Repo root = `C:\Users\justi\grain_simulation` (spec layout §10). `data/raw/` git-ignored, manifest committed.
