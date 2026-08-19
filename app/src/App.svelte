@@ -100,6 +100,19 @@
     initSim();
   }
 
+  function setMode(m: "simple" | "advanced") {
+    app.viewMode = m;
+    localStorage.setItem("windrow_mode", m);
+    if (m === "simple" && app.heatmapOn) toggleHeatmap();
+  }
+
+  function replay() {
+    seek(0);
+    app.done = false;
+    app.playing = true;
+    post({ type: "play" });
+  }
+
   function setScenario(id: ScenarioId) {
     app.scenario = id;
     const preset = SCENARIOS.find((s) => s.id === id);
@@ -161,6 +174,9 @@
             app.clusters = m.clusters;
             plPortIdx = app.sites.findIndex((s) => s.name.includes("Lincoln"));
             resetHistories();
+            // the map should live immediately — a frozen dashboard reads as broken
+            app.playing = true;
+            post({ type: "play" });
             break;
           case "baseline":
             if (m.season === app.season) app.baseline = m.data;
@@ -218,10 +234,15 @@
   <header>
     <div>
       <h1>Windrow</h1>
-      <span class="sub">Eyre Peninsula grain supply chain — agent simulation</span>
+      <span class="sub">Watch an Eyre Peninsula harvest move from paddock to ship</span>
     </div>
     <button class="help" title="Guided tour" onclick={() => { app.tourStep = 0; app.showTour = true; }}>?</button>
   </header>
+
+  <div class="modes">
+    <button class:active={app.viewMode === "simple"} onclick={() => setMode("simple")}>Simple</button>
+    <button class:active={app.viewMode === "advanced"} onclick={() => setMode("advanced")} title="Levers, dollar takeaways, truck-flow heatmap, CSV export">Advanced</button>
+  </div>
 
   <div class="row">
     <label
@@ -240,11 +261,15 @@
   </div>
 
   <div class="row controls">
-    <button class="play" onclick={togglePlay} disabled={app.loading}>
-      {app.playing ? "⏸ Pause" : app.done ? "▶ Done" : "▶ Play"}
-    </button>
+    {#if app.done}
+      <button class="play" onclick={replay}>↺ Replay season</button>
+    {:else}
+      <button class="play" onclick={togglePlay} disabled={app.loading}>
+        {app.playing ? "⏸ Pause" : "▶ Play"}
+      </button>
+    {/if}
     {#each SPEEDS as sp}
-      <button class:active={app.speed === sp.v} onclick={() => setSpeed(sp.v)}>{sp.label}</button>
+      <button class:active={app.speed === sp.v} onclick={() => setSpeed(sp.v)} title="simulation speed">{sp.label}</button>
     {/each}
   </div>
 
@@ -261,22 +286,22 @@
 
   {#if app.snap}
     <div class="kpis">
-      <div class="kpi">
+      <div class="kpi" title="Grain delivered into silos and ports so far (simulated). 'actual' = the operator's published figure to this date.">
         <span class="v">{fmtMt(app.snap.kpi.receivedT)}</span>
-        <span class="l">received (sim)</span>
-        {#if obsCumAtDay != null}<span class="o">obs {fmtMt(obsCumAtDay)}</span>{/if}
+        <span class="l">grain delivered (sim)</span>
+        {#if obsCumAtDay != null}<span class="o">actual {fmtMt(obsCumAtDay)}</span>{/if}
       </div>
-      <div class="kpi">
+      <div class="kpi" title="Grain loaded onto ships so far (simulated)">
         <span class="v">{fmtMt(app.snap.kpi.shippedT)}</span>
-        <span class="l">shipped</span>
+        <span class="l">shipped out</span>
       </div>
-      <div class="kpi">
+      <div class="kpi" title="Trucks waiting to unload across all sites right now">
         <span class="v">{app.snap.kpi.queueTrucks}</span>
         <span class="l">trucks queued</span>
       </div>
-      <div class="kpi">
+      <div class="kpi" title="Ships at anchor waiting for a berth or for grain">
         <span class="v">{app.snap.kpi.vesselsWaiting}</span>
-        <span class="l">vessels waiting</span>
+        <span class="l">ships waiting</span>
       </div>
     </div>
     <MoneyChart {dailyReceived} observed={app.observed} season={app.season} day={app.snap.day} />
@@ -284,10 +309,12 @@
 
   <LeversPanel onchange={() => initSim(350)} />
 
-  <div class="row tools">
-    <button class:active={app.heatmapOn} onclick={toggleHeatmap} title="Cumulative loaded tonnes per route">🚚 truck-flow heatmap</button>
-    <button onclick={downloadCsv} title="Daily sim series + observed weekly (CSV)">⬇ CSV</button>
-  </div>
+  {#if app.viewMode === "advanced"}
+    <div class="row tools">
+      <button class:active={app.heatmapOn} onclick={toggleHeatmap} title="Cumulative loaded tonnes per route">🚚 truck-flow heatmap</button>
+      <button onclick={downloadCsv} title="Daily sim series + actual weekly deliveries (CSV)">⬇ CSV</button>
+    </div>
+  {/if}
 
   {#if app.error}<div class="err">{app.error}</div>{/if}
   {#if app.loading}<div class="loading">loading bundle…</div>{/if}
@@ -356,6 +383,21 @@
     height: 24px;
     cursor: pointer;
     font-weight: 700;
+  }
+  .modes {
+    display: flex;
+    gap: 0;
+    margin-top: 8px;
+    border: 1px solid #31465e;
+    border-radius: 6px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .modes button {
+    border: none;
+    border-radius: 0;
+    font-size: 11px;
+    padding: 4px 14px;
   }
   .row {
     display: flex;

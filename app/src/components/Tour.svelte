@@ -12,15 +12,15 @@
     },
     {
       title: "Time controls",
-      text: "Press Play and choose a speed (1 day per second is a good start). Drag the date slider to jump anywhere in the season — the simulation deterministically replays to that day.",
+      text: "The season is already playing at one day per second — harvest gets going from mid-October. Pause any time, change speed, or drag the date slider to jump anywhere; the simulation replays to that exact day.",
     },
     {
-      title: "Sim vs reality",
-      text: "The chart overlays the simulation (green) on the operator's actual published weekly receivals (gold dashed). Markers show the first delivery, record weeks and rain events. That gap between the lines is the honest measure of the model.",
+      title: "Simulated vs actual",
+      text: "The chart overlays the simulation (green) on what farmers actually delivered each week (gold dashed, from the operator's published reports). Markers show the first delivery, record weeks and rain events. The gap between the lines is the honest measure of the model.",
     },
     {
-      title: "What-ifs and levers",
-      text: "Pick a scenario or drag the levers: crop size, truck fleet, Lucky Bay's pull, a port outage, rail reinstated, a highway closure. The takeaways box translates the difference into plain terms — tonnes, queues, ship waiting — and indicative dollars (freight, demurrage, farm-gate value).",
+      title: "What-ifs",
+      text: "Pick a scenario — a bumper year, a drought, the port closed for a week, the trains brought back. 'What changed' translates the difference into plain terms — tonnes, queues, ships waiting — and indicative dollars. Switch to Advanced (top of the panel) to drag the underlying levers yourself, light up the truck-flow heatmap, or export CSV.",
     },
     {
       title: "Trust and limits",

@@ -16,7 +16,10 @@
     onchange();
   }
 
-  let story = $derived(SCENARIOS.find((s) => s.id === app.scenario)?.story ?? "Custom what-if — you moved the levers. Deltas below compare against the calibrated baseline.");
+  let story = $derived(
+    SCENARIOS.find((s) => s.id === app.scenario)?.story ??
+      "Custom what-if — you moved the levers. The takeaways below compare your version of the season against the normal one.",
+  );
 
   interface Takeaway {
     text: string;
@@ -34,36 +37,36 @@
 
     const dRec = s.kpi.receivedT - (b.receivedByDay[i] ?? 0);
     if (Math.abs(dRec) > 20000)
-      out.push({ text: `Bunge receivals ${kt(dRec)} vs baseline`, dir: dRec > 0 ? "up" : "down" });
+      out.push({ text: `Grain delivered ${kt(dRec)} vs the real season`, dir: dRec > 0 ? "up" : "down" });
 
     const dLb = s.kpi.receivedLbT - (b.lbByDay[i] ?? 0);
     if (Math.abs(dLb) > 10000)
-      out.push({ text: `T-Ports intake ${kt(dLb)}`, dir: dLb > 0 ? "up" : "down" });
+      out.push({ text: `Lucky Bay (T-Ports) intake ${kt(dLb)}`, dir: dLb > 0 ? "up" : "down" });
 
     const dShip = s.kpi.shippedT - (b.shippedByDay[i] ?? 0);
     if (Math.abs(dShip) > 20000)
-      out.push({ text: `Shipped ${kt(dShip)}`, dir: dShip > 0 ? "up" : "down" });
+      out.push({ text: `Shipped out ${kt(dShip)}`, dir: dShip > 0 ? "up" : "down" });
 
     const dTkm = s.kpi.tonneKm - (b.tonneKmByDay[i] ?? 0);
     const freight = dTkm * FREIGHT_PER_T_KM;
     if (Math.abs(freight) > 150000)
       out.push({
-        text: `Road cartage ${dTkm > 0 ? "+" : "−"}${Math.abs(dTkm / 1e6).toFixed(1)}M t·km`,
+        text: `Trucking task ${dTkm > 0 ? "+" : "−"}${Math.abs(dTkm / 1e6).toFixed(1)}M tonne-km`,
         money: `${freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(freight))} freight`,
         dir: freight > 0 ? "up" : "down",
       });
 
     const q0 = b.queueByDay[i] ?? 0;
     if (Math.abs(s.kpi.peakQueue - q0) > 15)
-      out.push({ text: `Worst site queue ${s.kpi.peakQueue} vs ${q0} trucks`, dir: s.kpi.peakQueue > q0 ? "up" : "down" });
+      out.push({ text: `Worst truck queue ${s.kpi.peakQueue} vs ${q0}`, dir: s.kpi.peakQueue > q0 ? "up" : "down" });
 
     const waitDays = (s.kpi.meanWaitH * s.kpi.vesselsArrived) / 24;
     const baseWaitDays = ((b.waitByDay[i] ?? 0) * (b.arrivedByDay[i] ?? 0)) / 24;
     const demurrage = (waitDays - baseWaitDays) * DEMURRAGE_PER_DAY;
     if (Math.abs(demurrage) > 200000)
       out.push({
-        text: `Vessel waiting ${s.kpi.meanWaitH.toFixed(0)} h/ship vs ${(b.waitByDay[i] ?? 0).toFixed(0)} h`,
-        money: `${demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(demurrage))} demurrage-equiv.`,
+        text: `Ships waiting ${s.kpi.meanWaitH.toFixed(0)} h each vs ${(b.waitByDay[i] ?? 0).toFixed(0)} h`,
+        money: `${demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(demurrage))} waiting cost`,
         dir: demurrage > 0 ? "up" : "down",
       });
 
@@ -84,52 +87,54 @@
 
 <div class="levers">
   <div class="head">
-    <span class="t">What-if levers</span>
-    <button class="reset" onclick={reset}>reset</button>
+    <span class="t">{app.viewMode === "advanced" ? "What-if levers" : "What-if"}</span>
+    {#if app.scenario !== "baseline"}<button class="reset" onclick={reset}>back to normal</button>{/if}
   </div>
   <p class="story">{story}</p>
 
-  <label>
-    <span>Crop size <b>{Math.round(app.levers.productionScale * 100)}%</b> of actual</span>
-    <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
-      oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
-  </label>
-  <label>
-    <span>Truck fleet <b>{Math.round(app.levers.fleetTrucks)}</b> trucks</span>
-    <input type="range" min="300" max="800" step="10" value={app.levers.fleetTrucks}
-      oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
-  </label>
-  <label>
-    <span>Lucky Bay pull <b>{app.levers.luckyBayBias.toFixed(1)}×</b></span>
-    <input type="range" min="0.2" max="3" step="0.1" value={app.levers.luckyBayBias}
-      oninput={(e) => set("luckyBayBias", parseFloat(e.currentTarget.value))} />
-  </label>
-  <label>
-    <span>Direct-to-port pull <b>{app.levers.portAttractBias.toFixed(1)}×</b></span>
-    <input type="range" min="0.4" max="2.5" step="0.1" value={app.levers.portAttractBias}
-      oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
-  </label>
-  <div class="toggles">
-    <button class:on={app.levers.rail} onclick={() => set("rail", !app.levers.rail)}>rail</button>
-    <button class:on={app.levers.outage} onclick={() => set("outage", !app.levers.outage)}>PL outage</button>
-    <button class:on={app.levers.roadClosure} onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
-  </div>
+  {#if app.viewMode === "advanced"}
+    <label>
+      <span>Crop size <b>{Math.round(app.levers.productionScale * 100)}%</b> of actual</span>
+      <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
+        oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
+    </label>
+    <label>
+      <span>Truck fleet <b>{Math.round(app.levers.fleetTrucks)}</b> trucks</span>
+      <input type="range" min="300" max="800" step="10" value={app.levers.fleetTrucks}
+        oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
+    </label>
+    <label>
+      <span>Grain drawn to Lucky Bay <b>{app.levers.luckyBayBias.toFixed(1)}×</b></span>
+      <input type="range" min="0.2" max="3" step="0.1" value={app.levers.luckyBayBias}
+        oninput={(e) => set("luckyBayBias", parseFloat(e.currentTarget.value))} />
+    </label>
+    <label>
+      <span>Farmers carting straight to port <b>{app.levers.portAttractBias.toFixed(1)}×</b></span>
+      <input type="range" min="0.4" max="2.5" step="0.1" value={app.levers.portAttractBias}
+        oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
+    </label>
+    <div class="toggles">
+      <button class:on={app.levers.rail} onclick={() => set("rail", !app.levers.rail)}>trains</button>
+      <button class:on={app.levers.outage} onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
+      <button class:on={app.levers.roadClosure} onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
+    </div>
+  {:else}
+    <div class="fine hint">Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself.</div>
+  {/if}
 
   {#if takeaways.length}
     <div class="tk">
-      <div class="tkt">Key takeaways vs baseline{app.snap && app.snap.day < 360 ? ` (to ${app.snap.dateIso})` : ""}</div>
+      <div class="tkt">What changed{app.snap && app.snap.day < 360 ? ` (to ${app.snap.dateIso})` : ""}</div>
       {#each takeaways as t}
         <div class="row {t.dir}">
           <span>{t.text}</span>
           {#if t.money}<span class="money">{t.money}</span>{/if}
         </div>
       {/each}
-      <div class="fine">Indicative: 10¢/t·km cartage, ~A$30k/vessel-day, ~$380/t farm-gate (assumptions A18–A19).</div>
+      <div class="fine">Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (assumptions A18–A19).</div>
     </div>
-  {:else if app.baseline}
-    <div class="tk"><div class="fine">Run or scrub the season — deltas vs baseline appear here.</div></div>
-  {:else}
-    <div class="tk"><div class="fine">Computing baseline…</div></div>
+  {:else if app.scenario !== "baseline" && app.baseline}
+    <div class="tk"><div class="fine">Play the season — differences from the normal season appear here.</div></div>
   {/if}
 </div>
 
@@ -231,5 +236,8 @@
     font-size: 9.5px;
     margin-top: 5px;
     line-height: 1.35;
+  }
+  .hint b {
+    color: #9db1c5;
   }
 </style>

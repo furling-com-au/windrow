@@ -52,7 +52,7 @@
       <div class="port" class:major={i === 0}>
         <div class="phead">
           <span class="pname">{p.short}</span>
-          <span class="pstock">{(p.stockT / 1000).toFixed(0)} kt stored</span>
+          <span class="pstock" title="{Math.round(p.stockT).toLocaleString()} tonnes in storage at this port">{(p.stockT / 1000).toFixed(0)} kt stored</span>
           {#if p.waiting > 0}<span class="wait">{p.waiting} at anchor</span>{/if}
         </div>
         {#each p.berthed as v}

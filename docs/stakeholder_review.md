@@ -190,3 +190,31 @@ cluster around (a) exposing more of what the sim already computes (quick wins 3�
 (b) two structural model gaps (carry-in stocks, corridor heatmap), and (c) the one
 thing public data cannot provide — operator-grade site parameters — which is a
 partnership question, not an engineering one.
+
+---
+
+## Fresh-eyes usability review (2026-08-19, post-sprint)
+
+Walked the deployed site as a first-time lay visitor. Findings → fixes, all shipped:
+
+1. **The dashboard was dead on arrival** — date frozen at 1 Oct, every KPI 0.00,
+   "berth idle" ×3 behind the tour. A static screen reads as broken. → The season now
+   **auto-plays at 1 day/second** on load and after every scenario/season change; the
+   end state offers "↺ Replay season".
+2. **Jargon on the first screen** — "held-out", "sim vs observed", "Western region
+   receivals", "Lucky Bay pull 0.7×", "deltas vs baseline", "PL outage". → Plain-language
+   pass everywhere: "drought year", "simulated vs actual", "Grain delivered", "Grain
+   drawn to Lucky Bay", "What changed", "Port Lincoln closed a week". Technical terms
+   survive only in docs and tooltips.
+3. **One panel for every audience** was overwhelming. → **Two view modes** (persisted):
+   **Simple** (default) = map + play + KPIs + chart + scenario stories + "What changed"
+   takeaways; **Advanced** adds the lever sliders, truck-flow heatmap and CSV export.
+   Scenario presets remain the lay person's what-if instrument — the takeaways panel
+   works identically in both modes.
+
+**On "different views for different users":** two modes, not five role dashboards.
+The role-specific *content* differences (grower vs planner vs port) are already served
+by where you look (site drill-down vs heatmap vs port panel) and would fragment a
+single-page tool if split further; the real divide observed was depth-of-control, which
+the Simple/Advanced toggle captures. Revisit only if a specific audience (e.g. DIT)
+requests a dedicated corridor view.

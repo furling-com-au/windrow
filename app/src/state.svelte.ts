@@ -32,13 +32,13 @@ export const DEFAULT_LEVERS: Levers = {
 };
 
 export const SCENARIOS: { id: ScenarioId; label: string; story: string; levers: Partial<Levers> }[] = [
-  { id: "baseline", label: "Baseline replay", story: "The season as it happened: observed production, observed vessel program, calibrated network.", levers: {} },
-  { id: "bumper", label: "Bumper harvest (+30%)", story: "A big year. Watch site storage fill, queues build at peak, and surplus grain spill toward T-Ports.", levers: { productionScale: 1.3 } },
-  { id: "drought", label: "Drought (−40%)", story: "A small crop against an unchanged export program: the land side relaxes but ships wait at anchor for grain that never comes.", levers: { productionScale: 0.6 } },
-  { id: "rail", label: "Rail reinstated", story: "Two trainsets on the old Cummins/Kimba/Wudinna lines take over part of the port shuttle, easing peak road queues.", levers: { rail: true } },
-  { id: "luckybay", label: "Lucky Bay share shift", story: "T-Ports made 2.5× more attractive: eastern-EP grain drains to Lucky Bay and out of the Bunge network.", levers: { luckyBayBias: 2.5 } },
-  { id: "outage", label: "Port Lincoln outage (7 d)", story: "The terminal closes for a week at harvest peak. Deliveries redirect upcountry; the buffer holds — at a queueing price.", levers: { outage: true } },
-  { id: "roadclosure", label: "Tod Hwy closure", story: "The central spine is impassable (2.5× travel time). Trucks re-sort to Lincoln-Highway-side sites.", levers: { roadClosure: true } },
+  { id: "baseline", label: "The season as it happened", story: "Real crop sizes, the real shipping program, and the network as it ran. The gold dashed line on the chart is what farmers actually delivered.", levers: {} },
+  { id: "bumper", label: "Bumper harvest (+30%)", story: "A big year. Watch silos fill toward their limits, truck queues build at the peak, and surplus grain spill toward Lucky Bay.", levers: { productionScale: 1.3 } },
+  { id: "drought", label: "Drought (−40%)", story: "A small crop against an unchanged shipping program: the roads and silos relax, but ships sit at anchor waiting for grain that never comes.", levers: { productionScale: 0.6 } },
+  { id: "rail", label: "Bring back the trains", story: "Two trainsets return to the old Cummins–Kimba–Wudinna lines and take over part of the silo-to-port shuttle, taking millions of truck-kilometres off the highways.", levers: { rail: true } },
+  { id: "luckybay", label: "More grain to Lucky Bay", story: "T-Ports' Lucky Bay made 2.5× more attractive: eastern-peninsula grain drains away from the main network.", levers: { luckyBayBias: 2.5 } },
+  { id: "outage", label: "Port Lincoln closed a week", story: "The port terminal shuts for a week at harvest peak. Deliveries redirect to country silos — the system holds, at a queueing price.", levers: { outage: true } },
+  { id: "roadclosure", label: "Tod Highway closed", story: "The peninsula's central spine is impassable (detours = 2.5× travel time). Trucks re-sort toward Lincoln Highway sites.", levers: { roadClosure: true } },
 ];
 
 export function leversToPatch(l: Levers): Partial<Params> {
@@ -59,10 +59,12 @@ export function leversToPatch(l: Levers): Partial<Params> {
 export const SEASONS = ["2023/24", "2024/25", "2025/26", "2026/27"];
 export const SEASON_LABELS: Record<string, string> = {
   "2023/24": "2023/24",
-  "2024/25": "2024/25 (drought · held-out)",
+  "2024/25": "2024/25 — drought year",
   "2025/26": "2025/26",
-  "2026/27": "2026/27 (live · provisional)",
+  "2026/27": "2026/27 — live (forecast)",
 };
+
+export type ViewMode = "simple" | "advanced";
 
 export interface BaselineSeries {
   receivedByDay: number[];
@@ -78,8 +80,11 @@ class AppState {
   season = $state("2025/26");
   scenario = $state<ScenarioId>("baseline");
   levers = $state<Levers>({ ...DEFAULT_LEVERS });
+  viewMode = $state<ViewMode>(
+    typeof localStorage !== "undefined" && localStorage.getItem("windrow_mode") === "advanced" ? "advanced" : "simple",
+  );
   playing = $state(false);
-  speed = $state(3600); // sim-seconds per real second
+  speed = $state(86400); // sim-seconds per real second (1 day/s default)
   snap = $state<Snapshot | null>(null);
   observed = $state<ObservedFile | null>(null);
   sites = $state<BundleSite[]>([]);

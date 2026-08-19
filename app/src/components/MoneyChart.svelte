@@ -57,8 +57,8 @@
 </script>
 
 <div class="chart">
-  <div class="title">
-    Western region receivals — <span class="sim">sim</span> vs <span class="obs">observed</span> (cumulative)
+  <div class="title" title="Cumulative grain delivered into the network's Eyre Peninsula sites (million tonnes)">
+    Grain delivered — <span class="sim">simulated</span> vs <span class="obs">actual</span>
   </div>
   <svg viewBox="0 0 {W} {H}">
     {#each [0.25, 0.5, 0.75, 1] as g}
