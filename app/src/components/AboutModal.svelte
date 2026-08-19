@@ -39,10 +39,11 @@
     <h3>How the dollar figures are estimated</h3>
     <p>
       The "what this changes" figures are rough, order-of-magnitude estimates: trucking at
-      ~10¢ per tonne-kilometre, ship waiting at ~A$30,000 per vessel-day, and farm-gate
-      value at ~$375–405 per tonne derived from PIRSA's published seasonal totals. They are
-      meant for comparing scenarios, not for costing anything (assumptions A18–A19 in the
-      repository).
+      ~10¢ per tonne-kilometre, ship waiting at ~A$30,000 per vessel-day, grain waiting on
+      farm at ~9¢ per tonne per day (financing only — weather and quality risk are real
+      but unpriced), and farm-gate value at ~$375–405 per tonne derived from PIRSA's
+      published seasonal totals. They are meant for comparing scenarios, not for costing
+      anything (assumptions A18–A19, A22 in the repository).
     </p>
     <h3>Key data sources</h3>
     <ul>

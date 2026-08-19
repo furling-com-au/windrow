@@ -185,6 +185,18 @@ presented as measured data.
 - **Upgrade path**: a real reinstatement proposal (consist sizes, timetable, loop
   lengths) would replace all of this.
 
+## A22 — on-farm holding cost (economics layer, indicative)
+- **Value**: A$0.09 per tonne per day for harvested grain waiting on farm before
+  delivery (≈ $380/t farm-gate value financed at ~9 % p.a. agricultural overdraft).
+- **Used in**: app takeaways ("Grain waiting on farm" row/sentence), driven by the
+  engine's cumulative on-farm tonne-days. Never affects sim behaviour.
+- **Reasoning**: growers are not paid until grain is delivered/warehoused; delay is a
+  financing cost (PIRSA's 2024/25 report notes extended overdrafts under exactly this
+  pressure). Deliberately financing-ONLY: weather, insect and quality risks of on-farm
+  holding are real but have no public price, so they are named in the UI as unpriced
+  rather than guessed.
+- **Sensitivity**: linear on the displayed holding dollars; labelled indicative.
+
 ## A13 — vessel arrival schedules for seasons before stem coverage
 - **Value**: for seasons where archived stem snapshots are sparse (2021/22–2023/24
   ≈ monthly snapshots), vessel arrivals derive from AIS-observed berth visits instead of

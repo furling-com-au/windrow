@@ -74,6 +74,7 @@ export interface BaselineSeries {
   waitByDay: number[];
   queueByDay: number[];
   arrivedByDay: number[];
+  onFarmTdByDay: number[];
 }
 
 class AppState {

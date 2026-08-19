@@ -94,6 +94,7 @@ function computeBaseline(season: string) {
   const waitByDay: number[] = [];
   const queueByDay: number[] = [];
   const arrivedByDay: number[] = [];
+  const onFarmTdByDay: number[] = [];
   for (let d = 0; d < 365; d++) {
     b.step(DAY_TICKS);
     const s = b.snapshot();
@@ -104,8 +105,9 @@ function computeBaseline(season: string) {
     waitByDay.push(s.kpi.meanWaitH);
     queueByDay.push(s.kpi.peakQueue);
     arrivedByDay.push(s.kpi.vesselsArrived);
+    onFarmTdByDay.push(s.kpi.onFarmTd);
   }
-  const data = { receivedByDay, shippedByDay, tonneKmByDay, lbByDay, waitByDay, queueByDay, arrivedByDay };
+  const data = { receivedByDay, shippedByDay, tonneKmByDay, lbByDay, waitByDay, queueByDay, arrivedByDay, onFarmTdByDay };
   baselineCache.set(season, data);
   post({ type: "baseline", season, data });
 }

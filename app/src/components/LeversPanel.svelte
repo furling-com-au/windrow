@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DEMURRAGE_PER_DAY, FARMGATE_PER_T, FREIGHT_PER_T_KM, fmtMoney } from "../lib/economics";
+  import { DEMURRAGE_PER_DAY, FARMGATE_PER_T, FREIGHT_PER_T_KM, HOLDING_PER_T_DAY, fmtMoney } from "../lib/economics";
   import { DEFAULT_LEVERS, SCENARIOS, app } from "../state.svelte";
 
   let { onchange }: { onchange: () => void } = $props();
@@ -75,6 +75,7 @@
     Trucking: "Loaded truck travel. When grain can't go straight to port it gets double-handled — farm to silo now, silo to port later — which adds kilometres and cost (10¢/t·km, A18).",
     "Worst silo queue": "The most trucks waiting to unload at any ONE silo at any single moment this season, this what-if vs the real season. The absolute number rests on an assumed unloading time (A2) — read it as relative.",
     "Delivery pace": "How many days earlier or later this what-if reaches the same delivered tonnage as the real season. Slower logistics (e.g. fewer trucks) shows up here — grain waits on farm, a cost the freight dollars don't price.",
+    "Grain waiting on farm": "Extra tonne-days harvested grain spends in field bins before delivery, vs the real season. Priced as financing only — ~9¢/t/day (grain value at overdraft rates, A22). Weather, insect and quality risk of holding grain on farm are real but not publicly priceable, so NOT included.",
     "Ships waiting": "Average hours each ship spends at anchor waiting for a berth or for grain, costed at a demurrage-like ~A$30k per ship-day (A19).",
     "Crop value (farm gate)": "The changed harvest tonnage valued at PIRSA-derived farm-gate prices (~$380/t).",
   };
@@ -116,6 +117,13 @@
         dim: Math.abs(d.paceLagDays) < 2,
         dir: Math.abs(d.paceLagDays) < 2 ? "flat" : d.paceLagDays > 0 ? "up" : "down",
       },
+      mk(
+        "Grain waiting on farm",
+        d.holding,
+        150000,
+        `${d.dOnFarmTd > 0 ? "+" : "−"}${Math.abs(d.dOnFarmTd / 1e6).toFixed(1)}M tonne-days`,
+        `${d.holding > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.holding))} financing`,
+      ),
       mk(
         "Ships waiting",
         d.demurrage,
@@ -184,7 +192,9 @@
       while (j < b.receivedByDay.length && (b.receivedByDay[j] ?? 0) < s.kpi.receivedT) j++;
       paceLagDays = s.day - j; // positive = behind the real season
     }
-    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays };
+    const dOnFarmTd = s.kpi.onFarmTd - (b.onFarmTdByDay?.[i] ?? 0);
+    const holding = dOnFarmTd * HOLDING_PER_T_DAY;
+    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays, dOnFarmTd, holding };
   });
 
   const tonnes = (t: number) => {
@@ -228,8 +238,15 @@
     if (Math.abs(d.paceLagDays) >= 3) {
       lines.push(
         d.paceLagDays > 0
-          ? `Deliveries run about ${d.paceLagDays} days behind the real season — grain waits longer on farm (a cost the freight dollars don't price).`
+          ? `Deliveries run about ${d.paceLagDays} days behind the real season.`
           : `Deliveries run about ${-d.paceLagDays} days ahead of the real season.`,
+      );
+    }
+    if (Math.abs(d.holding) > 250000) {
+      lines.push(
+        d.holding > 0
+          ? `Grain waits longer on farm — roughly ${fmtMoney(Math.abs(d.holding))} in financing while growers wait to deliver (weather and quality risk on top, unpriced).`
+          : `Grain spends less time waiting on farm — roughly ${fmtMoney(Math.abs(d.holding))} less financing.`,
       );
     }
     if (Math.abs(d.demurrage) > 500000) {
@@ -381,7 +398,7 @@
           </div>
         {/each}
         {#if app.levers.fleetTrucks < DEFAULT_LEVERS.fleetTrucks * 0.92 && (deltas?.freight ?? 0) < -200000}
-          <div class="fine">Why cheaper with fewer trucks? Shorter queues mean trucks stop driving past the nearest silo — fewer kilometres. The cost moved into time instead: see “Delivery pace”. Slower service and grain waiting on farm aren't priced.</div>
+          <div class="fine">Why cheaper with fewer trucks? Shorter queues mean trucks stop driving past the nearest silo — fewer kilometres. The cost moved into time: see “Delivery pace” and “Grain waiting on farm” (which prices the financing, but not the weather/quality risk).</div>
         {/if}
         <div class="fine">Values keep updating as the season plays. Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (A18–A19).</div>
       {/if}

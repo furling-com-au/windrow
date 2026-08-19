@@ -160,6 +160,7 @@ export interface Snapshot {
     peakQueue: number; // worst single-site truck queue so far
     vesselsArrived: number;
     carryInT: number; // opening stocks carried over from the prior season (A17)
+    onFarmTd: number; // cumulative tonne-days of harvested grain waiting on farm (A22)
   };
 }
 

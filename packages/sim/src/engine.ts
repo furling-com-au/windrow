@@ -155,6 +155,7 @@ export class Sim {
   truckTravelMin = 0; // loaded+empty travel minutes (truck-km proxy for corridor analysis)
   tonneKm = 0; // loaded tonne-km (economics layer)
   carryInT = 0; // opening stocks seeded from observed Oct-Nov shipments (A17)
+  onFarmTonneDays = 0; // harvested grain waiting on farm x days (holding-cost basis, A22)
   /** cumulative loaded tonnes per rendered path ("cid-sid" farm, "si-pj" line-haul) */
   tripTonnesByPath = new Map<string, number>();
 
@@ -596,6 +597,9 @@ export class Sim {
     if (tick % DAY_TICKS === 0) {
       this.dailyHarvest();
       if (this.day > 0) this.checkInvariants();
+      let onFarm = 0;
+      for (let i = 0; i < this.clusterOnFarm.length; i++) onFarm += this.clusterOnFarm[i]!;
+      this.onFarmTonneDays += onFarm;
       this.dailyBungeReceivals.push(this.receivedBungeT);
       if (this.day % 7 === 0 && this.debugEvents) {
         this.log({ t: tick, type: "week", received: Math.round(this.receivedBungeT) });
@@ -988,6 +992,7 @@ export class Sim {
         peakQueue: this.peakQueue,
         vesselsArrived: this.vessels.reduce((a, v) => a + (v.state !== V_PENDING ? 1 : 0), 0),
         carryInT: Math.round(this.carryInT),
+        onFarmTd: Math.round(this.onFarmTonneDays),
       },
     };
   }

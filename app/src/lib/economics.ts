@@ -14,6 +14,11 @@ export const FREIGHT_PER_T_KM = 0.10; // range 0.07-0.13
  *  ~US$15-25k/day => ~A$30k/day mid-range. */
 export const DEMURRAGE_PER_DAY = 30000;
 
+/** A$ per tonne per day for harvested grain waiting on farm (A22): financing only —
+ *  ~$380/t at ~9% p.a. agricultural overdraft ≈ 9c/t/day. Weather, insect and quality
+ *  risk of on-farm holding are real but not publicly priceable, so NOT included. */
+export const HOLDING_PER_T_DAY = 0.09;
+
 /** A$/t farm-gate value by season, computed from PIRSA published farm-gate totals
  *  divided by production (2022/23 $4.8B/12.79Mt; 2023/24 $3.3B/8.70Mt;
  *  2024/25 $2.1B/5.17Mt). 2025/26 + live season: recent-mean, flagged assumed. */
