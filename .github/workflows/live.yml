@@ -1,0 +1,35 @@
+name: live-season-refresh
+# Refreshes the 2026/27 live bundle from public sources and redeploys.
+# Requires repo secret CLOUDFLARE_API_TOKEN (Workers deploy permission); until the
+# secret is added, the deploy step is skipped and the workflow just validates.
+on:
+  schedule:
+    - cron: "0 21 * * 0" # Mondays 07:30 ACDT (Sun 21:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: uv sync
+      - name: refresh live bundle (2026/27)
+        run: uv run python pipeline/p2_build_live.py
+      - run: npm ci
+      - run: npm --workspace app run build
+      - name: deploy to Cloudflare
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler deploy
+      - name: commit refreshed bundle
+        run: |
+          git config user.name "windrow-live-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add app/public/data/*2026-27*
+          git diff --cached --quiet || git commit -m "live: refresh 2026/27 bundle [skip ci]"
+          git push

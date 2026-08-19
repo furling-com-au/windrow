@@ -164,24 +164,26 @@ spec's degrade-gracefully item is only partly done) [M].
 
 ## Prioritised backlog distilled from the above
 
-| # | Item | Effort | Serves |
-|---|---|---|---|
-| 1 | ~~Ships waiting at anchor (AIS-linked)~~ **done this pass** | — | 7, 8, 10 |
-| 2 | ~~Map legend~~ **done this pass** | — | 10, everyone |
-| 3 | Commodity-level stock display (sites + ports) | Q | 2, 8 |
-| 4 | Per-site drill-down panel (season curve, queue profile) | Q | 1, 2 |
-| 5 | Berth-occupancy timeline + per-vessel wait table export | Q | 7, 8, 9 |
-| 6 | Chart annotations (records, rain events, first delivery) + intro tour | Q | 10 |
-| 7 | CSV export of run results; CITATION.cff | Q | 9 |
-| 8 | Carry-in stocks at season start | M | 8, calibration |
-| 9 | Corridor truck-km heatmap (§8 stretch) + DIT AADT cross-check | M | 4, 5 |
-| 10 | LB transshipment weather downtime from ERA5 wind | M | 3 |
-| 11 | Routed road-closure detours (replace straight-line heuristic) | M | 5 |
-| 12 | Site-mention time series from report narratives (per-site anchors) | M | 1, 2 |
-| 13 | Daily stem-derived vessel-program dataset from 75 archived PDFs | M | 8, 9 |
-| 14 | Mobile layout pass | M | 10 |
-| 15 | Operator data partnership (capacities, turnarounds) | L | 1, 2, absolute credibility |
-| 16 | Sentinel-2 paddock segmentation (§8) | L | 1, 6 |
+| # | Item | Effort | Serves | Status |
+|---|---|---|---|---|
+| 1 | Ships waiting at anchor (AIS-linked) | — | 7, 8, 10 | **done** |
+| 2 | Map legend | — | 10, everyone | **done** |
+| 3 | Commodity-level stock display (site drill-down) | Q | 2, 8 | **done** |
+| 4 | Per-site drill-down panel (click a site) | Q | 1, 2 | **done** |
+| 5 | Berth-occupancy sparkline (PL panel) | Q | 7, 8, 9 | **done** (wait-table export pending) |
+| 6 | Chart annotations + guided intro tour | Q | 10 | **done** |
+| 7 | CSV export; CITATION.cff; public GitHub repo | Q | 9 | **done** |
+| 8 | Carry-in stocks at season start (A17) | M | 8, calibration | **done** |
+| 9 | Corridor truck-flow heatmap (in-app toggle) | M | 4, 5 | **done** (DIT AADT cross-check pending) |
+| — | Interactive what-if levers + plain-language takeaways with indicative $ (A18–A19) | M | everyone | **done** |
+| — | Live 2026/27 season machinery + weekly refresh workflow | M | everyone | **done** (provisional until harvest) |
+| 10 | LB transshipment weather downtime from ERA5 wind | M | 3 | open |
+| 11 | Routed road-closure detours (replace straight-line heuristic) | M | 5 | open |
+| 12 | Site-mention time series from report narratives (per-site anchors) | M | 1, 2 | open |
+| 13 | Daily stem-derived vessel-program dataset from 75 archived PDFs | M | 8, 9 | open |
+| 14 | Mobile layout pass (panel collapses; legend hidden < 800 px) | M | 10 | partial |
+| 15 | Operator data partnership (capacities, turnarounds) | L | 1, 2 | open |
+| 16 | Sentinel-2 paddock segmentation (§8) | L | 1, 6 | open |
 
 The theme across stakeholders: the *observed* spine is already trustworthy; the wants
 cluster around (a) exposing more of what the sim already computes (quick wins 3–7),

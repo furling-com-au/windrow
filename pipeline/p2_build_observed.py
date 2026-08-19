@@ -86,6 +86,54 @@ def main():
         for r in pd_.filter(pl.col("crop") == "TOTAL").iter_rows(named=True):
             prod_out[r["district"]] = r["production_t"]
 
+        # carry-in stocks (A17): Oct+Nov shipments draw almost entirely on old crop
+        y0 = s0.year
+        octnov = (
+            ships.filter(
+                pl.col("port").is_in(["Port Lincoln", "Thevenard"])
+                & (pl.col("year") == y0)
+                & pl.col("month").is_in([10, 11])
+            )
+            .group_by("port")
+            .agg(pl.col("export_t").sum().alias("t"))
+        )
+        ci = {r["port"]: r["t"] for r in octnov.iter_rows(named=True)}
+        carry_in = {
+            "port_lincoln_t": round(ci.get("Port Lincoln", 0.0)),
+            "thevenard_t": round(ci.get("Thevenard", 0.0)),
+            "upcountry_t": round(0.2 * (ci.get("Port Lincoln", 0.0) + ci.get("Thevenard", 0.0))),
+            "provenance": "A17: Oct+Nov observed grain shipments (Flinders statistics) taken as old-crop carry-over; +20% residual assigned to upcountry sites",
+        }
+
+        # chart annotations: first delivery, record week, EP-mean rain events
+        annotations = []
+        if FIRST_DELIVERY.get(season):
+            d = (date.fromisoformat(FIRST_DELIVERY[season]) - s0).days
+            annotations.append({"day": d, "label": "First delivery", "kind": "first"})
+        best_w, best_d = 0, None
+        for w in wk_out:
+            wt = (w.get("western") or {}).get("weekly_t")
+            if wt and wt > best_w:
+                best_w, best_d = wt, (date.fromisoformat(w["week_ending"]) - s0).days
+        if best_d is not None:
+            annotations.append({"day": best_d, "label": f"Record week {round(best_w/1000)} kt", "kind": "record"})
+        clim = (
+            pl.read_parquet(PROCESSED / "climate_daily.parquet")
+            .group_by("date")
+            .agg(pl.col("rain_mm").mean().alias("rain"))
+            .sort("date")
+        )
+        rain_days = [
+            (r["date"] - s0).days
+            for r in clim.iter_rows(named=True)
+            if s0 <= r["date"] <= s1 and (r["date"] - s0).days <= 123 and r["rain"] >= 8.0
+        ]
+        prev = -10
+        for d in rain_days:
+            if d - prev > 2:
+                annotations.append({"day": d, "label": "Rain event", "kind": "rain"})
+            prev = d
+
         obs = {
             "season": season,
             "attribution": {
@@ -100,6 +148,8 @@ def main():
             "thevenard_shipments_monthly": thev_out,
             "port_lincoln_drybulk_calls_monthly": calls_out,
             "district_production_t": prod_out,
+            "carry_in": carry_in,
+            "annotations": annotations,
         }
         f = APP_DATA / f"observed_{season.replace('/', '-')}.json"
         f.write_text(json.dumps(obs), encoding="utf-8")

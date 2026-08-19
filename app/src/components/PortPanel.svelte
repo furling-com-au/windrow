@@ -1,7 +1,15 @@
 <script lang="ts">
   import type { BundleSite, Snapshot } from "@windrow/sim";
 
-  let { snap, sites }: { snap: Snapshot | null; sites: BundleSite[] } = $props();
+  let { snap, sites, plBerthedByDay = [] }: { snap: Snapshot | null; sites: BundleSite[]; plBerthedByDay?: number[] } = $props();
+
+  let occSpark = $derived.by(() => {
+    if (plBerthedByDay.length < 2) return "";
+    const W = 240, H = 18;
+    return plBerthedByDay
+      .map((v, i) => `${((i / Math.max(1, plBerthedByDay.length - 1)) * W).toFixed(1)},${(H - (Math.min(2, v) / 2) * H).toFixed(1)}`)
+      .join(" ");
+  });
 
   let ports = $derived.by(() => {
     if (!snap) return [];
@@ -56,6 +64,10 @@
         {:else}
           <div class="idle">berth idle</div>
         {/each}
+        {#if i === 0 && occSpark}
+          <svg class="occ" viewBox="0 0 240 18"><polyline points={occSpark} fill="none" stroke="#50dca0" stroke-width="1.2" /></svg>
+          <div class="occl">berths occupied over the season (0–2)</div>
+        {/if}
       </div>
     {/each}
   </div>
@@ -133,5 +145,15 @@
   .idle {
     color: #708396;
     font-size: 11px;
+  }
+  .occ {
+    width: 100%;
+    margin-top: 5px;
+    background: #0d1826;
+    border-radius: 4px;
+  }
+  .occl {
+    color: #64788c;
+    font-size: 9px;
   }
 </style>

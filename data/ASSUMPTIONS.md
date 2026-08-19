@@ -138,6 +138,38 @@ presented as measured data.
   Whyalla berths); they are not used as a calibration anchor.
 - **Used in**: vessels_{season}.json (LB arrival schedule is indicative only).
 
+## A17 — carry-in (opening) stocks
+- **Value**: each season opens with stocks = that season's observed Oct+Nov grain
+  shipments at Port Lincoln and Thevenard (Flinders statistics), +20 % assigned to
+  upcountry sites; commodity split wheat 55 / barley 30 / lentils 15.
+- **Used in**: engine seeding; `observed_{season}.json.carry_in`.
+- **Reasoning**: October–November vessels load almost entirely old crop (new-crop
+  receivals only begin mid-October), so those shipments are a direct, season-specific
+  measurement of the carry-over actually drawn down.
+- **Sensitivity**: sets early-season shipping feasibility; receivals calibration
+  unaffected (carry-in is never "received").
+
+## A18 — road grain freight rate (economics layer, indicative)
+- **Value**: A$0.10 per tonne-km (range 0.07–0.13).
+- **Used in**: app takeaways panel only (freight $ deltas). Never in the sim itself.
+- **Reasoning**: consistency-checked against published anchors: ~144 km average
+  site→port haul ⇒ ≈A$14/t cartage, sitting sensibly inside the published $60–75/t
+  whole-of-chain cost at 200 km (AEGIC via ESCOSA 2019) and EP-vs-eastern-SA relative
+  cost statements. No single public EP $/t-km schedule exists.
+- **Sensitivity**: linear on displayed freight dollars; labelled "indicative" in-app.
+
+## A19 — vessel waiting cost (economics layer, indicative)
+- **Value**: A$30,000 per vessel-day at anchor (≈US$15–25k/day demurrage-equivalent
+  for handy-to-panamax bulk carriers, mid-range).
+- **Used in**: app takeaways panel only. Labelled indicative; market rates vary widely.
+
+## A20 — provisional 2026/27 live-season demand
+- **Value**: district×crop production = mean of PIRSA 2022/23–2025/26 estimates
+  (2.88 Mt EP total); carry-in = mean of prior two seasons' Oct+Nov shipments.
+- **Used in**: `demand_2026-27.json` etc. via `pipeline/p2_build_live.py`.
+- **Upgrade path**: replace automatically when PIRSA publishes 2026/27 estimates and
+  as live receivals/shipments land (re-run the live builder).
+
 ## A13 — vessel arrival schedules for seasons before stem coverage
 - **Value**: for seasons where archived stem snapshots are sparse (2021/22–2023/24
   ≈ monthly snapshots), vessel arrivals derive from AIS-observed berth visits instead of

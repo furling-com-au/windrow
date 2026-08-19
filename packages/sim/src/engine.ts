@@ -151,8 +151,12 @@ export class Sim {
   shippedT = 0;
   private dailyBungeReceivals: number[] = [];
   private vesselWaitTicksTotal = 0;
-  private peakQueue = 0;
+  peakQueue = 0;
   truckTravelMin = 0; // loaded+empty travel minutes (truck-km proxy for corridor analysis)
+  tonneKm = 0; // loaded tonne-km (economics layer)
+  carryInT = 0; // opening stocks seeded from observed Oct-Nov shipments (A17)
+  /** cumulative loaded tonnes per rendered path ("cid-sid" farm, "si-pj" line-haul) */
+  tripTonnesByPath = new Map<string, number>();
 
   events: SimEvent[] = [];
   private debugEvents: boolean;
@@ -290,6 +294,28 @@ export class Sim {
       this.sites.push(st);
     }
     // scenario: port outage handled in step()
+
+    // ---- carry-in stocks (A17): seed opening stocks from observed Oct-Nov shipments ----
+    const ci = bundle.observed.carry_in;
+    if (ci) {
+      const SPLIT: [number, number][] = [
+        [COMMODITIES.indexOf("wheat"), 0.55],
+        [COMMODITIES.indexOf("barley"), 0.3],
+        [COMMODITIES.indexOf("lentils"), 0.15],
+      ];
+      const seed = (siteIdx: number, tonnes: number) => {
+        if (siteIdx < 0 || tonnes <= 0) return;
+        const s = this.sites[siteIdx]!;
+        for (const [c, share] of SPLIT) s.stock[c] = s.stock[c]! + tonnes * share;
+        this.carryInT += tonnes;
+      };
+      seed(this.sites.findIndex((s) => s.name.includes("Lincoln")), ci.port_lincoln_t);
+      seed(this.sites.findIndex((s) => s.name.includes("Thevenard")), ci.thevenard_t);
+      // upcountry share distributed across open Bunge sites by capacity
+      const up = this.sites.filter((s) => !s.isPort && s.isBunge && s.open);
+      const capSum = up.reduce((a, s) => a + s.capacityT, 0) || 1;
+      for (const s of up) seed(s.idx, (ci.upcountry_t * s.capacityT) / capSum);
+    }
 
     // ---- cluster candidate sites ----
     this.clusterCand = [];
@@ -518,9 +544,10 @@ export class Sim {
     let onTrucks = 0;
     for (const t of this.trucks) onTrucks += t.loadT;
     // note: grain on vessels is already inside `shipped` (cumShippedT accrues as the
-    // shiploader draws stock), so there is no separate on-vessel term.
+    // shiploader draws stock), so there is no separate on-vessel term. Carry-in stocks
+    // enter the system at t=0 and must balance alongside harvested grain.
     const rhs = this.retainedT + onFarm + onTrucks + siteStock + shipped;
-    const diff = Math.abs(this.harvestedRawT - rhs);
+    const diff = Math.abs(this.harvestedRawT + this.carryInT - rhs);
     if (diff > 1.0) {
       throw new Error(
         `MASS CONSERVATION VIOLATED day ${this.day}: harvested=${this.harvestedRawT.toFixed(1)} rhs=${rhs.toFixed(1)} diff=${diff.toFixed(2)}`,
@@ -666,6 +693,10 @@ export class Sim {
           tr.legStart = tick;
           tr.doneAt = tick + Math.ceil(tr.legMin / TICK_MIN);
           this.truckTravelMin += tr.legMin * 2; // out + return
+          const km = (tr.legMin / 60) * 75; // mean 75 km/h (A5-derived)
+          this.tonneKm += km * tr.loadT;
+          const key = `c:${tr.cluster}-${tr.site}`;
+          this.tripTonnesByPath.set(key, (this.tripTonnesByPath.get(key) ?? 0) + tr.loadT);
         }
         return;
       case T_GO:
@@ -753,6 +784,9 @@ export class Sim {
         tr.legStart = tick;
         tr.doneAt = tick + Math.ceil((minutes + 60) / TICK_MIN); // + load/unload handling
         this.truckTravelMin += minutes * 2;
+        this.tonneKm += (minutes / 60) * 75 * load;
+        const lkey = `s:${src}-${bestPort}`;
+        this.tripTonnesByPath.set(lkey, (this.tripTonnesByPath.get(lkey) ?? 0) + load);
         this.portInboundT[bestPort] = this.portInboundT[bestPort]! + load;
         this.cachedPortNeed[bestPort] = this.cachedPortNeed[bestPort]! - load;
         return;
@@ -899,8 +933,12 @@ export class Sim {
     }
     const sites: SiteView[] = this.sites.map((s) => {
       let st = 0;
-      for (let c = 0; c < NC; c++) st += s.stock[c]!;
-      return { id: s.idx, stockT: Math.round(st), queue: s.queue.length, cumReceivedT: Math.round(s.cumReceivedT) };
+      const byC: number[] = new Array(NC);
+      for (let c = 0; c < NC; c++) {
+        byC[c] = Math.round(s.stock[c]!);
+        st += s.stock[c]!;
+      }
+      return { id: s.idx, stockT: Math.round(st), stockByC: byC, queue: s.queue.length, cumReceivedT: Math.round(s.cumReceivedT) };
     });
     const vessels: VesselView[] = this.vessels
       .filter((v) => v.state === V_ANCHOR || v.state === V_BERTH || (v.state === V_DONE && this.tick - v.berthedAt < DAY_TICKS))
@@ -941,8 +979,27 @@ export class Sim {
         shippedT: Math.round(this.shippedT),
         queueTrucks,
         vesselsWaiting,
+        tonneKm: Math.round(this.tonneKm),
+        truckKm: Math.round((this.truckTravelMin / 60) * 75),
+        meanWaitH: Math.round(this.meanVesselWaitHNow() * 10) / 10,
+        peakQueue: this.peakQueue,
+        vesselsArrived: this.vessels.reduce((a, v) => a + (v.state !== V_PENDING ? 1 : 0), 0),
       },
     };
+  }
+
+  /** mean anchorage wait so far, hours per vessel that has arrived */
+  meanVesselWaitHNow(): number {
+    let n = 0;
+    for (const v of this.vessels) if (v.state !== V_PENDING) n++;
+    return n ? (this.vesselWaitTicksTotal * TICK_MIN) / 60 / n : 0;
+  }
+
+  /** cumulative loaded tonnes per path key, for the corridor heatmap */
+  getTripTonnes(): Record<string, number> {
+    const out: Record<string, number> = {};
+    for (const [k, v] of this.tripTonnesByPath) out[k] = Math.round(v);
+    return out;
   }
 
   /** headless full-season run + calibration series */

@@ -71,8 +71,22 @@
     {#if obsPath}<path d={obsPath} class="obs-line" />{/if}
     {#each obsPts as pt}<circle cx={x(pt.d)} cy={y(pt.cum)} r="2" class="obs-dot" />{/each}
     {#if simPath}<path d={simPath} class="sim-line" />{/if}
+    {#each observed?.annotations ?? [] as a}
+      {#if a.day >= 0 && a.day <= X_DAYS}
+        <g class="ann {a.kind}">
+          <line x1={x(a.day)} x2={x(a.day)} y1={PAD.t} y2={H - PAD.b} />
+          <circle cx={x(a.day)} cy={PAD.t + 3} r="2.6" />
+          <title>{a.label}</title>
+        </g>
+      {/if}
+    {/each}
     {#if day <= X_DAYS}<line x1={x(day)} x2={x(day)} y1={PAD.t} y2={H - PAD.b} class="now" />{/if}
   </svg>
+  <div class="annkey">
+    <span class="k first">●</span> first delivery
+    <span class="k record">●</span> record week
+    <span class="k rain">●</span> rain event — hover markers
+  </div>
 </div>
 
 <style>
@@ -133,4 +147,28 @@
     stroke-width: 1;
     stroke-dasharray: 2 2;
   }
+  .ann line {
+    stroke-width: 0.8;
+    opacity: 0.45;
+  }
+  .ann.first line, .ann.first circle {
+    stroke: #7dd3a8;
+    fill: #7dd3a8;
+  }
+  .ann.record line, .ann.record circle {
+    stroke: #e8c568;
+    fill: #e8c568;
+  }
+  .ann.rain line, .ann.rain circle {
+    stroke: #6aa9e8;
+    fill: #6aa9e8;
+  }
+  .annkey {
+    font-size: 9px;
+    color: #708396;
+    margin-top: 2px;
+  }
+  .annkey .k.first { color: #7dd3a8; }
+  .annkey .k.record { color: #e8c568; }
+  .annkey .k.rain { color: #6aa9e8; }
 </style>

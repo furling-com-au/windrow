@@ -47,9 +47,11 @@ export class DeckMap {
   private deck: Deck<MapView>;
   private data: StaticData;
   private pathCache = new Map<string, PathCache>();
+  private onSiteClick?: (siteId: number) => void;
 
-  constructor(container: HTMLDivElement, data: StaticData) {
+  constructor(container: HTMLDivElement, data: StaticData, onSiteClick?: (siteId: number) => void) {
     this.data = data;
+    this.onSiteClick = onSiteClick;
     this.deck = new Deck<MapView>({
       parent: container,
       views: new MapView({ repeat: false, controller: { dragRotate: false, touchRotate: false } }),
@@ -110,7 +112,7 @@ export class DeckMap {
     return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
   }
 
-  update(snap: Snapshot | null) {
+  update(snap: Snapshot | null, heatmap: Record<string, number> | null = null) {
     const d = this.data;
     const layers: unknown[] = [
       new PolygonLayer({
@@ -133,6 +135,36 @@ export class DeckMap {
         pickable: false,
       }),
     ];
+
+    // corridor truck-flow heatmap: cumulative loaded tonnes per route
+    if (heatmap) {
+      const heatData: { path: [number, number][]; t: number }[] = [];
+      let maxT = 1;
+      for (const [key, t] of Object.entries(heatmap)) {
+        const [kind, rest] = [key.slice(0, 2), key.slice(2)];
+        const poly = kind === "c:" ? this.data.paths.cluster_site[rest] : this.data.paths.site_port[rest];
+        if (poly && t > 0) {
+          heatData.push({ path: poly, t });
+          maxT = Math.max(maxT, t);
+        }
+      }
+      layers.push(
+        new PathLayer({
+          id: "truckflow",
+          data: heatData,
+          getPath: (o: { path: [number, number][] }) => o.path,
+          getWidth: (o: { t: number }) => 1.5 + 9 * Math.sqrt(o.t / maxT),
+          widthUnits: "pixels",
+          getColor: (o: { t: number }) => {
+            const f = Math.sqrt(o.t / maxT);
+            return [255, 200 - 140 * f, 60, 60 + 150 * f] as [number, number, number, number];
+          },
+          capRounded: true,
+          jointRounded: true,
+          pickable: false,
+        }),
+      );
+    }
 
     if (snap) {
       const frac = snap.parcelHarvestFrac;
@@ -220,6 +252,9 @@ export class DeckMap {
           },
           updateTriggers: { getFillColor: snap.tick, getLineColor: snap.tick },
           pickable: true,
+          onClick: (info: { object?: { id?: number } }) => {
+            if (info.object?.id != null) this.onSiteClick?.(info.object.id);
+          },
         }),
         new TextLayer({
           id: "site-labels",

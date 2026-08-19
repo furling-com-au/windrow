@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use Windrow or its derived datasets, please cite it as below."
+title: "Windrow: an agent-level simulation of the Eyre Peninsula grain supply chain"
+type: software
+repository-code: "https://github.com/furling-com-au/windrow"
+url: "https://windrow.justinjywong.workers.dev"
+date-released: "2026-08-19"
+version: "1.1.0"
+authors:
+  - name: "Windrow project"
+abstract: >-
+  Browser-based deterministic simulation of the Eyre Peninsula (South Australia)
+  grain supply chain - weather-gated harvest, truck logistics, receival sites, and
+  ship loading at Port Lincoln - built on open and freely published data and
+  calibrated against published weekly receivals and official port statistics.
+  Simulation outputs are not operational data; see data/SOURCES.md and
+  data/ASSUMPTIONS.md for provenance and assumptions.

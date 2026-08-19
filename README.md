@@ -1,10 +1,22 @@
 # Windrow — Eyre Peninsula Grain Supply Chain Simulation
 
+**Live app: https://windrow.justinjywong.workers.dev**
+
 An agent-level, browser-based simulation of the Eyre Peninsula (South Australia) grain
 supply chain: weather-gated paddock harvest → farm trucks → receival sites → line-haul →
 port storage → ship loading at Port Lincoln, with Thevenard and T-Ports Lucky Bay as
 alternative gateways. Built entirely on open or freely published data and calibrated
-against published weekly receivals and official port statistics.
+against published weekly receivals and official port statistics. Vessels arrive at the
+Boston Bay anchorage at their AIS-observed times and hold for their berth slot, so
+ships visibly wait in the ocean exactly as the data shows they did.
+
+**Interact with it:** pick a scenario or drag the what-if levers (crop size, truck
+fleet, Lucky Bay pull, port outage, rail reinstated, highway closure); the takeaways
+panel translates every change into plain terms — tonnes, queues, ship waiting — and
+indicative dollars (freight at 10¢/t·km, demurrage at ~A$30k/vessel-day, farm-gate
+value at PIRSA-derived $/t; assumptions A18–A19). A guided tour opens on first visit;
+click any site for a drill-down; toggle the truck-flow heatmap for corridor loadings;
+export any run as CSV.
 
 > **This is a simulation, not operational data.** Truck movements, queues, site stocks
 > and vessel loading progress are modelled. Observed overlays (weekly receivals, port
@@ -69,6 +81,35 @@ npx wrangler deploy        # Workers static assets, config in wrangler.jsonc
 ```
 
 Any static host works: copy `app/dist/` wherever you like.
+
+## What $-shaped questions can it (indicatively) address?
+
+The physical model produces tonnes, kilometres, hours and queues; the app converts
+scenario *differences* into dollars using cited or registered unit rates (A18–A19 —
+indicative, not a costing model):
+
+- **Freight task**: Δ tonne-km × ~10¢ — e.g. what does a Tod Highway closure or a
+  Lucky Bay share shift add to the region's cartage bill? What does rail save?
+- **Demurrage exposure**: Δ vessel-days at anchor × ~A$30k — e.g. what does a drought
+  against an unchanged export program cost in ship waiting?
+- **Farm-gate value at stake**: Δ production × PIRSA-derived $/t (~$375–405) — the
+  headline size of a bumper or drought year (a −40 % season ≈ −$440 m farm-gate on
+  2025/26 volumes).
+- **Not addressed** (needs operator data): storage/handling fees, site operating
+  costs, per-grower freight differentials, port charges.
+
+## Live season (2026/27)
+
+The bundle includes a provisional 2026/27 season (A20: 4-season-mean demand, stem-fed
+vessel schedule). Refresh it any time — and weekly during harvest — with:
+
+```bash
+uv run python pipeline/p2_build_live.py && npm --workspace app run build && npx wrangler deploy
+```
+
+`.github/workflows/live.yml` does this on a Monday cron once the repo has a
+`CLOUDFLARE_API_TOKEN` secret; PIRSA 2026/27 estimates replace the provisional demand
+when published.
 
 ## Model in one paragraph
 

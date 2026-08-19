@@ -75,12 +75,27 @@ export interface ObservedWeek {
   western?: { weekly_t: number | null; cum_t: number | null };
 }
 
+export interface CarryIn {
+  port_lincoln_t: number;
+  thevenard_t: number;
+  upcountry_t: number;
+  provenance: string;
+}
+
+export interface ChartAnnotation {
+  day: number; // season day (0 = 1 Oct)
+  label: string;
+  kind: "first" | "record" | "rain";
+}
+
 export interface ObservedFile {
   season: string;
   first_delivery: string | null;
   weekly_receivals: ObservedWeek[];
   port_lincoln_shipments_monthly: { year: number; month: number; commodity: string; export_t: number }[];
   district_production_t: Record<string, number>;
+  carry_in?: CarryIn;
+  annotations?: ChartAnnotation[];
 }
 
 export interface DemandFile {
@@ -139,6 +154,11 @@ export interface Snapshot {
     shippedT: number;
     queueTrucks: number;
     vesselsWaiting: number;
+    tonneKm: number; // loaded truck tonne-km to date
+    truckKm: number; // total truck km (loaded + empty) to date
+    meanWaitH: number; // mean vessel anchorage wait so far (h/vessel arrived)
+    peakQueue: number; // worst single-site truck queue so far
+    vesselsArrived: number;
   };
 }
 
@@ -155,6 +175,7 @@ export interface TruckView {
 export interface SiteView {
   id: number;
   stockT: number;
+  stockByC: number[]; // per COMMODITIES order, tonnes
   queue: number;
   cumReceivedT: number;
 }

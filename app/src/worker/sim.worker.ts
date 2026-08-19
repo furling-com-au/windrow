@@ -77,6 +77,39 @@ function frame() {
   sendSnapshot();
 }
 
+/** headless baseline (default params, seed 42) daily series for the takeaways panel */
+const baselineCache = new Map<string, unknown>();
+
+function computeBaseline(season: string) {
+  if (!bundle) return;
+  if (baselineCache.has(season)) {
+    post({ type: "baseline", season, data: baselineCache.get(season) });
+    return;
+  }
+  const b = new Sim(bundle, defaultParams(), 42);
+  const receivedByDay: number[] = [];
+  const shippedByDay: number[] = [];
+  const tonneKmByDay: number[] = [];
+  const lbByDay: number[] = [];
+  const waitByDay: number[] = [];
+  const queueByDay: number[] = [];
+  const arrivedByDay: number[] = [];
+  for (let d = 0; d < 365; d++) {
+    b.step(DAY_TICKS);
+    const s = b.snapshot();
+    receivedByDay.push(s.kpi.receivedT);
+    shippedByDay.push(s.kpi.shippedT);
+    tonneKmByDay.push(s.kpi.tonneKm);
+    lbByDay.push(s.kpi.receivedLbT);
+    waitByDay.push(s.kpi.meanWaitH);
+    queueByDay.push(s.kpi.peakQueue);
+    arrivedByDay.push(s.kpi.vesselsArrived);
+  }
+  const data = { receivedByDay, shippedByDay, tonneKmByDay, lbByDay, waitByDay, queueByDay, arrivedByDay };
+  baselineCache.set(season, data);
+  post({ type: "baseline", season, data });
+}
+
 async function init(season: string, patch: Partial<Params>, seed: number) {
   curSeason = season;
   curPatch = patch;
@@ -84,6 +117,7 @@ async function init(season: string, patch: Partial<Params>, seed: number) {
   if (!bundle || bundle.season !== season) {
     post({ type: "loading" });
     bundle = await loadBundle(season);
+    baselineCache.delete(season);
   }
   const params: Params = { ...defaultParams(), ...patch };
   sim = new Sim(bundle, params, seed);
@@ -96,6 +130,7 @@ async function init(season: string, patch: Partial<Params>, seed: number) {
     clusters: bundle.matrix.clusters,
   });
   sendSnapshot();
+  setTimeout(() => computeBaseline(season), 30);
 }
 
 self.onmessage = async (ev: MessageEvent) => {
@@ -117,6 +152,9 @@ self.onmessage = async (ev: MessageEvent) => {
         break;
       case "speed":
         speed = m.value;
+        break;
+      case "heatmap":
+        if (sim) post({ type: "heatmap", data: sim.getTripTonnes() });
         break;
       case "seek": {
         // deterministic scrub: re-init and fast-forward to target day
