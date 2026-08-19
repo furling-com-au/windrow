@@ -1,11 +1,19 @@
 {
-  // Windrow — static deployment to Cloudflare Workers (assets-only, no server code).
+  // Windrow — static SPA on Cloudflare Workers, served at tools.justinwong.io/ep-farm-sim
+  // (worker/index.ts strips the base prefix; the workers.dev URL keeps working too).
   // Deploy: npm run build:app && npx wrangler deploy
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "windrow",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-08-01",
   "assets": {
     "directory": "./app/dist",
-    "not_found_handling": "single-page-application"
-  }
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    { "pattern": "tools.justinwong.io/ep-farm-sim*", "zone_name": "justinwong.io" }
+  ],
+  // keep the original public URL alive alongside the route
+  "workers_dev": true
 }

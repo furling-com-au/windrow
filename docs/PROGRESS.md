@@ -19,7 +19,7 @@ This file is the canonical record of where the project is. Updated as work proce
 - [x] Phase 3 — Sim core (`packages/sim/`): 5-min tick, sfc32 seeded, mass-conservation invariants, 3 unit tests, full season in ~0.8 s headless. Calibrated: 9 knobs, random search + refine (313 s, deterministic), fitted on 2023/24+2025/26
 - [x] Phase 4 — Browser app: Svelte 5 + deck.gl standalone (no tile server), sim in Web Worker, KPI strip, sim-vs-observed money chart, 7 scenarios, port panels, About/attribution. Build 222 kB gz. Playwright happy-path passes
 - [x] Phase 5 — `docs/calibration_report.md` (+SVG charts), `docs/scenarios.md`, README
-- [x] **DEPLOYED: https://windrow.justinjywong.workers.dev** (Cloudflare Workers static assets, `npx wrangler deploy`)
+- [x] **DEPLOYED: https://tools.justinwong.io/ep-farm-sim/** (Cloudflare Workers static assets + zone route; workers.dev URL kept alive; `npx wrangler deploy`)
 
 ## Validation headline (see docs/calibration_report.md)
 

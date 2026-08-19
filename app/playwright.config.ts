@@ -4,11 +4,11 @@ export default defineConfig({
   testDir: "./tests",
   timeout: 60000,
   use: {
-    baseURL: "http://localhost:4173",
+    baseURL: "http://localhost:4173/ep-farm-sim/",
   },
   webServer: {
     command: "npm run preview -- --port 4173 --strictPort",
-    url: "http://localhost:4173",
+    url: "http://localhost:4173/ep-farm-sim/",
     reuseExistingServer: true,
     timeout: 30000,
   },

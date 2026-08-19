@@ -1,7 +1,8 @@
 name: live-season-refresh
 # Refreshes the 2026/27 live bundle from public sources and redeploys.
-# Requires repo secret CLOUDFLARE_API_TOKEN (Workers deploy permission); until the
-# secret is added, the deploy step is skipped and the workflow just validates.
+# Requires repo secret CLOUDFLARE_API_TOKEN (Workers Scripts:Edit on the account, plus
+# Zone Workers Routes:Edit on justinwong.io — the worker deploys with a zone route);
+# until the secret is added, the deploy step is skipped and the workflow just validates.
 on:
   schedule:
     - cron: "0 21 * * 0" # Mondays 07:30 ACDT (Sun 21:00 UTC)

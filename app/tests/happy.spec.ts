@@ -7,7 +7,7 @@ import { expect, test } from "@playwright/test";
 test("loads, auto-plays, KPIs move, pause works", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(String(e)));
-  await page.goto("/");
+  await page.goto("./"); // relative: resolves under the /ep-farm-sim/ base path
   await expect(page).toHaveTitle(/Windrow/);
 
   // first visit: intro card appears; start watching

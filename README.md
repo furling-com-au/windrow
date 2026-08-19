@@ -1,6 +1,6 @@
 # Windrow — Eyre Peninsula Grain Supply Chain Simulation
 
-**Live app: https://windrow.justinjywong.workers.dev**
+**Live app: https://tools.justinwong.io/ep-farm-sim/** (also at https://windrow.justinjywong.workers.dev)
 
 An agent-level, browser-based simulation of the Eyre Peninsula (South Australia) grain
 supply chain: weather-gated paddock harvest → farm trucks → receival sites → line-haul →
