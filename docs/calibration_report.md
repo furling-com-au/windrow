@@ -32,9 +32,9 @@ delivery damping, T-Ports inland bunkers closed in 2024/25 (A15).
 | season | role | sim total (Mt) | obs total (Mt) | total err | weekly RMSE / mean weekly | PL vessels sim / AIS |
 |---|---|---|---|---|---|---|
 | 2022/23 | replay only* | 2.248 | 3.267 | -31.2 % | 63 % | 0 / – |
-| 2023/24 | calibration | 1.877 | 1.864 | +0.7 % | 67 % | 86 / 86 |
-| 2024/25 | **held out** | 1.481 | 1.507 | -1.7 % | 65 % | 43 / 53 |
-| 2025/26 | calibration | 2.193 | 2.249 | -2.5 % | 55 % | 51 / 51 |
+| 2023/24 | calibration | 1.880 | 1.864 | +0.9 % | 67 % | 86 / 86 |
+| 2024/25 | **held out** | 1.483 | 1.507 | -1.6 % | 65 % | 46 / 53 |
+| 2025/26 | calibration | 2.197 | 2.249 | -2.3 % | 54 % | 51 / 51 |
 
 \* 2022/23 has no AIS vessel schedule (pre-coverage); its vessel program is synthetic,
 so only the receivals side is meaningful.
@@ -43,9 +43,9 @@ so only the receivals side is meaningful.
 
 | criterion (spec §5) | value | threshold | verdict |
 |---|---|---|---|
-| season total error | -1.7 % | ±5 % | **PASS** |
+| season total error | -1.6 % | ±5 % | **PASS** |
 | weekly RMSE / mean weekly | 65 % | ≤15 % band (see note) | see note |
-| vessel call count | -18.9 % | ±10 % | **FAIL** |
+| vessel call count | -13.2 % | ±10 % | **FAIL** |
 
 **Note on the weekly band.** The spec's "±15 % weekly RMSE band" is ambiguous for weeks
 where observed values swing 80–490 kt; we report RMSE as a share of the mean weekly

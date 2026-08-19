@@ -102,7 +102,8 @@ const RAIL_SITES = ["Cummins", "Kimba", "Wudinna"];
 interface Vessel {
   id: number;
   port: number; // site index
-  arriveTick: number;
+  arriveTick: number; // arrival at anchorage (AIS-linked where available)
+  slotTick: number; // earliest berthing (observed berth time; pilotage/slot proxy)
   targetT: number;
   commodity: number; // -1 = decide at berth
   state: number;
@@ -399,11 +400,15 @@ export class Sim {
     if (bundle.vessels) {
       for (const v of bundle.vessels.port_lincoln_berth_visits) {
         const t = Math.max(0, Math.round((Date.parse(v.arrive) - this.startUtc) / 60000 / TICK_MIN));
+        const ta = v.anchor_arrive
+          ? Math.max(0, Math.round((Date.parse(v.anchor_arrive) - this.startUtc) / 60000 / TICK_MIN))
+          : t;
         const commodity = v.stem_commodity ? COMMODITIES.indexOf(STEM_TO_COMMODITY[v.stem_commodity] ?? "wheat") : -1;
         this.vessels.push({
           id: vid++,
           port: plIdx,
-          arriveTick: t,
+          arriveTick: Math.min(ta, t),
+          slotTick: t,
           targetT: Math.max(3000, v.est_cargo_t || 0),
           commodity,
           state: V_PENDING,
@@ -438,7 +443,7 @@ export class Sim {
         for (const v of lst) {
           const t = Math.max(0, Math.round((Date.parse(v.arrive) - this.startUtc) / 60000 / TICK_MIN));
           this.vessels.push({
-            id: vid++, port: theIdx, arriveTick: t, targetT: per, commodity: -1,
+            id: vid++, port: theIdx, arriveTick: t, slotTick: t, targetT: per, commodity: -1,
             state: V_PENDING, loadedT: 0, waitTicks: 0, berthedAt: -1, lastDrawTick: 0, name: null, rateTph: 0,
           });
         }
@@ -446,7 +451,7 @@ export class Sim {
       for (const v of bundle.vessels.lucky_bay_anchorage_stays) {
         const t = Math.max(0, Math.round((Date.parse(v.arrive) - this.startUtc) / 60000 / TICK_MIN));
         this.vessels.push({
-          id: vid++, port: lbIdx, arriveTick: t,
+          id: vid++, port: lbIdx, arriveTick: t, slotTick: t,
           targetT: Math.min(35000, Math.max(8000, (v.anchor_hours / 24) * 10000)),
           commodity: -1, state: V_PENDING, loadedT: 0, waitTicks: 0, berthedAt: -1, lastDrawTick: 0, name: null, rateTph: 0,
         });
@@ -796,7 +801,7 @@ export class Sim {
           }
           let stock = 0;
           for (let c = 0; c < NC; c++) stock += port.stock[c]!;
-          if (port.berthsFree > 0 && stock > Math.min(2000, v.targetT * 0.1)) {
+          if (tick >= v.slotTick && port.berthsFree > 0 && stock > Math.min(2000, v.targetT * 0.1)) {
             port.berthsFree--;
             v.state = V_BERTH;
             v.berthedAt = tick;

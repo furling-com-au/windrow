@@ -43,7 +43,9 @@ export interface Matrix {
 
 export interface VesselVisit {
   craft_id: number;
-  arrive: string; // ISO datetime
+  arrive: string; // ISO datetime of berthing (AIS berth-visit start)
+  anchor_arrive?: string | null; // ISO datetime of arrival at anchorage (AIS-linked)
+  observed_wait_h?: number | null;
   berth_hours: number;
   est_cargo_t: number;
   name_candidate?: string;

@@ -113,6 +113,28 @@ def main():
             & (pl.col("start") <= datetime(s1.year, s1.month, s1.day, 23, 59))
         )
         plv = vis.filter((pl.col("zone") == "port_lincoln") & (pl.col("state") == "berth")).sort("start")
+        # link each berth visit to its preceding anchorage stay (same craftID, anchor stay
+        # ending within [-36 h, +6 h] of berthing) so the sim shows ships waiting at anchor
+        anchors = (
+            vis.filter((pl.col("zone") == "port_lincoln") & (pl.col("state") == "anchor"))
+            .sort("start")
+            .to_dicts()
+        )
+        used_anchor: set[int] = set()
+
+        def find_anchor(craft_id: int, berth_start) -> dict | None:
+            best = None
+            for i, a in enumerate(anchors):
+                if i in used_anchor or a["craftID"] != craft_id:
+                    continue
+                gap_h = (berth_start - a["end"]).total_seconds() / 3600
+                if a["start"] < berth_start and -6 <= gap_h <= 36:
+                    if best is None or a["start"] > anchors[best]["start"]:
+                        best = i
+            if best is None:
+                return None
+            used_anchor.add(best)
+            return anchors[best]
         # allocate monthly official grain tonnes across visits by duration
         month_t: dict[tuple[int, int], float] = {}
         for r in pls.group_by("year", "month").agg(pl.col("export_t").sum().alias("t")).iter_rows(named=True):
@@ -122,14 +144,20 @@ def main():
         for r in rows:
             by_month.setdefault((r["start"].year, r["start"].month), []).append(r)
         vessels = []
+        n_anchored = 0
         for (yy, mm), lst in sorted(by_month.items()):
             tot_dur = sum(r["duration_h"] for r in lst) or 1.0
             mt = month_t.get((yy, mm), 0.0)
             for r in lst:
+                a = find_anchor(r["craftID"], r["start"])
+                if a is not None:
+                    n_anchored += 1
                 vessels.append(
                     {
                         "craft_id": r["craftID"],
                         "arrive": r["start"].isoformat(),
+                        "anchor_arrive": a["start"].isoformat() if a else None,
+                        "observed_wait_h": round((r["start"] - a["start"]).total_seconds() / 3600, 1) if a else None,
                         "berth_hours": round(r["duration_h"], 1),
                         "length_m": r["length_m"],
                         "draught_in": r["draught_start"],
@@ -158,7 +186,7 @@ def main():
         }
         f = APP_DATA / f"vessels_{season.replace('/', '-')}.json"
         f.write_text(json.dumps(vj), encoding="utf-8")
-        print(f"{f.name}: PL {len(vessels)}, LB {len(lb_out)}, THE {len(th_out)} ({f.stat().st_size/1e3:.0f} kB)")
+        print(f"{f.name}: PL {len(vessels)} ({n_anchored} with linked anchorage), LB {len(lb_out)}, THE {len(th_out)} ({f.stat().st_size/1e3:.0f} kB)")
 
 
 if __name__ == "__main__":

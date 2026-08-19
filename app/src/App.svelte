@@ -210,6 +210,16 @@
 </div>
 
 <PortPanel snap={app.snap} sites={app.sites} />
+
+<div class="legend">
+  <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: unharvested → harvested</div>
+  <div><span class="sw dot" style="background:#ebc85a"></span> farm trucks (colour = commodity)</div>
+  <div><span class="sw dot" style="background:#5ac8eb"></span> line-haul to port</div>
+  <div><span class="sw ring"></span> site: fill = storage used, red ring = queue</div>
+  <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
+  <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
+</div>
+
 {#if app.showAbout}<AboutModal onclose={() => (app.showAbout = false)} />{/if}
 
 <style>
@@ -349,5 +359,44 @@
   .disclaimer {
     color: #708396;
     font-size: 10px;
+  }
+  .legend {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    background: rgba(13, 22, 34, 0.88);
+    border: 1px solid #2a3b50;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #b9c7d6;
+    font-size: 10.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    backdrop-filter: blur(4px);
+  }
+  .legend .sw {
+    display: inline-block;
+    width: 22px;
+    height: 8px;
+    border-radius: 4px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .legend .sw.dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-left: 6px;
+    margin-right: 12px;
+  }
+  .legend .sw.ring {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #4c7a62;
+    border: 2px solid #ff5046;
+    margin-left: 5px;
+    margin-right: 11px;
   }
 </style>
