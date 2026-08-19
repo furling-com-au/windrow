@@ -21,6 +21,25 @@
       "Custom what-if — you moved the levers. The takeaways below compare your version of the season against the normal one.",
   );
 
+  // human-readable lever readouts (raw multipliers mean nothing to a reader)
+  let cropMt = $derived.by(() => {
+    const prod = Object.values(app.observed?.district_production_t ?? {}).reduce((a, v) => a + v, 0);
+    return prod > 0 ? (prod * app.levers.productionScale) / 1e6 : null;
+  });
+  const strength = (v: number, normal: number): string => {
+    const r = v / normal;
+    if (r < 0.55) return "much weaker than reality";
+    if (r < 0.85) return "weaker than reality";
+    if (r <= 1.2) return "as in reality";
+    if (r <= 2) return "stronger than reality";
+    return "much stronger than reality";
+  };
+  let fleetDesc = $derived.by(() => {
+    const d = app.levers.fleetTrucks / DEFAULT_LEVERS.fleetTrucks - 1;
+    if (Math.abs(d) < 0.03) return "the real-world fleet";
+    return `${Math.abs(d * 100).toFixed(0)}% ${d > 0 ? "more trucks than" : "fewer trucks than"} reality`;
+  });
+
   interface Takeaway {
     text: string;
     money?: string;
@@ -174,30 +193,31 @@
   <p class="story">{story}</p>
 
   {#if app.viewMode === "advanced"}
-    <label>
-      <span>Crop size <b>{Math.round(app.levers.productionScale * 100)}%</b> of actual</span>
+    <div class="fine how">Drag a lever and the whole season instantly re-runs with that change. “What changed” below compares it against the real season.</div>
+    <label title="Scales how much grain grows on every paddock. 100% = what was really harvested.">
+      <span>How big is the crop? <b>{Math.round(app.levers.productionScale * 100)}%{cropMt ? ` ≈ ${cropMt.toFixed(1)} million t` : ""}</b></span>
       <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
         oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
     </label>
-    <label>
-      <span>Truck fleet <b>{Math.round(app.levers.fleetTrucks)}</b> trucks</span>
+    <label title="The number of farm trucks working the harvest. Fewer trucks = grain waits on farm; more = longer silo queues.">
+      <span>How many trucks working the harvest? <b>{Math.round(app.levers.fleetTrucks)} — {fleetDesc}</b></span>
       <input type="range" min="300" max="800" step="10" value={app.levers.fleetTrucks}
         oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
     </label>
-    <label>
-      <span>Grain drawn to Lucky Bay <b>{app.levers.luckyBayBias.toFixed(1)}×</b></span>
+    <label title="How strongly the competing T-Ports Lucky Bay system attracts nearby farmers (price incentives, service). Push it up and eastern-peninsula grain drains away from the main network.">
+      <span>Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, 0.651)}</b></span>
       <input type="range" min="0.2" max="3" step="0.1" value={app.levers.luckyBayBias}
         oninput={(e) => set("luckyBayBias", parseFloat(e.currentTarget.value))} />
     </label>
-    <label>
-      <span>Farmers carting straight to port <b>{app.levers.portAttractBias.toFixed(1)}×</b></span>
+    <label title="How willing farmers are to drive past their local silo and cart directly to the port. More direct carting = longer farm trips but less double-handling.">
+      <span>Carting straight to port: <b>{strength(app.levers.portAttractBias, 0.8)}</b></span>
       <input type="range" min="0.4" max="2.5" step="0.1" value={app.levers.portAttractBias}
         oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
     </label>
     <div class="toggles">
-      <button class:on={app.levers.rail} onclick={() => set("rail", !app.levers.rail)}>trains</button>
-      <button class:on={app.levers.outage} onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
-      <button class:on={app.levers.roadClosure} onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
+      <button class:on={app.levers.rail} title="Bring back two grain trains on the railway closed in 2019 (Cummins–Kimba–Wudinna lines into Port Lincoln)" onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
+      <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
+      <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>
   {:else}
     <div class="fine hint">Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself.</div>
@@ -355,6 +375,9 @@
   }
   .hint b {
     color: #9db1c5;
+  }
+  .how {
+    margin: 0 0 6px;
   }
   .verdict {
     margin: 2px 0 6px;

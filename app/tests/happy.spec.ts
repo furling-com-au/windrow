@@ -31,7 +31,7 @@ test("loads, auto-plays, KPIs move, pause works", async ({ page }) => {
 
   // mode toggle exists and switches to Advanced (levers appear)
   await page.getByRole("button", { name: "Advanced" }).click();
-  await expect(page.getByText("Truck fleet")).toBeVisible();
+  await expect(page.getByText("How many trucks working the harvest?")).toBeVisible();
 
   expect(errors).toEqual([]);
 });

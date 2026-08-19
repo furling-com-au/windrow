@@ -15,6 +15,7 @@
 
   let showIntro = $state(false);
   let userTouchedSpeed = false;
+  let legendOpen = $state(typeof window !== "undefined" && window.innerWidth > 900);
 
   let mapEl: HTMLDivElement;
   let map: DeckMap | null = null;
@@ -366,14 +367,29 @@
 <Tour />
 {#if showIntro}<Intro onwatch={() => (showIntro = false)} />{/if}
 
-<div class="legend">
-  <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: unharvested → harvested</div>
-  <div><span class="sw dot" style="background:#ebc85a"></span> farm trucks (colour = commodity)</div>
-  <div><span class="sw dot" style="background:#5ac8eb"></span> line-haul to port</div>
-  <div><span class="sw ring"></span> site: fill = storage used, red ring = queue · click for detail</div>
-  <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
-  <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
-</div>
+{#if legendOpen}
+  <div class="legend">
+    <div class="lg-head">
+      <b>Map key</b>
+      <button class="lg-x" onclick={() => (legendOpen = false)}>×</button>
+    </div>
+    <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: green = crop standing, gold = harvested</div>
+    <div class="lg-sub">moving dots are trucks, coloured by their load:</div>
+    <div class="chips">
+      <span><i style="background:#ebc85a"></i>wheat</span>
+      <span><i style="background:#d6a864"></i>barley</span>
+      <span><i style="background:#fadc28"></i>canola</span>
+      <span><i style="background:#c85a50"></i>lentils</span>
+      <span><i style="background:#96b45a"></i>beans</span>
+      <span><i style="background:#5ac8eb"></i>silo→port shuttle</span>
+    </div>
+    <div><span class="sw ring"></span> silo/site: fills as storage is used · red ring = trucks queued · click it for detail</div>
+    <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
+    <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
+  </div>
+{:else}
+  <button class="legend-btn" onclick={() => (legendOpen = true)}>🗺 map key</button>
+{/if}
 
 {#if app.showAbout}<AboutModal onclose={() => (app.showAbout = false)} />{/if}
 
@@ -603,7 +619,8 @@
     position: absolute;
     left: 356px;
     bottom: 12px;
-    background: rgba(13, 22, 34, 0.88);
+    max-width: 300px;
+    background: rgba(13, 22, 34, 0.94);
     border: 1px solid #2a3b50;
     border-radius: 8px;
     padding: 8px 10px;
@@ -613,6 +630,51 @@
     flex-direction: column;
     gap: 3px;
     backdrop-filter: blur(4px);
+    z-index: 6;
+  }
+  .legend-btn {
+    position: absolute;
+    left: 356px;
+    bottom: 12px;
+    z-index: 6;
+    background: rgba(13, 22, 34, 0.9);
+    border: 1px solid #2a3b50;
+    color: #b9c7d6;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .lg-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #dfe7ef;
+  }
+  .lg-x {
+    background: none;
+    border: none;
+    color: #9db1c5;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0 2px;
+  }
+  .lg-sub {
+    color: #8fa3b8;
+    margin-top: 2px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 1px 0 3px;
+  }
+  .chips span i {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
   }
   .legend .sw {
     display: inline-block;
@@ -643,8 +705,10 @@
       width: calc(100vw - 24px);
       max-height: 55vh;
     }
-    .legend {
-      display: none;
+    .legend,
+    .legend-btn {
+      left: 12px;
+      bottom: 58vh;
     }
   }
 </style>
