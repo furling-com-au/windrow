@@ -25,6 +25,17 @@
       Site storage capacities for upcountry sites and truck cycle parameters are assumptions —
       see ASSUMPTIONS.md in the repository.
     </p>
+    <h3>How do we know the truck numbers?</h3>
+    <p>
+      We don't count trucks — nobody publishes the fleet. The <strong>589-truck fleet is
+      fitted</strong>: it's the size that makes the simulated weekly deliveries match the
+      operator's published weekly figures across two seasons (validated on a third,
+      held-out season). The <strong>~38&nbsp;t average load is an assumption</strong> built
+      from published anchors: the industry's own truck mass charts (road trains to
+      ~110&nbsp;t gross), a study putting typical EP load sizes at ~72&nbsp;t, and a
+      ~29&nbsp;t all-deliveries state average. Sanity check: the real peak week moved
+      ~490,000&nbsp;t ≈ 1,850 loads/day ≈ 450–600 trucks at 3–4 trips each.
+    </p>
     <h3>How the dollar figures are estimated</h3>
     <p>
       The "what this changes" figures are rough, order-of-magnitude estimates: trucking at

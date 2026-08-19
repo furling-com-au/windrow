@@ -36,8 +36,8 @@
   };
   let fleetDesc = $derived.by(() => {
     const d = app.levers.fleetTrucks / DEFAULT_LEVERS.fleetTrucks - 1;
-    if (Math.abs(d) < 0.03) return "the real-world fleet";
-    return `${Math.abs(d * 100).toFixed(0)}% ${d > 0 ? "more trucks than" : "fewer trucks than"} reality`;
+    if (Math.abs(d) < 0.03) return "our best estimate of the real fleet";
+    return `${Math.abs(d * 100).toFixed(0)}% ${d > 0 ? "more trucks than" : "fewer trucks than"} that estimate`;
   });
 
   /** one line naming exactly what differs from the real season */
@@ -287,7 +287,7 @@
       <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
         oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="The number of farm trucks working the harvest. Fewer trucks = grain waits on farm; more = longer silo queues.">
+    <label title="Nobody publishes the real fleet size. 589 is FITTED: it's the fleet that makes the simulated weekly deliveries match the published ones (av. load ~38 t, from industry mass limits — see About). Fewer trucks = grain waits on farm; more = longer silo queues.">
       <span>How many trucks working the harvest? <b>{Math.round(app.levers.fleetTrucks)} — {fleetDesc}</b></span>
       <input type="range" min="300" max="800" step="10" value={app.levers.fleetTrucks}
         oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
