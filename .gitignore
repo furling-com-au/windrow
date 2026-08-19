@@ -1,0 +1,21 @@
+# Raw data cache: immutable, large, reproducible via pipeline + SOURCES.md.
+# Integrity tracked via data/raw/MANIFEST.sha256 (which IS committed).
+data/raw/*
+!data/raw/MANIFEST.sha256
+!data/raw/README.md
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.svelte-kit/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
