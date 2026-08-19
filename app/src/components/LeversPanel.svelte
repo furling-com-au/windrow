@@ -40,6 +40,79 @@
     return `${Math.abs(d * 100).toFixed(0)}% ${d > 0 ? "more trucks than" : "fewer trucks than"} reality`;
   });
 
+  /** one line naming exactly what differs from the real season */
+  let changeSummary = $derived.by(() => {
+    const l = app.levers;
+    const parts: string[] = [];
+    if (l.productionScale !== 1) parts.push(`crop at ${Math.round(l.productionScale * 100)}%`);
+    if (Math.abs(l.fleetTrucks - DEFAULT_LEVERS.fleetTrucks) > 15)
+      parts.push(`${l.fleetTrucks > DEFAULT_LEVERS.fleetTrucks ? "more" : "fewer"} trucks (${Math.round(l.fleetTrucks)})`);
+    if (l.luckyBayBias / DEFAULT_LEVERS.luckyBayBias > 1.2) parts.push("Lucky Bay pull stronger");
+    if (l.luckyBayBias / DEFAULT_LEVERS.luckyBayBias < 0.85) parts.push("Lucky Bay pull weaker");
+    if (l.portAttractBias / DEFAULT_LEVERS.portAttractBias > 1.2) parts.push("more direct-to-port carting");
+    if (l.portAttractBias / DEFAULT_LEVERS.portAttractBias < 0.85) parts.push("less direct-to-port carting");
+    if (l.rail) parts.push("trains running");
+    if (l.outage) parts.push("Port Lincoln closed 1 wk (mid-Dec)");
+    if (l.roadClosure) parts.push("Tod Hwy closed");
+    return parts.join(" · ");
+  });
+
+  /** Advanced mode: a FIXED table — same rows every frame, values change, nothing pops
+   *  in or out. Quiet rows are dimmed as "≈ no change" instead of disappearing. */
+  interface Row {
+    label: string;
+    val: string;
+    money?: string;
+    dim: boolean;
+    dir: "up" | "down" | "flat";
+  }
+  let fixedRows = $derived.by((): Row[] => {
+    const d = deltas;
+    const s = app.snap;
+    if (!d || !s) return [];
+    const kt = (t: number) => `${t > 0 ? "+" : "−"}${Math.abs(t / 1000).toFixed(0)}k t`;
+    const mk = (label: string, delta: number, thr: number, val?: string, money?: string): Row => ({
+      label,
+      val: Math.abs(delta) > thr ? (val ?? kt(delta)) : "≈ no change",
+      money: Math.abs(delta) > thr ? money : undefined,
+      dim: Math.abs(delta) <= thr,
+      dir: Math.abs(delta) <= thr ? "flat" : delta > 0 ? "up" : "down",
+    });
+    const rows: Row[] = [
+      mk("Grain delivered", d.dRec, 20000),
+      mk("→ to Lucky Bay instead", d.dLb, 10000),
+      mk("Shipped out", d.dShip, 20000),
+      mk(
+        "Trucking",
+        d.freight,
+        150000,
+        `${d.dTkm > 0 ? "+" : "−"}${Math.abs(d.dTkm / 1e6).toFixed(1)}M t·km`,
+        `${d.freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.freight))} freight`,
+      ),
+      {
+        label: "Worst silo queue",
+        val: `${s.kpi.peakQueue} vs ${d.baseQ} trucks`,
+        dim: Math.abs(s.kpi.peakQueue - d.baseQ) <= 15,
+        dir: Math.abs(s.kpi.peakQueue - d.baseQ) <= 15 ? "flat" : s.kpi.peakQueue > d.baseQ ? "up" : "down",
+      },
+      mk(
+        "Ships waiting",
+        d.demurrage,
+        200000,
+        `${Math.round(d.waitNow)} h vs ${Math.round(d.waitBase)} h each`,
+        `${d.demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.demurrage))} waiting cost`,
+      ),
+    ];
+    if (d.farmgate !== 0)
+      rows.unshift({
+        label: "Crop value (farm gate)",
+        val: `${d.farmgate > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.farmgate))}`,
+        dim: false,
+        dir: d.farmgate > 0 ? "up" : "down",
+      });
+    return rows;
+  });
+
   interface Takeaway {
     text: string;
     money?: string;
@@ -239,7 +312,8 @@
     </div>
   {:else if app.viewMode === "simple"}
     <div class="tk">
-      <div class="tkt">What this changes</div>
+      <div class="tkt">What this changes <span class="live">· updates as the season plays</span></div>
+      {#if changeSummary && app.scenario === "custom"}<div class="uchg">Your change: <b>{changeSummary}</b></div>{/if}
       {#if !app.baseline}
         <p class="verdict soft">Working out the normal season to compare against…</p>
       {:else if sentences}
@@ -256,19 +330,18 @@
     </div>
   {:else}
     <div class="tk">
-      <div class="tkt">What changed{app.snap && app.snap.day < 360 ? ` (to ${app.snap.dateIso})` : ""}</div>
+      <div class="tkt">What changed <span class="live">· running comparison{app.snap && app.snap.day < 360 ? `, to ${app.snap.dateIso}` : " — full season"}</span></div>
+      {#if changeSummary}<div class="uchg">Comparing the real season against: <b>{changeSummary}</b></div>{/if}
       {#if !app.baseline}
-        <div class="fine">Computing baseline…</div>
-      {:else if takeaways.length}
-        {#each takeaways as t}
-          <div class="row {t.dir}">
-            <span>{t.text}</span>
-            {#if t.money}<span class="money">{t.money}</span>{/if}
+        <div class="fine">Computing the real-season baseline…</div>
+      {:else}
+        {#each fixedRows as r}
+          <div class="row {r.dir}" class:dim={r.dim}>
+            <span>{r.label}</span>
+            <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
-        <div class="fine">Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (assumptions A18–A19).</div>
-      {:else}
-        <div class="fine">No significant deltas vs baseline yet — most emerge from harvest onward.</div>
+        <div class="fine">Values keep updating as the season plays. Indicative dollars: 10¢/t·km cartage, ~A$30k per ship-day waiting, ~$380/t farm-gate (A18–A19).</div>
       {/if}
     </div>
   {/if}
@@ -362,6 +435,23 @@
   }
   .row.down {
     color: #7dd3a8;
+  }
+  .row.dim {
+    color: #5b6d80;
+  }
+  .live {
+    color: #64788c;
+    font-weight: 400;
+    font-size: 9.5px;
+  }
+  .uchg {
+    font-size: 10.5px;
+    color: #9db1c5;
+    margin: 2px 0 6px;
+    line-height: 1.4;
+  }
+  .uchg b {
+    color: #cfdbe8;
   }
   .row .money {
     font-variant-numeric: tabular-nums;

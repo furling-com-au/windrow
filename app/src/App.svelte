@@ -383,7 +383,7 @@
       <span><i style="background:#96b45a"></i>beans</span>
       <span><i style="background:#5ac8eb"></i>silo→port shuttle</span>
     </div>
-    <div><span class="sw ring"></span> silo/site: fills as storage is used · red ring = trucks queued · click it for detail</div>
+    <div><span class="sw ring"></span> silo/site: turns bright blue as storage fills · red ring = trucks queued · click it for detail</div>
     <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
     <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
   </div>
@@ -695,7 +695,7 @@
     width: 11px;
     height: 11px;
     border-radius: 50%;
-    background: #4c7a62;
+    background: linear-gradient(90deg, #163449, #4dd7ff);
     border: 2px solid #ff5046;
     margin-left: 5px;
     margin-right: 11px;

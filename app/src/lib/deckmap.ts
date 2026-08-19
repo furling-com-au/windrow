@@ -177,11 +177,12 @@ export class DeckMap {
           radiusUnits: "meters",
           getFillColor: (p: { f: number; cropping_ha: number }) => {
             const f = p.f;
-            // unharvested crop green -> harvested stubble gold
-            const r = 62 + (196 - 62) * f;
-            const g = 112 + (168 - 112) * f;
-            const b = 62 + (92 - 62) * f;
-            const alpha = Math.min(210, 40 + p.cropping_ha / 3);
+            // unharvested crop green -> harvested stubble gold (kept muted so the
+            // infrastructure layer reads on top)
+            const r = 58 + (172 - 58) * f;
+            const g = 104 + (146 - 104) * f;
+            const b = 58 + (84 - 58) * f;
+            const alpha = Math.min(150, 30 + p.cropping_ha / 3.5);
             return [r, g, b, alpha] as [number, number, number, number];
           },
           updateTriggers: { getFillColor: snap.tick },
@@ -236,19 +237,20 @@ export class DeckMap {
           id: "sites",
           data: siteData,
           getPosition: (s: BundleSite) => [s.lon, s.lat],
-          getRadius: (s: { role: string }) => (s.role === "port" ? 2600 : 1900),
+          getRadius: (s: { role: string }) => (s.role === "port" ? 3400 : 2500),
           radiusUnits: "meters",
-          radiusMinPixels: 4,
-          radiusMaxPixels: 18,
+          radiusMinPixels: 6,
+          radiusMaxPixels: 22,
           stroked: true,
-          getLineWidth: 2,
+          getLineWidth: 2.5,
           lineWidthUnits: "pixels",
           getLineColor: (s: { queue: number }) =>
-            s.queue > 20 ? [255, 80, 70, 255] : s.queue > 8 ? [255, 180, 60, 255] : [180, 200, 215, 200],
+            s.queue > 20 ? [255, 80, 70, 255] : s.queue > 8 ? [255, 180, 60, 255] : [238, 244, 250, 235],
           getFillColor: (s: { fill: number; role: string; status: string }) => {
-            if (s.status !== "active_2025_26" && s.status !== "active") return [70, 80, 92, 160];
+            if (s.status !== "active_2025_26" && s.status !== "active") return [58, 68, 82, 210];
+            // storage fill: deep slate (empty) -> bright cyan (full) — pops against the gold
             const f = s.fill;
-            return [40 + 180 * f, 120 - 40 * f, 90 - 40 * f, 230] as [number, number, number, number];
+            return [22 + 55 * f, 52 + 160 * f, 76 + 178 * f, 250] as [number, number, number, number];
           },
           updateTriggers: { getFillColor: snap.tick, getLineColor: snap.tick },
           pickable: true,
@@ -258,15 +260,16 @@ export class DeckMap {
         }),
         new TextLayer({
           id: "site-labels",
-          data: siteData.filter((s) => s.role === "port" || true),
+          data: siteData,
           getPosition: (s: BundleSite) => [s.lon, s.lat],
           getText: (s: { name: string; queue: number }) => (s.queue > 0 ? `${short(s.name)} (${s.queue})` : short(s.name)),
-          getSize: (s: { role: string }) => (s.role === "port" ? 14 : 11),
-          getColor: [225, 232, 240, 220],
-          getPixelOffset: [0, -16],
+          getSize: (s: { role: string }) => (s.role === "port" ? 16 : 13),
+          getColor: [255, 255, 255, 245],
+          getPixelOffset: [0, -20],
           fontFamily: "system-ui, sans-serif",
-          outlineWidth: 2,
-          outlineColor: [10, 18, 28, 220],
+          fontWeight: 700,
+          outlineWidth: 4,
+          outlineColor: [6, 11, 18, 245],
           fontSettings: { sdf: true },
           updateTriggers: { getText: snap.tick },
           pickable: false,
