@@ -157,11 +157,13 @@
       {
         label: "Delivery pace",
         val:
-          Math.abs(d.paceLagDays) < 2
-            ? "keeping pace"
-            : `~${Math.abs(d.paceLagDays)} days ${d.paceLagDays > 0 ? "behind" : "ahead of"} the modelled normal season`,
-        dim: Math.abs(d.paceLagDays) < 2,
-        dir: Math.abs(d.paceLagDays) < 2 ? "flat" : d.paceLagDays > 0 ? "up" : "down",
+          d.paceLagDays === null
+            ? "not comparable"
+            : Math.abs(d.paceLagDays) < 2
+              ? "keeping pace"
+              : `~${Math.abs(d.paceLagDays)} days ${d.paceLagDays > 0 ? "behind" : "ahead of"} the modelled normal season`,
+        dim: d.paceLagDays === null || Math.abs(d.paceLagDays) < 2,
+        dir: d.paceLagDays === null || Math.abs(d.paceLagDays) < 2 ? "flat" : d.paceLagDays > 0 ? "up" : "down",
         goodWhenUp: false,
       },
       mk(
@@ -246,11 +248,13 @@
       farmgate = (app.levers.productionScale - 1) * prod * (FARMGATE_PER_T[app.season] ?? 380);
     }
     // delivery pace: how many days ahead/behind the baseline reached this cumulative tonnage
-    let paceLagDays = 0;
+    let paceLagDays: number | null = 0;
     if (s.kpi.receivedT > 80000) {
       let j = 0;
       while (j < b.receivedByDay.length && (b.receivedByDay[j] ?? 0) < s.kpi.receivedT) j++;
-      paceLagDays = s.day - j; // positive = behind the modelled normal season
+      // baseline never reaches this cumulative (scenario outran the season total, or the
+      // baseline plateaued below it) — there's no day to compare against, so don't guess one
+      paceLagDays = j >= b.receivedByDay.length ? null : s.day - j; // positive = behind the modelled normal season
     }
     const dOnFarmTd = s.kpi.onFarmTd - (b.onFarmTdByDay?.[i] ?? 0);
     const holding = dOnFarmTd * app.econ.holdingPerTDay;
@@ -321,7 +325,7 @@
         text: `Queues at the busiest silo peak about ${pct(d.dQrel)} ${d.dQrel > 0 ? "longer" : "shorter"} than the modelled normal season.`,
       });
     }
-    if (Math.abs(d.paceLagDays) >= 3) {
+    if (d.paceLagDays !== null && Math.abs(d.paceLagDays) >= 3) {
       lines.push({
         key: "paceLagDays",
         weight: Math.abs(d.paceLagDays) / 3,
