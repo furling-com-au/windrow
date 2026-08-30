@@ -104,5 +104,5 @@ road trains (53.5 m), which SA permits at materially higher masses:
    road-train network?** This decides whether silo->port line-haul runs at ~45 t net
    (Viterra's 2019 rail-replacement statement: 48 loaded trucks/day for ~2,100-2,200 t/day)
    or at ~85 t net (Type 2 at SA CML 132.83 t). The simulation's rail scenario is highly
-   sensitive to it: the truck-km a railway would save falls from ~2.5 M (at 45 t) to
+   sensitive to it: the truck-km a railway would save falls from ~2.2 M (at 45 t) to
    ~0.9 M (at 85 t) - see ASSUMPTIONS A1/A21 and docs/scenarios.md.

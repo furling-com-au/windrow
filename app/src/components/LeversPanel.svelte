@@ -60,7 +60,7 @@
     return `${Math.abs(d * 100).toFixed(0)}% ${d > 0 ? "more trucks than" : "fewer trucks than"} that estimate`;
   });
 
-  /** one line naming exactly what differs from the real season */
+  /** one line naming exactly what differs from the modelled normal season */
   let changeSummary = $derived.by(() => {
     const l = app.levers;
     const parts: string[] = [];
@@ -98,13 +98,14 @@
   }
 
   const ROW_TIPS: Record<string, string> = {
-    "Grain delivered": "Grain farmers delivered into the main network's silos and ports this season, vs the real season at the same date.",
+    "Grain delivered": "Grain farmers delivered into the main network's silos and ports this season, vs the modelled normal season at the same date.",
     "→ to Lucky Bay instead": "Deliveries that went to the competing T-Ports Lucky Bay system — grain that left the main network.",
     "Shipped out": "Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay).",
-    Trucking: "Loaded truck travel. When grain can't go straight to port it gets double-handled — farm to silo now, silo to port later — which adds kilometres and cost (10¢/t·km, A18).",
-    "Worst silo queue": "The most trucks waiting to unload at any ONE silo at any single moment this season, this what-if vs the real season. The absolute number rests on an assumed unloading time (A2) — read it as relative.",
-    "Delivery pace": "How many days earlier or later this what-if reaches the same delivered tonnage as the real season. Slower logistics (e.g. fewer trucks) shows up here — grain waits on farm, a cost the freight dollars don't price.",
-    "Grain waiting on farm": "Extra tonne-days harvested grain spends in field bins before delivery, vs the real season. Priced as financing only — ~9¢/t/day (grain value at overdraft rates, A22). Weather, insect and quality risk of holding grain on farm are real but not publicly priceable, so NOT included.",
+    Trucking: "Loaded travel BY ROAD. When grain can't go straight to port it gets double-handled — farm to silo now, silo to port later — which adds kilometres and cost (10¢/t·km, A18). Tonnes moved by rail are counted separately and are NOT charged at the road rate — nor is the cost of running the railway.",
+    "Kilometres driven": "Truck-kilometres on the road, loaded and empty. Tonne-km measure the freight task; this counts the vehicle trips behind it — the number that drives road wear, emissions and driver demand. A bigger silo-to-port payload, or a trainset taking the load, removes truck trips without changing how far the grain travels.",
+    "Worst silo queue": "The most trucks waiting to unload at any ONE silo at any single moment this season, this what-if vs the modelled normal season. The absolute number rests on an assumed unloading time (A2) — read it as relative.",
+    "Delivery pace": "How many days earlier or later this what-if reaches the same delivered tonnage as the modelled normal season. Slower logistics (e.g. fewer trucks) shows up here — grain waits on farm, a cost the freight dollars don't price.",
+    "Grain waiting on farm": "Extra tonne-days harvested grain spends in field bins before delivery, vs the modelled normal season. Priced as financing only — ~9¢/t/day (grain value at overdraft rates, A22). Weather, insect and quality risk of holding grain on farm are real but not publicly priceable, so NOT included.",
     "Ships waiting": "Average hours each ship spends at anchor waiting for a berth or for grain, costed at a demurrage-like ~A$30k per ship-day (A19).",
     "Crop value (farm gate)": "The changed harvest tonnage valued at PIRSA-derived farm-gate prices (~$380/t).",
   };
@@ -131,6 +132,12 @@
         `${d.dTkm > 0 ? "+" : "−"}${Math.abs(d.dTkm / 1e6).toFixed(1)}M t·km`,
         `${d.freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.freight))} freight`,
       ),
+      mk(
+        "Kilometres driven",
+        d.dTruckKm,
+        250000,
+        `${d.dTruckKm > 0 ? "+" : "−"}${Math.abs(d.dTruckKm / 1e6).toFixed(2)}M truck-km`,
+      ),
       {
         label: "Worst silo queue",
         val: `${s.kpi.peakQueue} vs ${d.baseQ} trucks`,
@@ -142,7 +149,7 @@
         val:
           Math.abs(d.paceLagDays) < 2
             ? "keeping pace"
-            : `~${Math.abs(d.paceLagDays)} days ${d.paceLagDays > 0 ? "behind" : "ahead of"} the real season`,
+            : `~${Math.abs(d.paceLagDays)} days ${d.paceLagDays > 0 ? "behind" : "ahead of"} the modelled normal season`,
         dim: Math.abs(d.paceLagDays) < 2,
         dir: Math.abs(d.paceLagDays) < 2 ? "flat" : d.paceLagDays > 0 ? "up" : "down",
       },
@@ -220,6 +227,8 @@
     const dShip = s.kpi.shippedT - (b.shippedByDay[i] ?? 0);
     const dTkm = s.kpi.tonneKm - (b.tonneKmByDay[i] ?? 0);
     const freight = dTkm * app.econ.freightPerTKm;
+    // vehicle-km, not tonne-km: what actually changes when a trainset replaces truck trips
+    const dTruckKm = s.kpi.truckKm - (b.truckKmByDay?.[i] ?? 0);
     const baseQ = b.queueByDay[i] ?? 0;
     const dQrel = baseQ > 20 ? (s.kpi.peakQueue - baseQ) / baseQ : 0;
     const waitDays = (s.kpi.meanWaitH * s.kpi.vesselsArrived) / 24;
@@ -235,11 +244,11 @@
     if (s.kpi.receivedT > 80000) {
       let j = 0;
       while (j < b.receivedByDay.length && (b.receivedByDay[j] ?? 0) < s.kpi.receivedT) j++;
-      paceLagDays = s.day - j; // positive = behind the real season
+      paceLagDays = s.day - j; // positive = behind the modelled normal season
     }
     const dOnFarmTd = s.kpi.onFarmTd - (b.onFarmTdByDay?.[i] ?? 0);
     const holding = dOnFarmTd * app.econ.holdingPerTDay;
-    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays, dOnFarmTd, holding };
+    return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, dTruckKm, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays, dOnFarmTd, holding };
   });
 
   const tonnes = (t: number) => {
@@ -253,77 +262,167 @@
   let sentences = $derived.by((): { verdict: string; lines: string[] } | null => {
     const d = deltas;
     if (!d || (app.scenario === "baseline" && !assumpDirty)) return null;
-    const lines: string[] = [];
+    const lines: { key: string; weight: number; text: string }[] = [];
 
     if (d.farmgate !== 0) {
-      lines.push(
-        `A crop ${pct(app.levers.productionScale - 1)} ${app.levers.productionScale > 1 ? "bigger" : "smaller"} is worth about ${fmtMoney(Math.abs(d.farmgate))} ${d.farmgate > 0 ? "more" : "less"} to farmers at the gate.`,
-      );
+      lines.push({
+        key: "farmgate",
+        weight: Infinity, // headline number always leads
+        text: `A crop ${pct(app.levers.productionScale - 1)} ${app.levers.productionScale > 1 ? "bigger" : "smaller"} is worth about ${fmtMoney(Math.abs(d.farmgate))} ${d.farmgate > 0 ? "more" : "less"} to farmers at the gate.`,
+      });
     }
     if (Math.abs(d.relRec) >= 0.02 && Math.abs(d.dRec) > 20000) {
-      lines.push(`${tonnes(d.dRec)} ${d.dRec > 0 ? "more" : "less"} grain reaches the silos and ports (${d.dRec > 0 ? "+" : "−"}${pct(d.relRec)}).`);
+      lines.push({
+        key: "relRec",
+        weight: Math.abs(d.relRec) / 0.02,
+        text: `${tonnes(d.dRec)} ${d.dRec > 0 ? "more" : "less"} grain reaches the silos and ports (${d.dRec > 0 ? "+" : "−"}${pct(d.relRec)}).`,
+      });
     }
     if (Math.abs(d.dLb) > 10000) {
-      lines.push(
-        d.dLb > 0
-          ? `${tonnes(d.dLb)} of deliveries shift to the rival Lucky Bay port instead.`
-          : `${tonnes(d.dLb)} of deliveries shift away from Lucky Bay back to the main network.`,
-      );
+      lines.push({
+        key: "dLb",
+        weight: Math.abs(d.dLb) / 10000,
+        text:
+          d.dLb > 0
+            ? `${tonnes(d.dLb)} of deliveries shift to the rival Lucky Bay port instead.`
+            : `${tonnes(d.dLb)} of deliveries shift away from Lucky Bay back to the main network.`,
+      });
     }
     if (Math.abs(d.freight) > 300000) {
-      lines.push(
-        d.freight > 0
-          ? `Trucks travel further overall — grain gets double-handled (farm to silo now, silo to port later) — roughly ${fmtMoney(Math.abs(d.freight))} extra in freight.`
-          : `Trucks travel less overall — roughly ${fmtMoney(Math.abs(d.freight))} saved in freight.`,
-      );
+      lines.push({
+        key: "freight",
+        weight: Math.abs(d.freight) / 300000,
+        text:
+          d.freight > 0
+            ? `Trucks travel further overall — grain gets double-handled (farm to silo now, silo to port later) — roughly ${fmtMoney(Math.abs(d.freight))} extra in freight.`
+            : `Trucks travel less overall — roughly ${fmtMoney(Math.abs(d.freight))} saved in freight.`,
+      });
+    }
+    if (Math.abs(d.dTruckKm) > 250000) {
+      lines.push({
+        key: "dTruckKm",
+        weight: Math.abs(d.dTruckKm) / 250000,
+        text:
+          d.dTruckKm < 0
+            ? `About ${(Math.abs(d.dTruckKm) / 1e6).toFixed(1)} million fewer truck-kilometres are driven on the peninsula's roads.`
+            : `About ${(d.dTruckKm / 1e6).toFixed(1)} million extra truck-kilometres are driven on the peninsula's roads.`,
+      });
     }
     if (Math.abs(d.dQrel) >= 0.15) {
-      lines.push(`Queues at the busiest silo peak about ${pct(d.dQrel)} ${d.dQrel > 0 ? "longer" : "shorter"} than the real season.`);
+      lines.push({
+        key: "dQrel",
+        weight: Math.abs(d.dQrel) / 0.15,
+        text: `Queues at the busiest silo peak about ${pct(d.dQrel)} ${d.dQrel > 0 ? "longer" : "shorter"} than the modelled normal season.`,
+      });
     }
     if (Math.abs(d.paceLagDays) >= 3) {
-      lines.push(
-        d.paceLagDays > 0
-          ? `Deliveries run about ${d.paceLagDays} days behind the real season.`
-          : `Deliveries run about ${-d.paceLagDays} days ahead of the real season.`,
-      );
+      lines.push({
+        key: "paceLagDays",
+        weight: Math.abs(d.paceLagDays) / 3,
+        text:
+          d.paceLagDays > 0
+            ? `Deliveries run about ${d.paceLagDays} days behind the modelled normal season.`
+            : `Deliveries run about ${-d.paceLagDays} days ahead of the modelled normal season.`,
+      });
     }
     if (Math.abs(d.holding) > 250000) {
-      lines.push(
-        d.holding > 0
-          ? `Grain waits longer on farm — roughly ${fmtMoney(Math.abs(d.holding))} in financing while growers wait to deliver (weather and quality risk on top, unpriced).`
-          : `Grain spends less time waiting on farm — roughly ${fmtMoney(Math.abs(d.holding))} less financing.`,
-      );
+      lines.push({
+        key: "holding",
+        weight: Math.abs(d.holding) / 250000,
+        text:
+          d.holding > 0
+            ? `Grain waits longer on farm — roughly ${fmtMoney(Math.abs(d.holding))} in financing while growers wait to deliver (weather and quality risk on top, unpriced).`
+            : `Grain spends less time waiting on farm — roughly ${fmtMoney(Math.abs(d.holding))} less financing.`,
+      });
     }
     if (Math.abs(d.demurrage) > 500000) {
-      lines.push(
-        `Ships wait about ${Math.round(d.waitNow)} hours each at anchor (normally ~${Math.round(d.waitBase)}) — roughly ${fmtMoney(Math.abs(d.demurrage))} in ${d.demurrage > 0 ? "extra" : "avoided"} waiting costs.`,
-      );
+      lines.push({
+        key: "demurrage",
+        weight: Math.abs(d.demurrage) / 500000,
+        text: `Ships wait about ${Math.round(d.waitNow)} hours each at anchor (normally ~${Math.round(d.waitBase)}) — roughly ${fmtMoney(Math.abs(d.demurrage))} in ${d.demurrage > 0 ? "extra" : "avoided"} waiting costs.`,
+      });
     }
     if (Math.abs(d.dShip) > 50000) {
-      lines.push(`${tonnes(d.dShip)} ${d.dShip > 0 ? "more" : "less"} grain gets shipped out by season's end.`);
+      lines.push({
+        key: "dShip",
+        weight: Math.abs(d.dShip) / 50000,
+        text: `${tonnes(d.dShip)} ${d.dShip > 0 ? "more" : "less"} grain gets shipped out by season's end.`,
+      });
     }
 
     // verdict: lead with the shape of the outcome, not a number
     let verdict: string;
+    const pinnedKeys = new Set<string>();
     if (d.farmgate !== 0) {
       verdict =
         app.levers.productionScale > 1
           ? "A bigger crop gets through — but watch the queues and where the surplus goes."
           : "A smaller crop: the pain is in what farmers don't harvest, not in moving it.";
+      pinnedKeys.add("farmgate"); // headline number, keep first (weight Infinity within the pinned tier)
+      if (app.levers.productionScale > 1) {
+        pinnedKeys.add("dQrel"); // "watch the queues"
+        pinnedKeys.add("dLb"); // "where the surplus goes"
+      }
     } else if (Math.abs(d.relRec) < 0.02) {
       const costs: string[] = [];
-      if (d.dQrel >= 0.15) costs.push("longer queues");
-      if (d.freight > 300000) costs.push("extra trucking");
-      if (d.demurrage > 500000) costs.push("ships waiting");
+      if (d.dQrel >= 0.15) {
+        costs.push("longer queues");
+        pinnedKeys.add("dQrel");
+      }
+      if (d.freight > 300000) {
+        costs.push("extra trucking");
+        pinnedKeys.add("freight");
+      }
+      if (d.demurrage > 500000) {
+        costs.push("ships waiting");
+        pinnedKeys.add("demurrage");
+      }
+      // the same tonnage can still be a materially better season — say so instead of
+      // reporting "no difference" over a multi-million-kilometre change (F4)
+      const gains: string[] = [];
+      if (d.dTruckKm < -250000) {
+        gains.push(`${(Math.abs(d.dTruckKm) / 1e6).toFixed(1)}M fewer truck-kilometres`);
+        pinnedKeys.add("dTruckKm");
+      }
+      if (d.freight < -300000) {
+        gains.push(`${fmtMoney(Math.abs(d.freight))} less freight`);
+        pinnedKeys.add("freight");
+      }
+      if (d.dQrel <= -0.15) {
+        gains.push("shorter queues");
+        pinnedKeys.add("dQrel");
+      }
+      // only the first two gains are named in the sentence — don't pin ones left unmentioned
+      if (!costs.length) {
+        const namedGainKeys = new Set<string>();
+        if (d.dTruckKm < -250000) namedGainKeys.add("dTruckKm");
+        if (d.freight < -300000) namedGainKeys.add("freight");
+        if (d.dQrel <= -0.15) namedGainKeys.add("dQrel");
+        const named = [...namedGainKeys].slice(0, 2);
+        pinnedKeys.clear();
+        named.forEach((k) => pinnedKeys.add(k));
+      }
       verdict = costs.length
         ? `The system absorbs this: almost the same grain gets through — the price is ${costs.join(" and ")}.`
-        : "Barely any difference from the real season.";
+        : gains.length
+          ? `The same grain gets through, for less: ${gains.slice(0, 2).join(" and ")}.`
+          : "Barely any difference from the modelled normal season.";
     } else if (d.relRec <= -0.02) {
       verdict = `The main network handles ${pct(d.relRec)} less grain${d.dLb > 10000 ? " — much of it goes to Lucky Bay instead" : ""}.`;
+      if (d.dLb > 10000) pinnedKeys.add("dLb");
     } else {
-      verdict = `The network handles ${pct(d.relRec)} more grain than the real season.`;
+      verdict = `The network handles ${pct(d.relRec)} more grain than the modelled normal season.`;
     }
-    return { verdict, lines: lines.slice(0, 4) };
+
+    // rank by effect relative to each row's own threshold, but keep whatever the
+    // verdict sentence names on top so slicing to 4 can't drop the line it points at (#5)
+    const ranked = [...lines].sort((a, b) => {
+      const ap = pinnedKeys.has(a.key) ? 1 : 0;
+      const bp = pinnedKeys.has(b.key) ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return b.weight - a.weight;
+    });
+    return { verdict, lines: ranked.slice(0, 4).map((l) => l.text) };
   });
 
   /** compact metric rows for Advanced mode */
@@ -340,6 +439,11 @@
         text: `Trucking task ${d.dTkm > 0 ? "+" : "−"}${Math.abs(d.dTkm / 1e6).toFixed(1)}M tonne-km`,
         money: `${d.freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.freight))} freight`,
         dir: d.freight > 0 ? "up" : "down",
+      });
+    if (Math.abs(d.dTruckKm) > 250000)
+      out.push({
+        text: `Truck-km on the road ${d.dTruckKm > 0 ? "+" : "−"}${Math.abs(d.dTruckKm / 1e6).toFixed(2)}M`,
+        dir: d.dTruckKm > 0 ? "up" : "down",
       });
     if (app.snap && Math.abs(app.snap.kpi.peakQueue - d.baseQ) > 15)
       out.push({ text: `Peak site queue ${app.snap.kpi.peakQueue} vs ${d.baseQ} trucks`, dir: app.snap.kpi.peakQueue > d.baseQ ? "up" : "down" });
@@ -367,7 +471,7 @@
   <p class="story">{story}</p>
 
   {#if app.viewMode === "advanced"}
-    <div class="fine how">Drag a lever and the whole season instantly re-runs with that change. “What changed” below compares it against the real season.</div>
+    <div class="fine how">Drag a lever and the whole season instantly re-runs with that change. “What changed” below compares it against the modelled normal season.</div>
     <label title="Scales how much grain grows on every paddock. 100% = what was really harvested.">
       <span>How big is the crop? <b>{Math.round(app.levers.productionScale * 100)}%{cropMt ? ` ≈ ${cropMt.toFixed(1)} million t` : ""}</b></span>
       <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
@@ -389,7 +493,7 @@
         oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
     </label>
     <div class="toggles">
-      <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, max ~2 cycles/day (assumption A21). How much trucking this saves depends strongly on the silo-to-port load assumption (see Model assumptions)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
+      <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, at narrow-gauge line speed rather than road speed, which works out at ~1.5 cycles a day each (assumption A21). How much trucking this saves depends strongly on the silo-to-port load assumption (see Model assumptions)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
       <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
       <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>
@@ -503,9 +607,9 @@
   {:else}
     <div class="tk">
       <div class="tkt">What changed <span class="live">· running comparison{app.snap && app.snap.day < 360 ? `, to ${app.snap.dateIso}` : " — full season"}</span></div>
-      {#if changeSummary}<div class="uchg">Comparing the real season against: <b>{changeSummary}</b></div>{/if}
+      {#if changeSummary}<div class="uchg">Comparing the modelled normal season against: <b>{changeSummary}</b></div>{/if}
       {#if !app.baseline}
-        <div class="fine">Computing the real-season baseline…</div>
+        <div class="fine">Computing the modelled normal season baseline…</div>
       {:else}
         {#each fixedRows as r}
           <div class="row {r.dir}" class:dim={r.dim} title={ROW_TIPS[r.label] ?? ""}>
@@ -513,6 +617,9 @@
             <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
+        {#if (app.snap?.kpi.railTonneKm ?? 0) > 0}
+          <div class="fine">Trains carried {((app.snap?.kpi.railTonneKm ?? 0) / 1e6).toFixed(0)}M t·km of that task. The freight figure counts only what the trucks no longer do — rebuilding and running the railway is not priced here.</div>
+        {/if}
         {#if app.levers.fleetTrucks < DEFAULT_LEVERS.fleetTrucks * 0.92 && (deltas?.freight ?? 0) < -200000}
           <div class="fine">Why cheaper with fewer trucks? Shorter queues mean trucks stop driving past the nearest silo — fewer kilometres. The cost moved into time: see “Delivery pace” and “Grain waiting on farm” (which prices the financing, but not the weather/quality risk).</div>
         {/if}

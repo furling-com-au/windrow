@@ -165,8 +165,9 @@ export interface Snapshot {
     shippedT: number;
     queueTrucks: number;
     vesselsWaiting: number;
-    tonneKm: number; // loaded truck tonne-km to date
-    truckKm: number; // total truck km (loaded + empty) to date
+    tonneKm: number; // loaded ROAD tonne-km to date (the freight task A18 prices)
+    railTonneKm: number; // loaded RAIL tonne-km to date (rail scenario; not road freight)
+    truckKm: number; // total ROAD truck km (loaded + empty) to date — excludes trainsets
     meanWaitH: number; // mean vessel anchorage wait so far (h/vessel arrived)
     peakQueue: number; // worst single-site truck queue so far
     vesselsArrived: number;

@@ -11,6 +11,8 @@
       "meanVesselWaitH": 28.3,
       "peakQueue": 139,
       "truckKmProxy": 17636975,
+      "roadTonneKmM": 302.3,
+      "railTonneKmM": 0,
       "peakWeekKt": 433
     },
     {
@@ -23,6 +25,8 @@
       "meanVesselWaitH": 28.3,
       "peakQueue": 450,
       "truckKmProxy": 20275705,
+      "roadTonneKmM": 356.5,
+      "railTonneKmM": 0,
       "peakWeekKt": 432
     },
     {
@@ -35,6 +39,8 @@
       "meanVesselWaitH": 1504.5,
       "peakQueue": 59,
       "truckKmProxy": 11771892,
+      "roadTonneKmM": 193.8,
+      "railTonneKmM": 0,
       "peakWeekKt": 262
     },
     {
@@ -45,9 +51,11 @@
       "shippedPlMt": 1.22,
       "vesselCount": 51,
       "meanVesselWaitH": 28.3,
-      "peakQueue": 119,
-      "truckKmProxy": 15148467,
-      "peakWeekKt": 431
+      "peakQueue": 118,
+      "truckKmProxy": 15443252,
+      "roadTonneKmM": 253.2,
+      "railTonneKmM": 52,
+      "peakWeekKt": 432
     },
     {
       "id": "luckybay",
@@ -59,6 +67,8 @@
       "meanVesselWaitH": 28.3,
       "peakQueue": 123,
       "truckKmProxy": 18211025,
+      "roadTonneKmM": 312.6,
+      "railTonneKmM": 0,
       "peakWeekKt": 412
     },
     {
@@ -71,6 +81,8 @@
       "meanVesselWaitH": 28.8,
       "peakQueue": 182,
       "truckKmProxy": 18485589,
+      "roadTonneKmM": 321.7,
+      "railTonneKmM": 0,
       "peakWeekKt": 433
     },
     {
@@ -83,6 +95,8 @@
       "meanVesselWaitH": 28.3,
       "peakQueue": 140,
       "truckKmProxy": 19018196,
+      "roadTonneKmM": 325.3,
+      "railTonneKmM": 0,
       "peakWeekKt": 431
     }
   ]

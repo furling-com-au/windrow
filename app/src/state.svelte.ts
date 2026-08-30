@@ -44,7 +44,7 @@ export const SCENARIOS: { id: ScenarioId; label: string; story: string; levers: 
   { id: "baseline", label: "The season as it happened", story: "Real crop sizes, the real shipping program, and the network as it ran. The gold dashed line on the chart is what farmers actually delivered.", levers: {} },
   { id: "bumper", label: "Bumper harvest (+30%)", story: "A big year. Watch silos fill toward their limits, truck queues build at the peak, and surplus grain spill toward Lucky Bay.", levers: { productionScale: 1.3 } },
   { id: "drought", label: "Drought (−40%)", story: "A small crop against an unchanged shipping program: the roads and silos relax, but ships sit at anchor waiting for grain that never comes.", levers: { productionScale: 0.6 } },
-  { id: "rail", label: "Bring back the trains", story: "Two trainsets return to the old Cummins–Kimba–Wudinna lines and take over part of the silo-to-port shuttle. How much trucking that saves depends on how big the trucks it replaces are: about 2.5 million truck-km against 45 t loads, but only ~1.0 million against the 85 t road trains SA law actually permits. Either way, the figures below count only the trucking saved — NOT what rebuilding and running a railway would cost, which is why the real line closed in 2019.", levers: { rail: true } },
+  { id: "rail", label: "Bring back the trains", story: "Two trainsets return to the old Cummins–Kimba–Wudinna lines and take over part of the silo-to-port shuttle. How much trucking that saves depends on how big the trucks it replaces are: about 2.2 million truck-km against 45 t loads, but only ~0.9 million against the 85 t road trains SA law actually permits. Either way, the figures below count only the trucking saved — NOT what rebuilding and running a railway would cost, which is why the real line closed in 2019.", levers: { rail: true } },
   { id: "luckybay", label: "More grain to Lucky Bay", story: "T-Ports' Lucky Bay made 2.5× more attractive — like posting roughly a $6/t cash premium at a typical eastern-peninsula farm (A23). Grain drains away from the main network.", levers: { luckyBayBias: 2.5 } },
   { id: "outage", label: "Port Lincoln closed a week", story: "The port terminal shuts for a week at harvest peak. Deliveries redirect to country silos — the system holds, at a queueing price.", levers: { outage: true } },
   { id: "roadclosure", label: "Tod Highway closed", story: "The peninsula's central spine is impassable (detours = 2.5× travel time). Trucks re-sort toward Lincoln Highway sites.", levers: { roadClosure: true } },
@@ -88,7 +88,9 @@ export function leversToPatch(l: Levers, a: AssumpLevers): Partial<Params> {
   if (l.portAttractBias !== DEFAULT_LEVERS.portAttractBias) p.portAttractBias = l.portAttractBias;
   if (l.rail) {
     p.railReinstated = true;
-    p.linehaulTrucks = 32;
+    // A21: the trains take over part of the shuttle, so the road line-haul fleet is cut
+    // by a third — same rule the headless scenario set applies (scripts/scenarios.ts).
+    p.linehaulTrucks = Math.round((CAL.linehaulTrucks * 2) / 3);
   }
   if (l.outage) p.outage = { port: "Lincoln", fromDay: 70, days: 7 };
   if (l.roadClosure) p.roadClosure = { corridor: "tod", factor: 2.5 };
@@ -117,6 +119,7 @@ export interface BaselineSeries {
   receivedByDay: number[];
   shippedByDay: number[];
   tonneKmByDay: number[];
+  truckKmByDay: number[];
   lbByDay: number[];
   waitByDay: number[];
   queueByDay: number[];

@@ -16,7 +16,7 @@
     },
     {
       title: "Simulated vs actual",
-      text: "The chart overlays the simulation (green) on what farmers actually delivered each week (gold dashed, from the operator's published reports). Markers show the first delivery, record weeks and rain events. The gap between the lines is the honest measure of the model.",
+      text: "The chart overlays the simulation (green) on what farmers actually delivered each week (gold dashed, from the operator's published reports). Markers show the first delivery, record weeks and rain events. Season totals land within a few percent of what was reported, but the model's weak spot is intra-season timing — which week the harvest peak lands in — so the two lines can drift apart week to week even when the season adds up right.",
     },
     {
       title: "What-ifs",

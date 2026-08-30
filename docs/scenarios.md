@@ -7,15 +7,17 @@ they show how the *land side* copes, and where the fixed export program breaks.
 
 | scenario | Bunge received (Mt) | T-Ports intake (Mt) | PL shipped (Mt) | peak site queue | mean vessel wait | truck-km (M) | peak week (kt) |
 |---|---|---|---|---|---|---|---|
-| Baseline replay | 2.18 | 0.36 | 1.22 | 189 | 28.3 h | 16.6 | 366 |
-| Bumper (+30 %) | 2.78 | 0.53 | 1.22 | **285** | 28.3 h | 19.8 | 396 |
-| Drought (−40 %) | 1.40 | 0.13 | 1.03 | 93 | 2,100 h† | 11.2 | 260 |
-| Rail reinstated | 2.19 | 0.36 | 1.22 | 185 | 28.3 h | **13.6** | 362 |
-| Lucky Bay share ×2.5 | **2.07** | **0.47** | 1.22 | 165 | 28.3 h | 16.7 | 355 |
-| PL outage (7 d @ day 70) | 2.16 | 0.39 | 1.22 | **241** | 28.8 h | 17.2 | 366 |
-| Tod Hwy closure (×2.5) | 2.17 | 0.37 | 1.22 | 170 | 28.3 h | 18.1 | 363 |
+| Baseline replay | 2.23 | 0.33 | 1.21 | 139 | 28.3 h | 17.64 | 433 |
+| Bumper (+30 %) | 2.79 | 0.54 | 1.22 | **450** | 28.3 h | 20.28 | 432 |
+| Drought (−40 %) | 1.40 | 0.13 | 1.03 | 59 | 1,505 h† | 11.77 | 262 |
+| Rail reinstated | 2.23 | 0.32 | 1.22 | 118 | 28.3 h | **15.44** | 432 |
+| Lucky Bay share ×2.5 | **2.09** | **0.47** | 1.22 | 123 | 28.3 h | 18.21 | 412 |
+| PL outage (7 d @ day 70) | 2.20 | 0.35 | 1.22 | **182** | 28.8 h | 18.49 | 433 |
+| Tod Hwy closure (×2.5) | 2.22 | 0.33 | 1.21 | 140 | 28.3 h | 19.02 | 431 |
 
-(Numbers include A17 carry-in stocks; regenerated 2026-08-19.)
+(Numbers include A17 carry-in stocks; regenerated 2026-08-31 on the recalibrated bay
+capacities of `c08513c`. The truck-km column is ROAD vehicle-kilometres only —
+trainset kilometres are tracked separately and excluded.)
 
 † Mean across all vessels including those that waited weeks for grain that never came —
 see Drought below.
@@ -27,22 +29,36 @@ deltas on top of that (e.g. the outage's +0.5 h) are simulated stock/berth effec
 
 ## Readings
 
-**Bumper (+30 %).** The extra 0.6 Mt is absorbed, but with carry-in stock already
-occupying storage the worst site-hour queue jumps ~50 % (189 → 285 trucks) and more
-grain spills to the T-Ports system (+0.17 Mt) as Bunge sites cap out. Port Lincoln shipping is unchanged — the vessel
+**Bumper (+30 %).** The extra 0.56 Mt is absorbed, but with carry-in stock already
+occupying storage the worst site-hour queue more than triples (139 → 450 trucks) and more
+grain spills to the T-Ports system (+0.21 Mt) as Bunge sites cap out. Port Lincoln shipping is unchanged — the vessel
 program, not the land side, is the export bottleneck in a big year. (Real-world
 response would be more vessels; the fixed program isolates the landside effect.)
 
-**Drought (−40 %).** The land side relaxes (queues down ~40 %), but the *fixed* export
+**Drought (−40 %).** The land side relaxes (worst queue 139 → 59 trucks), but the *fixed* export
 program becomes infeasible: Port Lincoln ships 1.03 Mt against a 1.54 Mt program, and
 vessels sit at anchor for weeks waiting for grain before short-loading (the sim's
 5-day starvation guard). This mirrors 2024/25 reality, where the program itself shrank.
 
 **Rail reinstated.** Two 1,600 t trainsets on the old Cummins/Kimba/Wudinna alignments
-(demand-dispatched, ≤~2 cycles/day each — A21; road line-haul fleet cut by a third)
-keep port stocks equally well supplied while removing truck-kilometres from the roads.
-Receival and shipping outcomes are unchanged, consistent with why the 2019 closure was
-absorbable by ~48 trucks/day.
+(demand-dispatched; road line-haul fleet cut by a third — A21) keep port stocks equally
+well supplied while removing truck-kilometres from the roads. Receival and shipping
+outcomes are unchanged, consistent with why the 2019 closure was absorbable by ~48
+trucks/day.
+
+Trainsets run the alignment at a 40 km/h line speed, not the 75 km/h road mean, so a
+cycle is 2 × transit + 4 h handling: ~1.8 cycles/day on the long Kimba and Wudinna runs,
+~3.6 on the short Cummins one, and **1.5 per trainset per active day** as actually
+dispatched over 2025/26 — the shuttle idles whenever port stocks are covered. (Earlier
+revisions asserted a "≤~2 cycles/day" ceiling that nothing in the engine enforced; at
+road speeds trainsets reached 4.0.)
+
+Rail tonne-km are accounted separately from road tonne-km. On the 45 t default the
+trains take **52 M t·km** off the road task (302 → 253 M road t·km), which is what makes
+the freight line a **saving of ~$4.9 M** at the A18 rate rather than a cost. That figure
+prices only the cartage the trucks no longer do: rebuilding and operating the railway is
+not costed anywhere in this model, and the road cartage rate does not describe rail
+haulage.
 
 **How big that saving is depends entirely on how big the trucks it displaces are** — the
 single most consequential open assumption in this scenario (A1; data/trucks.md open
@@ -50,33 +66,34 @@ question 7). Measured on 2025/26:
 
 | silo→port load | road truck-km | with rail | rail saves |
 |---|---|---|---|
-| **45 t** (default; Viterra's 2019 rail-replacement statement) | 17.64 M | 15.15 M | **2.49 M** (−14 %) |
-| 72 t (ACCC's EP *permitted* load size) | 16.03 M | 14.70 M | **1.34 M** (−8 %) |
-| 85 t (SA Type 2 road train at CML 132.83 t) | 15.60 M | 14.56 M | **1.04 M** (−7 %) |
+| **45 t** (default; Viterra's 2019 rail-replacement statement) | 17.64 M | 15.44 M | **2.19 M** (−12 %) |
+| 72 t (ACCC's EP *permitted* load size) | 16.03 M | 14.90 M | **1.13 M** (−7 %) |
+| 85 t (SA Type 2 road train at CML 132.83 t) | 15.60 M | 14.69 M | **0.92 M** (−6 %) |
 
 So the headline saving falls by **more than half** if EP line-haul runs the
 heavier road trains SA law permits — i.e. the case for rail is *weakest* under the most
 permissive road rules, and the earlier single-figure "−3.0 M truck-km" overstated it.
-Loaded tonne-km (and therefore the A18 freight dollars) barely move across this range,
-because the same grain travels the same distance regardless of how it is split across
-trucks; it is the vehicle-kilometre count — and with it road wear, emissions and driver
-demand — that changes. Against any of these figures, a reinstatement capital case would
+Total loaded tonne-km barely move across this range, because the same grain travels the
+same distance regardless of how it is split across trucks; what changes is the
+vehicle-kilometre count — and with it road wear, emissions and driver demand — plus how
+much of the tonne-km task sits on rail rather than road (52 / 40 / 37 M t·km at 45 / 72 /
+85 t). Against any of these figures, a reinstatement capital case would
 still have to stack up.
 
-**Lucky Bay share ×2.5.** T-Ports intake grows 0.35 → 0.46 Mt; Bunge Western receivals
-drop ~0.11 Mt, concentrated in eastern-EP clusters (Cowell/Cleve/Kimba catchments), and
+**Lucky Bay share ×2.5.** T-Ports intake grows 0.33 → 0.47 Mt; Bunge Western receivals
+drop ~0.14 Mt, concentrated in eastern-EP clusters (Cowell/Cleve/Kimba catchments), and
 Bunge peak queues ease. Port Lincoln shipping is unaffected at this scale — the grain
 that leaves the Bunge system was upcountry surplus, not port feed.
 
-**Port Lincoln outage (7 days at harvest peak).** Receivals barely drop (−0.02 Mt) but
-the buffer does its job at a price: the worst site queue spikes to 241 trucks as
+**Port Lincoln outage (7 days at harvest peak).** Receivals barely drop (−0.03 Mt) but
+the buffer does its job at a price: the worst site queue spikes to 182 trucks as
 direct-to-port deliveries redirect to Cummins/Tumby Bay, and line-haul catches up
-afterwards (+0.6 M truck-km). Vessels ride it out at anchor (+0.5 h mean wait over
+afterwards (+0.85 M truck-km). Vessels ride it out at anchor (+0.5 h mean wait over
 baseline).
 
 **Tod Highway closure.** With cluster→site travel times ×2.5 along the corridor, trucks
 re-sort to Lincoln-Highway-side sites; total receivals are almost unchanged but the
-detours add **+1.4 M truck-km** (+9 %, ≈ a few hundred thousand dollars of cartage at
+detours add **+1.4 M truck-km** (+8 %, ≈ a few hundred thousand dollars of cartage at
 A18 rates). (Corridor assignment is a
 straight-line heuristic — see engine comment; a routed-detour version is future work.)
 

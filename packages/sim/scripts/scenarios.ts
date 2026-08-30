@@ -31,7 +31,9 @@ interface ScenarioOut {
   vesselCount: number;
   meanVesselWaitH: number;
   peakQueue: number;
-  truckKmProxy: number; // sum of farm-truck travel minutes (relative measure)
+  truckKmProxy: number; // road truck travel minutes -> km (farm + line-haul; excludes trainsets)
+  roadTonneKmM: number; // loaded ROAD tonne-km (Mt-km) — the task priced at A18
+  railTonneKmM: number; // loaded RAIL tonne-km (Mt-km), rail scenario only
   peakWeekKt: number;
 }
 
@@ -52,6 +54,8 @@ for (const sc of SCENARIOS) {
     meanVesselWaitH: +res.meanVesselWaitH.toFixed(1),
     peakQueue: res.peakQueue,
     truckKmProxy: Math.round(sim.truckTravelMin * (75 / 60)), // minutes -> ~km at 75 km/h mean
+    roadTonneKmM: +(sim.tonneKm / 1e6).toFixed(1),
+    railTonneKmM: +(sim.railTonneKm / 1e6).toFixed(1),
     peakWeekKt: Math.round(peakWeek / 1000),
   });
   console.log(`${sc.id.padEnd(12)} received ${(res.seasonReceivedT / 1e6).toFixed(2)} Mt | LB ${(sim.receivedLbT / 1e6).toFixed(2)} | shipped PL ${(res.seasonShippedPlT / 1e6).toFixed(2)} | peakQ ${res.peakQueue} | wait ${res.meanVesselWaitH.toFixed(1)} h | peak wk ${Math.round(peakWeek / 1000)} kt`);

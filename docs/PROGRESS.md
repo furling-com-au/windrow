@@ -133,6 +133,28 @@ This file is the canonical record of where the project is. Updated as work proce
 - App now derives every displayed default from `defaultParams()` instead of hardcoding
   copies, so a future recalibration cannot leave stale numbers in the UI.
 
+### 2026-08-31 (F4: "bring back the trains" reported freight going up)
+
+- **Trainset tonne-km were being added to the road counter** and priced at the A18
+  cartage rate, so the rail scenario rendered `+2.0 M t·km · +$197k freight` in the
+  "worse" colour while the 2.7 M truck-km it saves sat unused in `kpi.truckKm`. Split:
+  `railTonneKm` / `railTravelMin` accumulate inside the `isTrain` branch, `tonneKm` and
+  `truckKm` are now road-only, and only road tonne-km reach A18. The rail scenario now
+  reads −49 M road t·km ≈ **−$4.9 M freight**, with the 52 M t·km the trains carry
+  reported separately and explicitly not priced.
+- **Truck-km is now shown.** New "Kilometres driven" row (advanced), plain-English
+  sentence (simple) and `truckKmByDay` baseline series. The Simple-mode verdict no longer
+  says "barely any difference" when the season is materially cheaper — it now names the
+  gain.
+- **Trainsets ran at road speed.** They now run the alignment at 40 km/h against the
+  matrix's 75 km/h road mean, covering the same distance in ~1.9× the time: 1.5
+  cycles/trainset/active day as dispatched (was 4.0). A21, docs/scenarios.md and the
+  engine comment all asserted a "~2 cycles/day ceiling" that nothing enforced; all three
+  now state what the model actually does.
+- **The app's rail lever applies A21's one-third line-haul fleet cut** derived from
+  `defaultParams()` (60 → 40), matching `scripts/scenarios.ts` instead of a hardcoded 32.
+- `docs/scenarios.md` regenerated: its table also predated the `c08513c` recalibration.
+
 ## Key decisions
 
 - Repo root = `C:\Users\justi\grain_simulation` (spec layout §10). `data/raw/` git-ignored, manifest committed.

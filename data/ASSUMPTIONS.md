@@ -28,7 +28,7 @@ presented as measured data.
 - **Sensitivity**: farm→site payload is linear on truck counts and largely absorbed by
   the fitted fleet size (see A1 note in docs/calibration_report.md). Line-haul payload is
   NOT absorbed: it drives truck-km directly, and the rail scenario's headline saving
-  falls from ~2.5 M truck-km (45 t) to ~1.3 M (72 t) to ~0.9 M (85 t) on 2025/26. Loaded
+  falls from ~2.2 M truck-km (45 t) to ~1.1 M (72 t) to ~0.9 M (85 t) on 2025/26. Loaded
   tonne-km — and therefore the freight dollar figures — barely move, since the same
   grain travels the same distance either way.
 - **Upgrade path**: operator turnaround/weighbridge data; truck-spec tare sheets; RAVnet
@@ -205,17 +205,32 @@ presented as measured data.
 ## A21 — rail-reinstatement scenario parameters
 - **Value**: 2 trainsets × 1,600 t net, serving only the historically rail-served silos
   (Cummins, Kimba, Wudinna) into Port Lincoln; no timetable — dispatch is demand-driven
-  like the road shuttle; combined load/unload handling 4 h (≈2 cycles/day ceiling);
-  road line-haul fleet cut by one-third in the scenario.
+  like the road shuttle; combined load/unload handling 4 h; line speed 40 km/h against
+  the matrix's 75 km/h road mean, so a trainset covers the same distance as the trucks
+  it replaces but takes ~1.9× as long; road line-haul fleet cut by one-third in the
+  scenario. Cycle time = 2 × transit + 4 h handling, which works out at **~1.8
+  cycles/day on the Kimba and Wudinna lines and ~3.6 on the short Cummins run** — 1.5
+  per trainset per active day as actually dispatched on 2025/26 (a demand-driven
+  shuttle idles when port stocks are covered). There is no hard cycle cap: an earlier
+  version of this entry claimed a "≈2 cycles/day ceiling" that the engine never
+  enforced and, at road speeds, never observed.
 - **Used in**: engine `railReinstated`; "Bring back the trains" scenario.
 - **Reasoning**: anchored to the published replacement task — Viterra stated the closed
   railway's work equalled "48 loaded trucks a day" (~2,100–2,200 t/day; ABC, Feb 2019) —
   and ACCC's record that rail carried only the Cummins/Kimba/Wudinna lines. Consist
-  size, trainset count, cycle handling time and the absence of track-capacity limits
-  are modelling choices, not citations.
+  size, trainset count, cycle handling time, line speed and the absence of
+  track-capacity limits are modelling choices, not citations; the EP narrow gauge was
+  slow and speed-restricted, and 40 km/h door to door is a judgement, not a measurement.
+  Rail distance is proxied by the road matrix (no rail alignment lengths in the bundle).
+- **Accounting**: trainset tonne-km accumulate in a separate `railTonneKm` counter and
+  trainset kilometres are excluded from `truckKm`. Only ROAD tonne-km are priced at the
+  A18 cartage rate — the road rate does not describe rail haulage, and the cost of
+  rebuilding and operating the railway is not priced anywhere in the model. Trainset
+  tonnes are likewise excluded from the corridor truck-flow heatmap, which shows road
+  traffic only.
 - **Sensitivity**: affects only the rail scenario's truck-km savings and queue relief —
   and those are dominated by the line-haul payload the trains displace (A1): the saving
-  falls from ~2.5 M truck-km at 45 t/load to ~0.9 M at 85 t. Report it as a range.
+  falls from ~2.2 M truck-km at 45 t/load to ~0.9 M at 85 t. Report it as a range.
 - **Upgrade path**: a real reinstatement proposal (consist sizes, timetable, loop
   lengths) would replace all of this.
 

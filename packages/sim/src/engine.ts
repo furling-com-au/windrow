@@ -98,6 +98,12 @@ interface Truck {
 
 /** historical EP rail-served sites (rail scenario): Cummins/Kimba/Wudinna lines -> Port Lincoln */
 const RAIL_SITES = ["Cummins", "Kimba", "Wudinna"];
+/** mean road speed built into the travel matrix (A5-derived); minutes -> km everywhere */
+const ROAD_SPEED_KMH = 75;
+/** mean EP narrow-gauge line speed for a loaded grain train, door to door (A21). The
+ *  alignment length is proxied by the road matrix, so a trainset covers the SAME distance
+ *  as the trucks it replaces but takes ROAD_SPEED_KMH/RAIL_SPEED_KMH times as long. */
+const RAIL_SPEED_KMH = 40;
 
 interface Vessel {
   id: number;
@@ -152,8 +158,10 @@ export class Sim {
   private dailyBungeReceivals: number[] = [];
   private vesselWaitTicksTotal = 0;
   peakQueue = 0;
-  truckTravelMin = 0; // loaded+empty travel minutes (truck-km proxy for corridor analysis)
-  tonneKm = 0; // loaded tonne-km (economics layer)
+  truckTravelMin = 0; // ROAD loaded+empty travel minutes (truck-km proxy for corridor analysis)
+  tonneKm = 0; // loaded ROAD tonne-km (economics layer; the only tonne-km A18 prices)
+  railTravelMin = 0; // trainset loaded+empty travel minutes (rail scenario)
+  railTonneKm = 0; // loaded RAIL tonne-km — moved by trainsets, so NOT a road freight cost
   /** farm trucks currently en route to each site: growers can see site status/wait
    *  before committing, so the choice model must not ignore committed traffic. */
   private siteInbound: Int32Array = new Int32Array(0);
@@ -744,7 +752,7 @@ export class Sim {
           tr.legStart = tick;
           tr.doneAt = tick + Math.ceil(tr.legMin / TICK_MIN);
           this.truckTravelMin += tr.legMin * 2; // out + return
-          const km = (tr.legMin / 60) * 75; // mean 75 km/h (A5-derived)
+          const km = (tr.legMin / 60) * ROAD_SPEED_KMH; // mean 75 km/h (A5-derived)
           this.tonneKm += km * tr.loadT;
           const key = `c:${tr.cluster}-${tr.site}`;
           this.tripTonnesByPath.set(key, (this.tripTonnesByPath.get(key) ?? 0) + tr.loadT);
@@ -822,8 +830,10 @@ export class Sim {
           }
         }
         if (src < 0 || srcT < 100) return;
-        const minutes = this.bundle.matrix.site_minutes[src]![bestPort]! * (this.params.travelTimeScale ?? 1);
-        if (minutes <= 0) return;
+        const roadMin = this.bundle.matrix.site_minutes[src]![bestPort]! * (this.params.travelTimeScale ?? 1);
+        if (roadMin <= 0) return;
+        // trains follow the same alignment but at rail line speed, not road speed (A21)
+        const minutes = isTrain ? roadMin * (ROAD_SPEED_KMH / RAIL_SPEED_KMH) : roadMin;
         const load = Math.min(tr.payloadT, srcT); // road train ~45 t net; trainset 1,600 t
         const s = this.sites[src]!;
         s.stock[srcC] = s.stock[srcC]! - load;
@@ -835,13 +845,25 @@ export class Sim {
         tr.state = T_GO;
         tr.legStart = tick;
         // handling: ~1 h for a road train; ~4 h combined load/unload for a 1,600 t
-        // trainset (A21) — caps trains at a realistic ~2 cycles/day
+        // trainset (A21). Cycle time = 2 x transit + handling, so a trainset manages
+        // ~1.8 cycles/day on the Kimba/Wudinna lines and ~3.6 on the short Cummins run.
         const handlingMin = isTrain ? 240 : 60;
         tr.doneAt = tick + Math.ceil((minutes + handlingMin) / TICK_MIN);
-        this.truckTravelMin += minutes * 2;
-        this.tonneKm += (minutes / 60) * 75 * load;
-        const lkey = `s:${src}-${bestPort}`;
-        this.tripTonnesByPath.set(lkey, (this.tripTonnesByPath.get(lkey) ?? 0) + load);
+        // distance is the same either way; only the vehicle and the time differ
+        const km = (roadMin / 60) * ROAD_SPEED_KMH;
+        if (isTrain) {
+          this.railTravelMin += minutes * 2;
+          this.railTonneKm += km * load;
+        } else {
+          this.truckTravelMin += minutes * 2;
+          this.tonneKm += km * load;
+        }
+        // the corridor layer is a TRUCK-flow heatmap: trainset tonnes are not road traffic,
+        // and the rail corridors are exactly the ones this scenario is meant to empty
+        if (!isTrain) {
+          const lkey = `s:${src}-${bestPort}`;
+          this.tripTonnesByPath.set(lkey, (this.tripTonnesByPath.get(lkey) ?? 0) + load);
+        }
         this.portInboundT[bestPort] = this.portInboundT[bestPort]! + load;
         this.cachedPortNeed[bestPort] = this.cachedPortNeed[bestPort]! - load;
         return;
@@ -1035,7 +1057,8 @@ export class Sim {
         queueTrucks,
         vesselsWaiting,
         tonneKm: Math.round(this.tonneKm),
-        truckKm: Math.round((this.truckTravelMin / 60) * 75),
+        railTonneKm: Math.round(this.railTonneKm),
+        truckKm: Math.round((this.truckTravelMin / 60) * ROAD_SPEED_KMH),
         meanWaitH: Math.round(this.meanVesselWaitHNow() * 10) / 10,
         peakQueue: this.peakQueue,
         vesselsArrived: this.vessels.reduce((a, v) => a + (v.state !== V_PENDING ? 1 : 0), 0),

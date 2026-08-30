@@ -90,6 +90,7 @@ function computeBaseline(season: string) {
   const receivedByDay: number[] = [];
   const shippedByDay: number[] = [];
   const tonneKmByDay: number[] = [];
+  const truckKmByDay: number[] = [];
   const lbByDay: number[] = [];
   const waitByDay: number[] = [];
   const queueByDay: number[] = [];
@@ -101,13 +102,14 @@ function computeBaseline(season: string) {
     receivedByDay.push(s.kpi.receivedT);
     shippedByDay.push(s.kpi.shippedT);
     tonneKmByDay.push(s.kpi.tonneKm);
+    truckKmByDay.push(s.kpi.truckKm);
     lbByDay.push(s.kpi.receivedLbT);
     waitByDay.push(s.kpi.meanWaitH);
     queueByDay.push(s.kpi.peakQueue);
     arrivedByDay.push(s.kpi.vesselsArrived);
     onFarmTdByDay.push(s.kpi.onFarmTd);
   }
-  const data = { receivedByDay, shippedByDay, tonneKmByDay, lbByDay, waitByDay, queueByDay, arrivedByDay, onFarmTdByDay };
+  const data = { receivedByDay, shippedByDay, tonneKmByDay, truckKmByDay, lbByDay, waitByDay, queueByDay, arrivedByDay, onFarmTdByDay };
   baselineCache.set(season, data);
   post({ type: "baseline", season, data });
 }
