@@ -168,13 +168,6 @@
         `${d.demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.demurrage))} waiting cost`,
       ),
     ];
-    if (d.farmgate !== 0)
-      rows.unshift({
-        label: "Crop value (farm gate)",
-        val: `${d.farmgate > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.farmgate))}`,
-        dim: false,
-        dir: d.farmgate > 0 ? "up" : "down",
-      });
     return rows;
   });
 
@@ -623,6 +616,13 @@
             <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
+        {#if deltas && deltas.farmgate !== 0}
+          <div class="tkt" style="margin-top:8px">Season total <span class="live">· not a running total — the whole crop's value, whatever the date</span></div>
+          <div class="row {deltas.farmgate > 0 ? 'up' : 'down'}" title={ROW_TIPS["Crop value (farm gate)"]}>
+            <span class="rl">Crop value (farm gate)<span class="q">?</span></span>
+            <span class="money">{deltas.farmgate > 0 ? "+" : "−"}{fmtMoney(Math.abs(deltas.farmgate))}</span>
+          </div>
+        {/if}
         {#if (app.snap?.kpi.railTonneKm ?? 0) > 0}
           <div class="fine">Trains carried {((app.snap?.kpi.railTonneKm ?? 0) / 1e6).toFixed(0)}M t·km of that task. The freight figure counts only what the trucks no longer do — rebuilding and running the railway is not priced here.</div>
         {/if}
