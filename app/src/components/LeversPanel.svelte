@@ -94,8 +94,14 @@
     money?: string;
     dim: boolean;
     dir: "up" | "down" | "flat";
+    goodWhenUp: boolean;
     tip?: string;
   }
+
+  const colorClass = (dir: "up" | "down" | "flat", goodWhenUp: boolean): string => {
+    if (dir === "flat") return "flat";
+    return (dir === "up") === goodWhenUp ? "up" : "down";
+  };
 
   const ROW_TIPS: Record<string, string> = {
     "Grain delivered": "Grain farmers delivered into the main network's silos and ports this season, vs the modelled normal season at the same date.",
@@ -114,21 +120,23 @@
     const s = app.snap;
     if (!d || !s) return [];
     const kt = (t: number) => `${t > 0 ? "+" : "−"}${Math.abs(t / 1000).toFixed(0)}k t`;
-    const mk = (label: string, delta: number, thr: number, val?: string, money?: string): Row => ({
+    const mk = (label: string, delta: number, thr: number, goodWhenUp: boolean, val?: string, money?: string): Row => ({
       label,
       val: Math.abs(delta) > thr ? (val ?? kt(delta)) : "≈ no change",
       money: Math.abs(delta) > thr ? money : undefined,
       dim: Math.abs(delta) <= thr,
       dir: Math.abs(delta) <= thr ? "flat" : delta > 0 ? "up" : "down",
+      goodWhenUp,
     });
     const rows: Row[] = [
-      mk("Grain delivered", d.dRec, 20000),
-      mk("→ to Lucky Bay instead", d.dLb, 10000),
-      mk("Shipped out", d.dShip, 20000),
+      mk("Grain delivered", d.dRec, 20000, true),
+      mk("→ to Lucky Bay instead", d.dLb, 10000, true),
+      mk("Shipped out", d.dShip, 20000, true),
       mk(
         "Trucking",
         d.freight,
         150000,
+        false,
         `${d.dTkm > 0 ? "+" : "−"}${Math.abs(d.dTkm / 1e6).toFixed(1)}M t·km`,
         `${d.freight > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.freight))} freight`,
       ),
@@ -136,6 +144,7 @@
         "Kilometres driven",
         d.dTruckKm,
         250000,
+        false,
         `${d.dTruckKm > 0 ? "+" : "−"}${Math.abs(d.dTruckKm / 1e6).toFixed(2)}M truck-km`,
       ),
       {
@@ -143,6 +152,7 @@
         val: `${s.kpi.peakQueue} vs ${d.baseQ} trucks`,
         dim: Math.abs(s.kpi.peakQueue - d.baseQ) <= 15,
         dir: Math.abs(s.kpi.peakQueue - d.baseQ) <= 15 ? "flat" : s.kpi.peakQueue > d.baseQ ? "up" : "down",
+        goodWhenUp: false,
       },
       {
         label: "Delivery pace",
@@ -152,11 +162,13 @@
             : `~${Math.abs(d.paceLagDays)} days ${d.paceLagDays > 0 ? "behind" : "ahead of"} the modelled normal season`,
         dim: Math.abs(d.paceLagDays) < 2,
         dir: Math.abs(d.paceLagDays) < 2 ? "flat" : d.paceLagDays > 0 ? "up" : "down",
+        goodWhenUp: false,
       },
       mk(
         "Grain waiting on farm",
         d.holding,
         150000,
+        false,
         `${d.dOnFarmTd > 0 ? "+" : "−"}${Math.abs(d.dOnFarmTd / 1e6).toFixed(1)}M tonne-days`,
         `${d.holding > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.holding))} financing`,
       ),
@@ -164,6 +176,7 @@
         "Ships waiting",
         d.demurrage,
         200000,
+        false,
         `${Math.round(d.waitNow)} h vs ${Math.round(d.waitBase)} h each`,
         `${d.demurrage > 0 ? "+" : "−"}${fmtMoney(Math.abs(d.demurrage))} waiting cost`,
       ),
@@ -611,14 +624,14 @@
         <div class="fine">Computing the modelled normal season baseline…</div>
       {:else}
         {#each fixedRows as r}
-          <div class="row {r.dir}" class:dim={r.dim} title={ROW_TIPS[r.label] ?? ""}>
+          <div class="row {colorClass(r.dir, r.goodWhenUp)}" class:dim={r.dim} title={ROW_TIPS[r.label] ?? ""}>
             <span class="rl">{r.label}<span class="q">?</span></span>
             <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
         {#if deltas && deltas.farmgate !== 0}
           <div class="tkt" style="margin-top:8px">Season total <span class="live">· not a running total — the whole crop's value, whatever the date</span></div>
-          <div class="row {deltas.farmgate > 0 ? 'up' : 'down'}" title={ROW_TIPS["Crop value (farm gate)"]}>
+          <div class="row {colorClass(deltas.farmgate > 0 ? 'up' : 'down', true)}" title={ROW_TIPS["Crop value (farm gate)"]}>
             <span class="rl">Crop value (farm gate)<span class="q">?</span></span>
             <span class="money">{deltas.farmgate > 0 ? "+" : "−"}{fmtMoney(Math.abs(deltas.farmgate))}</span>
           </div>
@@ -719,10 +732,10 @@
     padding: 2px 0;
   }
   .row.up {
-    color: #f0b46a;
+    color: #7dd3a8;
   }
   .row.down {
-    color: #7dd3a8;
+    color: #f0b46a;
   }
   .row.dim {
     color: #5b6d80;
