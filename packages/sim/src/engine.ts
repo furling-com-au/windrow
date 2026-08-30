@@ -26,6 +26,9 @@ import type {
 
 export const TICK_MIN = 5;
 export const DAY_TICKS = (24 * 60) / TICK_MIN;
+// how long a vessel sits at anchor before the charterer would have re-nominated the
+// program rather than keep waiting on grain that may never come (A19/#6)
+export const VESSEL_GIVEUP_TICKS = 15 * DAY_TICKS;
 
 // truck states
 export const T_IDLE = 0,
@@ -929,6 +932,13 @@ export class Sim {
               v.commodity = best;
             }
             this.log({ t: tick, type: "vessel_berth", id: v.id, port: port.name, waitH: (v.waitTicks * TICK_MIN) / 60 });
+          } else if (v.waitTicks >= VESSEL_GIVEUP_TICKS) {
+            // a vessel program held for a crop that shrank should have been re-issued: after
+            // ~2 weeks at anchor with no grain coming, the charterer re-nominates rather than
+            // wait indefinitely — the vessel leaves without ever taking a berth, so it stops
+            // consuming wait time (and doesn't tie up a berth other vessels need) (#6)
+            v.state = V_DONE;
+            this.log({ t: tick, type: "vessel_reissue", id: v.id, port: port.name, waitH: (v.waitTicks * TICK_MIN) / 60 });
           } else {
             v.waitTicks++;
             this.vesselWaitTicksTotal++;

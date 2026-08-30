@@ -7,20 +7,19 @@ they show how the *land side* copes, and where the fixed export program breaks.
 
 | scenario | Bunge received (Mt) | T-Ports intake (Mt) | PL shipped (Mt) | peak site queue | mean vessel wait | truck-km (M) | peak week (kt) |
 |---|---|---|---|---|---|---|---|
-| Baseline replay | 2.23 | 0.33 | 1.21 | 139 | 28.3 h | 17.64 | 433 |
-| Bumper (+30 %) | 2.79 | 0.54 | 1.22 | **450** | 28.3 h | 20.28 | 432 |
-| Drought (−40 %) | 1.40 | 0.13 | 1.03 | 59 | 1,505 h† | 11.77 | 262 |
-| Rail reinstated | 2.23 | 0.32 | 1.22 | 118 | 28.3 h | **15.44** | 432 |
-| Lucky Bay share ×2.5 | **2.09** | **0.47** | 1.22 | 123 | 28.3 h | 18.21 | 412 |
-| PL outage (7 d @ day 70) | 2.20 | 0.35 | 1.22 | **182** | 28.8 h | 18.49 | 433 |
-| Tod Hwy closure (×2.5) | 2.22 | 0.33 | 1.21 | 140 | 28.3 h | 19.02 | 431 |
+| Baseline replay | 2.23 | 0.33 | 1.19 | 139 | 27.7 h | 17.53 | 433 |
+| Bumper (+30 %) | 2.79 | 0.54 | 1.20 | **450** | 27.7 h | 20.16 | 432 |
+| Drought (−40 %) | 1.40 | 0.13 | 1.15 | 59 | 109.4 h | 12.53 | 262 |
+| Rail reinstated | 2.23 | 0.32 | 1.20 | 118 | 27.7 h | **15.37** | 432 |
+| Lucky Bay share ×2.5 | **2.09** | **0.47** | 1.20 | 123 | 27.7 h | 18.11 | 412 |
+| PL outage (7 d @ day 70) | 2.20 | 0.35 | 1.20 | **182** | 28.1 h | 18.38 | 433 |
+| Tod Hwy closure (×2.5) | 2.22 | 0.33 | 1.19 | 140 | 27.7 h | 18.92 | 431 |
 
-(Numbers include A17 carry-in stocks; regenerated 2026-08-31 on the recalibrated bay
-capacities of `c08513c`. The truck-km column is ROAD vehicle-kilometres only —
-trainset kilometres are tracked separately and excluded.)
-
-† Mean across all vessels including those that waited weeks for grain that never came —
-see Drought below.
+(Numbers include A17 carry-in stocks; regenerated 2026-08-31 on the vessel-program
+give-up fix of `#6` — a vessel waiting more than 15 days at anchor with no grain coming
+is now re-nominated rather than held forever, which also removed a small amount of
+phantom port demand that was skewing routing even at baseline. The truck-km column is
+ROAD vehicle-kilometres only — trainset kilometres are tracked separately and excluded.)
 
 Baseline vessel waiting is anchored to reality: vessels arrive at the Boston Bay
 anchorage at their AIS-observed times and hold until their berth slot, so the baseline
@@ -36,9 +35,15 @@ program, not the land side, is the export bottleneck in a big year. (Real-world
 response would be more vessels; the fixed program isolates the landside effect.)
 
 **Drought (−40 %).** The land side relaxes (worst queue 139 → 59 trucks), but the *fixed* export
-program becomes infeasible: Port Lincoln ships 1.03 Mt against a 1.54 Mt program, and
-vessels sit at anchor for weeks waiting for grain before short-loading (the sim's
-5-day starvation guard). This mirrors 2024/25 reality, where the program itself shrank.
+program becomes infeasible: Port Lincoln ships 1.15 Mt against a 1.54 Mt program. Vessels
+wait well above baseline (mean 109.4 h vs 27.7 h) while grain fails to arrive, but the sim
+now caps this realistically: a vessel that has sat at anchor for 15 days with no grain
+coming is treated as re-nominated — in reality the charterer would re-issue the program for
+a smaller crop rather than leave a ship waiting indefinitely — so it leaves rather than
+accumulating demurrage forever. (Earlier revisions let this wait grow unbounded, producing
+a mean of 1,093–1,505 h and a nonsensical multi-hundred-million-dollar "ships waiting"
+figure; see `engine.ts`'s `VESSEL_GIVEUP_TICKS`.) This mirrors 2024/25 reality, where the
+program itself shrank.
 
 **Rail reinstated.** Two 1,600 t trainsets on the old Cummins/Kimba/Wudinna alignments
 (demand-dispatched; road line-haul fleet cut by a third — A21) keep port stocks equally

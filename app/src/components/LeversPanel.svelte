@@ -336,10 +336,14 @@
       });
     }
     if (Math.abs(d.demurrage) > 500000) {
+      // a multi-week wait means the fixed vessel program should have been re-issued for
+      // the smaller/delayed crop rather than held open — say so at the point the big
+      // number appears, not just in docs/scenarios.md (#6)
+      const reissueNote = d.waitNow > 200 ? " (in reality the program would be re-issued for a smaller crop, not held open)" : "";
       lines.push({
         key: "demurrage",
         weight: Math.abs(d.demurrage) / 500000,
-        text: `Ships wait about ${Math.round(d.waitNow)} hours each at anchor (normally ~${Math.round(d.waitBase)}) — roughly ${fmtMoney(Math.abs(d.demurrage))} in ${d.demurrage > 0 ? "extra" : "avoided"} waiting costs.`,
+        text: `Ships wait about ${Math.round(d.waitNow)} hours each at anchor (normally ~${Math.round(d.waitBase)}) — roughly ${fmtMoney(Math.abs(d.demurrage))} in ${d.demurrage > 0 ? "extra" : "avoided"} waiting costs${reissueNote}.`,
       });
     }
     if (Math.abs(d.dShip) > 50000) {
