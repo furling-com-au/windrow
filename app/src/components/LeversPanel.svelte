@@ -362,6 +362,8 @@
       if (app.levers.productionScale > 1) {
         pinnedKeys.add("dQrel"); // "watch the queues"
         pinnedKeys.add("dLb"); // "where the surplus goes"
+      } else {
+        pinnedKeys.add("demurrage"); // a smaller crop leaves ships waiting at anchor
       }
     } else if (Math.abs(d.relRec) < 0.02) {
       const costs: string[] = [];
