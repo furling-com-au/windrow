@@ -18,6 +18,7 @@ export function loadBundle(season: string, dataDir?: string): Bundle {
     parcels: j("parcels.json").parcels,
     demand: j(`demand_${sid}.json`),
     matrix: j("matrix.json"),
+    paths: j("paths.json"), // routed leg geometry; the road-closure scenario reads it (#28)
     vessels,
     weather: j(`weather_${sid}.json`),
     observed: j(`observed_${sid}.json`),

@@ -10,6 +10,7 @@
  * no Math.random, no object-key iteration for state-affecting logic. Same bundle +
  * params + seed => byte-identical event log (hashed in RunResult).
  */
+import { CORRIDORS, corridorShare } from "./corridors";
 import { Rng } from "./rng";
 import { COMMODITIES, NC } from "./types";
 import type {
@@ -242,6 +243,10 @@ export class Sim {
   private csOpenQueueMin: number[] = [];
   private portInboundT: Float64Array = new Float64Array(0);
   private cachedPortNeed: Float64Array = new Float64Array(0);
+  /** road-closure multiplier on the site->port line-haul leg, [srcSite][portSite].
+   *  null unless the scenario is on; 1 for a leg the closed corridor does not touch.
+   *  Public so the closure can be inspected without running a season (#28). */
+  closureSitePort: number[][] | null = null;
 
   private weatherFactor: Float64Array; // [district*370 + day]
   private rampDays: number;
@@ -443,39 +448,58 @@ export class Sim {
       this.clusterCand.push(cand);
     }
 
-    // ---- road closure scenario: straight-line corridor heuristic ----
+    // ---- road closure scenario ----
+    // Both legs of the chain detour, not just the first. Before #28 the closure was
+    // applied ONLY to farm->site candidates, so silo->port line-haul kept running at full
+    // speed over a road the scenario had just declared impassable — and the test itself
+    // asked whether the STRAIGHT-LINE MIDPOINT of a leg fell within 0.18 deg of a
+    // straight-line corridor axis, which both missed legs that run the corridor end to
+    // end (their midpoint lands outside) and hit legs that merely pass near its middle.
+    //
+    // Now: measure the share of each leg that runs inside the closed corridor, along the
+    // leg's REAL routed polyline where the bundle carries one (see corridors.ts), and
+    // scale minutes and km by 1 + share*(factor-1). A detour costs distance as well as
+    // time, so both move. A leg entirely on the corridor still pays the full factor, as
+    // it did before; a leg that only crosses the closure pays almost nothing.
     if (params.roadClosure) {
-      const corridors: Record<string, [number, number, number, number]> = {
-        // lon1, lat1, lon2, lat2 rough corridor axes
-        lincoln: [135.87, -34.72, 136.45, -33.05],
-        tod: [135.73, -34.27, 135.46, -33.05],
-        flinders: [135.86, -34.72, 134.21, -32.8],
-        birdseye: [135.76, -33.57, 136.93, -33.68],
-      };
-      const [x1, y1, x2, y2] = corridors[params.roadClosure.corridor]!;
-      const near = (ax: number, ay: number, bx: number, by: number) => {
-        // does segment a-b pass within ~0.15 deg of corridor segment? (coarse)
-        const midx = (ax + bx) / 2,
-          midy = (ay + by) / 2;
-        const t = Math.max(
-          0,
-          Math.min(1, ((midx - x1) * (x2 - x1) + (midy - y1) * (y2 - y1)) / ((x2 - x1) ** 2 + (y2 - y1) ** 2)),
-        );
-        const px = x1 + t * (x2 - x1),
-          py = y1 + t * (y2 - y1);
-        return Math.hypot(midx - px, midy - py) < 0.18;
-      };
+      const corridor = CORRIDORS[params.roadClosure.corridor];
+      const extra = params.roadClosure.factor - 1;
+      const paths = bundle.paths;
       for (let cl = 0; cl < this.nClusters; cl++) {
         const c = clusters[cl]!;
         for (const cand of this.clusterCand[cl]!) {
           const s = bundle.matrix.sites[cand.site]!;
-          // a closure detour is longer in distance as well as time, so scale both
-          if (near(c.lon, c.lat, s.lon, s.lat)) {
-            cand.minutes *= params.roadClosure.factor;
-            cand.km *= params.roadClosure.factor;
-          }
+          const route = paths?.cluster_site[`${cl}-${cand.site}`] ?? [
+            [c.lon, c.lat],
+            [s.lon, s.lat],
+          ];
+          const share = corridorShare(route, corridor);
+          if (share <= 0) continue;
+          const f = 1 + share * extra;
+          cand.minutes *= f;
+          cand.km *= f;
         }
       }
+      // the same test for the site->port leg, precomputed here because stepLinehaul picks
+      // its source and destination fresh on every dispatch
+      const nSites = bundle.matrix.sites.length;
+      const scale: number[][] = [];
+      for (let i = 0; i < nSites; i++) scale.push(new Array<number>(nSites).fill(1));
+      for (let i = 0; i < nSites; i++) {
+        const src = bundle.matrix.sites[i]!;
+        for (let j = 0; j < nSites; j++) {
+          if (i === j) continue;
+          const dst = bundle.matrix.sites[j]!;
+          if (dst.role !== "port") continue; // line-haul only ever runs site -> port
+          const route = paths?.site_port[`${i}-${j}`] ?? [
+            [src.lon, src.lat],
+            [dst.lon, dst.lat],
+          ];
+          const share = corridorShare(route, corridor);
+          if (share > 0) scale[i]![j] = 1 + share * extra;
+        }
+      }
+      this.closureSitePort = scale;
     }
     // A5 assumption lever: global travel-TIME scale. It moves speed, not geography, so
     // distances are deliberately left alone (before #10 they moved with it, silently
@@ -984,12 +1008,15 @@ export class Sim {
           }
         }
         if (src < 0 || srcT < 100) return;
-        const roadMin = this.bundle.matrix.site_minutes[src]![bestPort]! * (this.params.travelTimeScale ?? 1);
+        // road-closure detour on the site->port leg (#28). Trainsets are exempt: the
+        // scenario closes a HIGHWAY, and the narrow-gauge line is not on it.
+        const closure = isTrain ? 1 : (this.closureSitePort?.[src]?.[bestPort] ?? 1);
+        const roadMin = this.bundle.matrix.site_minutes[src]![bestPort]! * closure * (this.params.travelTimeScale ?? 1);
         if (roadMin <= 0) return;
         // routed network distance for this leg; both vehicles cover the same ground (#10)
         const legKm =
-          this.bundle.matrix.site_km?.[src]?.[bestPort] ??
-          (this.bundle.matrix.site_minutes[src]![bestPort]! / 60) * FALLBACK_SPEED_KMH;
+          (this.bundle.matrix.site_km?.[src]?.[bestPort] ??
+            (this.bundle.matrix.site_minutes[src]![bestPort]! / 60) * FALLBACK_SPEED_KMH) * closure;
         // trains follow the same alignment but at rail line speed (A21), so their transit
         // comes off the distance, not off the road minutes -- the A5 road-speed lever is
         // not a lever on narrow-gauge line speed

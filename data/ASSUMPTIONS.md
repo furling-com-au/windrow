@@ -194,6 +194,18 @@ presented as measured data.
   truck-km). Realised leg speeds now span 40-91 km/h, median ~82 (farm legs) / ~86
   (site->port). `travelTimeScale` is a speed lever and moves minutes only; a road-closure
   detour scales both, since a detour is longer as well as slower.
+- **Road-closure corridors (scenario switch, `roadClosure`).** A closed corridor is a
+  polyline traced along the highway's real OSM alignment, not a straight line between two
+  towns (`packages/sim/src/corridors.ts`); a leg is scored on the share of its own routed
+  path (`paths.json`) that falls within ~5 km of that alignment, and its minutes and km
+  are scaled by `1 + share x (factor - 1)`. BOTH legs of the chain are scored — farm to
+  site and silo to port. Until 2026-08-31 (issue #28) only the farm leg was, so silo->port
+  road trains ran a closed corridor at full speed, and the test was whether a leg's
+  straight-line MIDPOINT fell within 0.18 deg of a straight-line axis, which missed legs
+  running the corridor end to end and caught legs that merely passed near its middle. The
+  x2.5 factor itself remains an ASSUMED penalty on the closed stretch: the model
+  identifies which legs used the road and how much of each did, but does not route the
+  alternative path, so a detour's real cost is not measured.
 
 ## A6 — climate source: ERA5 (open-meteo) instead of SILO/BOM point data
 - **Value**: daily rain/tmax/RH/wind at 8 district points from the open-meteo ERA5

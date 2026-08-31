@@ -50,6 +50,18 @@ export interface Matrix {
   cluster_site_km?: Record<string, Record<string, number>>;
 }
 
+/** Routed [lon, lat] polylines for every matrix leg (pipeline: paths.json).
+ *  The app renders trucks along these; the sim reads them so the road-closure scenario
+ *  can ask whether a leg ACTUALLY uses the closed corridor rather than guess from a
+ *  straight line (#28). Vertex order is site→cluster / port→site, which does not matter
+ *  to a "how much of this leg is inside the corridor" measurement. */
+export interface PathsFile {
+  /** keyed "clusterId-siteId" */
+  cluster_site: Record<string, [number, number][]>;
+  /** keyed "siteId-portId" */
+  site_port: Record<string, [number, number][]>;
+}
+
 export interface VesselVisit {
   craft_id: number;
   arrive: string; // ISO datetime of berthing (AIS berth-visit start)
@@ -126,6 +138,10 @@ export interface Bundle {
   parcels: BundleParcel[];
   demand: DemandFile;
   matrix: Matrix;
+  /** routed leg geometry. Optional because only the road-closure scenario reads it: the
+   *  test fixtures do not carry it, and a failed fetch in the app degrades the closure to
+   *  straight-line legs (what every leg used before #28) rather than breaking the run. */
+  paths?: PathsFile | null;
   vessels: VesselsFile | null;
   weather: WeatherFile;
   observed: ObservedFile;

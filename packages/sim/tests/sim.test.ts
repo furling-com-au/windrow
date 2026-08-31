@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CORRIDORS, corridorShare } from "../src/corridors";
 import { DAY_TICKS, Sim, gfdiFullyCured } from "../src/engine";
 import { defaultParams } from "../src/params";
 import type { Bundle, Params } from "../src/types";
@@ -151,6 +152,80 @@ describe("queue ceilings (#26/#27)", () => {
       checkCeilings(sim, params, label);
     }
   }, 300_000);
+});
+
+/**
+ * Regression cover for #28.
+ *
+ * The road-closure scenario used to scale ONLY farm->site candidates, so silo->port
+ * line-haul kept running at full speed over the road the scenario had just closed. The
+ * test that picked the affected legs asked whether their straight-line MIDPOINT sat
+ * within 0.18 deg of a straight-line corridor axis, which is neither where the road is
+ * nor where the leg is: it missed legs that run the corridor end to end and hit legs
+ * that merely pass near its middle.
+ */
+describe("road closure corridor (#28)", () => {
+  it("scores a leg by how much of it runs inside the closed corridor", () => {
+    const tod = CORRIDORS.tod;
+    // a leg tracing the highway itself is entirely inside the closure
+    expect(corridorShare(tod, tod)).toBeCloseTo(1, 6);
+    // the east-coast run from Kimba to Lucky Bay never comes near it
+    expect(
+      corridorShare(
+        [
+          [136.43, -33.12],
+          [137.04, -33.71],
+        ],
+        tod,
+      ),
+    ).toBe(0);
+    // a leg that CROSSES the corridor pays for the crossing, not for the whole trip:
+    // 1 deg of easting through the corridor at Lock, ~10 km of it inside the band
+    const crossing = corridorShare(
+      [
+        [135.2, -33.56],
+        [136.2, -33.58],
+      ],
+      tod,
+    );
+    expect(crossing).toBeGreaterThan(0);
+    expect(crossing).toBeLessThan(0.15);
+    // any stretch of the highway is still fully inside it, wherever it is measured —
+    // the old proxy scored a leg on one point, so where along the corridor a leg ran
+    // decided whether it counted at all
+    expect(corridorShare(tod.slice(4), tod)).toBeCloseTo(1, 6);
+  });
+
+  it("closure-adjusts the site->port line-haul leg, not just farm->site", () => {
+    let bundle: Bundle;
+    try {
+      bundle = loadBundle("2025/26");
+    } catch {
+      console.warn("real bundle not present; skipping");
+      return;
+    }
+    const idx = (n: string) => bundle.matrix.sites.findIndex((s) => s.name === n);
+    const pl = idx("Port Lincoln");
+    // baseline carries no closure at all: this scenario must not touch calibrated runs
+    expect(new Sim(bundle, defaultParams(), 42).closureSitePort).toBeNull();
+
+    const p: Params = { ...defaultParams(), roadClosure: { corridor: "tod", factor: 2.5 } };
+    const scale = new Sim(bundle, p, 42).closureSitePort!;
+    expect(scale).not.toBeNull();
+    // these three reach Port Lincoln down the Tod Highway for the whole leg — before the
+    // fix every one of them ran the closure at full speed, unpenalised
+    for (const name of ["Wudinna", "Cummins", "Lock"]) {
+      expect(scale[idx(name)]![pl], `${name} -> Port Lincoln`).toBeCloseTo(2.5, 2);
+    }
+    // Kimba reaches Port Lincoln down the LINCOLN Highway; the closure barely touches it
+    expect(scale[idx("Kimba")]![pl]).toBeLessThan(1.1);
+    // Wirrulla comes down the Tod Highway for two thirds of a 330 km leg: a partial
+    // detour, which the old all-or-nothing test had no way to express
+    expect(scale[idx("Wirrulla")]![pl]).toBeGreaterThan(1.5);
+    expect(scale[idx("Wirrulla")]![pl]).toBeLessThan(2.5);
+    // nothing is ever scaled toward a non-port: line-haul only runs site -> port
+    expect(scale[idx("Wudinna")]![idx("Cummins")]).toBe(1);
+  });
 });
 
 describe("harvest-ban fire danger (A7)", () => {
