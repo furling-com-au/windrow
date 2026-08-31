@@ -422,7 +422,7 @@
   <div class="narrator" class:shift={app.viewMode === "advanced"}>{narratorText}</div>
 {/if}
 
-<PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} />
+<PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} live={app.observed?.live ?? false} />
 <SiteDetail {siteHistory} />
 <Tour />
 {#if showIntro}<Intro onwatch={dismissIntro} />{/if}

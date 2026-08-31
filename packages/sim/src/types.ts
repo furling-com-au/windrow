@@ -101,6 +101,9 @@ export interface ObservedFile {
   district_production_t: Record<string, number>;
   carry_in?: CarryIn;
   annotations?: ChartAnnotation[];
+  /** true only for the current/upcoming season before real data has landed (see A20) —
+   *  weekly_receivals, district_production_t etc. are empty placeholders, not zero */
+  live?: boolean;
 }
 
 export interface DemandFile {

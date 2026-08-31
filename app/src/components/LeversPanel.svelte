@@ -31,9 +31,14 @@
     onchange();
   }
 
+  // 2026/27 has no real weather, crop or shipping data yet (see A20) — the baseline
+  // scenario's normal story ("the real shipping program... the network as it ran") is
+  // simply false for it, so it gets its own honest copy instead (F19)
   let story = $derived(
-    SCENARIOS.find((s) => s.id === app.scenario)?.story ??
-      "Custom what-if — you moved the levers. The takeaways below compare your version of the season against the normal one.",
+    app.scenario === "baseline" && app.observed?.live
+      ? "2026/27 hasn't happened yet: no real weather, no confirmed crop size, no shipping program. What you're watching is a placeholder — mean production from the last four seasons, no rain gating — that fills in as the real season lands."
+      : (SCENARIOS.find((s) => s.id === app.scenario)?.story ??
+          "Custom what-if — you moved the levers. The takeaways below compare your version of the season against the normal one."),
   );
 
   /** true when any assumption lever deviates from its registered default */
@@ -586,19 +591,27 @@
   {#if app.scenario === "baseline" && !assumpDirty}
     <div class="tk">
       <div class="tkt">Reality check</div>
-      <p class="verdict">Season totals land within 1.6% of the operator's published figures, across three simulated seasons.</p>
-      {#if simVsActual?.ready}
+      {#if app.observed?.live}
         <p class="verdict soft">
-          As at week ending {fmtWeekEnding(simVsActual.weekEnding)}: {(simVsActual.sim / 1e6).toFixed(2)} million t
-          modelled vs {(simVsActual.act / 1e6).toFixed(2)} reported
-          {#if simVsActual.rel != null}
-            — {Math.abs(simVsActual.rel * 100).toFixed(0)}% {simVsActual.rel > 0 ? "ahead of" : "behind"} reality.
-          {:else}
-            (too early in the season for a meaningful %).
-          {/if}
+          There's nothing to check yet — 2026/27's real receivals, weather and shipping data don't
+          exist until the season actually runs. This comparison starts working once Bunge's weekly
+          reports begin (usually mid-October).
         </p>
       {:else}
-        <p class="verdict soft">You're watching the season as it really ran. A week-by-week comparison appears each Sunday once harvest starts (mid-October).</p>
+        <p class="verdict">Season totals land within 1.6% of the operator's published figures, across three simulated seasons.</p>
+        {#if simVsActual?.ready}
+          <p class="verdict soft">
+            As at week ending {fmtWeekEnding(simVsActual.weekEnding)}: {(simVsActual.sim / 1e6).toFixed(2)} million t
+            modelled vs {(simVsActual.act / 1e6).toFixed(2)} reported
+            {#if simVsActual.rel != null}
+              — {Math.abs(simVsActual.rel * 100).toFixed(0)}% {simVsActual.rel > 0 ? "ahead of" : "behind"} reality.
+            {:else}
+              (too early in the season for a meaningful %).
+            {/if}
+          </p>
+        {:else}
+          <p class="verdict soft">You're watching the season as it really ran. A week-by-week comparison appears each Sunday once harvest starts (mid-October).</p>
+        {/if}
       {/if}
       <div class="fine">Pick a scenario above{app.viewMode === "advanced" ? ", or drag a lever," : ""} to ask "what if?".</div>
     </div>

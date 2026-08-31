@@ -1,7 +1,14 @@
 <script lang="ts">
   import type { BundleSite, Snapshot } from "@windrow/sim";
 
-  let { snap, sites, plBerthedByDay = [] }: { snap: Snapshot | null; sites: BundleSite[]; plBerthedByDay?: number[] } = $props();
+  let { snap, sites, plBerthedByDay = [], live = false }: {
+    snap: Snapshot | null;
+    sites: BundleSite[];
+    plBerthedByDay?: number[];
+    /** true when the loaded season has no real shipping schedule yet (F19) — every berth
+     *  reads "idle" for the whole run, which isn't the same claim as "idle right now" */
+    live?: boolean;
+  } = $props();
 
   let occSpark = $derived.by(() => {
     if (plBerthedByDay.length < 2) return "";
@@ -62,9 +69,9 @@
             <span class="vt" title="loaded / planned cargo, thousand tonnes">{(v.loadedT / 1000).toFixed(0)}k / {(v.targetT / 1000).toFixed(0)}k t</span>
           </div>
         {:else}
-          <div class="idle">berth idle</div>
+          <div class="idle">{live ? "no shipping schedule yet" : "berth idle"}</div>
         {/each}
-        {#if i === 0 && occSpark}
+        {#if i === 0 && occSpark && !live}
           <svg class="occ" viewBox="0 0 240 18"><polyline points={occSpark} fill="none" stroke="#50dca0" stroke-width="1.2" /></svg>
           <div class="occl">berths occupied over the season (0–2)</div>
         {/if}
