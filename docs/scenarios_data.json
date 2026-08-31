@@ -10,8 +10,8 @@
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
       "peakQueue": 139,
-      "truckKmProxy": 17534116,
-      "roadTonneKmM": 300,
+      "truckKm": 19525771,
+      "roadTonneKmM": 336.2,
       "railTonneKmM": 0,
       "peakWeekKt": 433
     },
@@ -24,8 +24,8 @@
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
       "peakQueue": 450,
-      "truckKmProxy": 20159624,
-      "roadTonneKmM": 353.8,
+      "truckKm": 22380276,
+      "roadTonneKmM": 394.2,
       "railTonneKmM": 0,
       "peakWeekKt": 432
     },
@@ -38,8 +38,8 @@
       "vesselCount": 51,
       "meanVesselWaitH": 109.4,
       "peakQueue": 59,
-      "truckKmProxy": 12525700,
-      "roadTonneKmM": 210.8,
+      "truckKm": 13972704,
+      "roadTonneKmM": 237.7,
       "railTonneKmM": 0,
       "peakWeekKt": 262
     },
@@ -51,11 +51,11 @@
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
-      "peakQueue": 118,
-      "truckKmProxy": 15372888,
-      "roadTonneKmM": 251.7,
-      "railTonneKmM": 51.4,
-      "peakWeekKt": 432
+      "peakQueue": 112,
+      "truckKm": 17144641,
+      "roadTonneKmM": 283,
+      "railTonneKmM": 56.1,
+      "peakWeekKt": 433
     },
     {
       "id": "luckybay",
@@ -66,8 +66,8 @@
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
       "peakQueue": 123,
-      "truckKmProxy": 18108331,
-      "roadTonneKmM": 310.3,
+      "truckKm": 20149004,
+      "roadTonneKmM": 347.4,
       "railTonneKmM": 0,
       "peakWeekKt": 412
     },
@@ -80,8 +80,8 @@
       "vesselCount": 51,
       "meanVesselWaitH": 28.1,
       "peakQueue": 182,
-      "truckKmProxy": 18381555,
-      "roadTonneKmM": 319.3,
+      "truckKm": 20525999,
+      "roadTonneKmM": 358.9,
       "railTonneKmM": 0,
       "peakWeekKt": 433
     },
@@ -94,8 +94,8 @@
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
       "peakQueue": 140,
-      "truckKmProxy": 18915882,
-      "roadTonneKmM": 323,
+      "truckKm": 21003564,
+      "roadTonneKmM": 361,
       "railTonneKmM": 0,
       "peakWeekKt": 431
     }

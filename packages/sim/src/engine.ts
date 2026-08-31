@@ -96,16 +96,21 @@ interface Truck {
   payloadT: number;
   doneAt: number; // tick when current activity completes
   legMin: number; // total minutes of current travel leg
+  legKm: number; // one-way network distance of that leg (routed km, not time x speed)
   legStart: number; // tick when leg started
 }
 
 /** historical EP rail-served sites (rail scenario): Cummins/Kimba/Wudinna lines -> Port Lincoln */
 const RAIL_SITES = ["Cummins", "Kimba", "Wudinna"];
-/** mean road speed built into the travel matrix (A5-derived); minutes -> km everywhere */
-const ROAD_SPEED_KMH = 75;
+/** Fallback mean road speed, used ONLY if a bundle predates the matrix `*_km` fields
+ *  (issue #10). Real leg distances now come out of the OSM routing step alongside the
+ *  minutes; deriving km from minutes at one blended speed understated trunk line-haul by
+ *  ~15% and overstated slow low-class farm legs by up to 25%, because A5 actually routes
+ *  at 90/80/70/60/40 km/h by road class. Never use this for a bundle that carries km. */
+const FALLBACK_SPEED_KMH = 75;
 /** mean EP narrow-gauge line speed for a loaded grain train, door to door (A21). The
- *  alignment length is proxied by the road matrix, so a trainset covers the SAME distance
- *  as the trucks it replaces but takes ROAD_SPEED_KMH/RAIL_SPEED_KMH times as long. */
+ *  alignment length is proxied by the road network, so a trainset covers the SAME distance
+ *  as the trucks it replaces, at this speed instead of the road speed for that route. */
 const RAIL_SPEED_KMH = 40;
 
 interface Vessel {
@@ -145,7 +150,7 @@ export class Sim {
   private clusterDistrict: Uint8Array = new Uint8Array(0);
   private clusterOnFarm: Float64Array; // [cl*NC+c]
   private clusterParcels: number[][];
-  private clusterCand: { site: number; minutes: number }[][];
+  private clusterCand: { site: number; minutes: number; km: number }[][];
 
   sites: SiteState[] = [];
   private trucks: Truck[] = [];
@@ -161,7 +166,8 @@ export class Sim {
   private dailyBungeReceivals: number[] = [];
   private vesselWaitTicksTotal = 0;
   peakQueue = 0;
-  truckTravelMin = 0; // ROAD loaded+empty travel minutes (truck-km proxy for corridor analysis)
+  truckTravelMin = 0; // ROAD loaded+empty travel minutes (cycle-time diagnostics)
+  truckKm = 0; // ROAD loaded+empty vehicle-km, summed from routed leg distances
   tonneKm = 0; // loaded ROAD tonne-km (economics layer; the only tonne-km A18 prices)
   railTravelMin = 0; // trainset loaded+empty travel minutes (rail scenario)
   railTonneKm = 0; // loaded RAIL tonne-km — moved by trainsets, so NOT a road freight cost
@@ -341,9 +347,13 @@ export class Sim {
     this.clusterCand = [];
     for (let cl = 0; cl < this.nClusters; cl++) {
       const m = bundle.matrix.cluster_site_minutes[String(cl)] ?? {};
-      const cand: { site: number; minutes: number }[] = [];
+      const mk = bundle.matrix.cluster_site_km?.[String(cl)] ?? {};
+      const cand: { site: number; minutes: number; km: number }[] = [];
       for (const [sid, min] of Object.entries(m)) {
-        cand.push({ site: parseInt(sid, 10), minutes: min });
+        // routed distance along the same path as `min`; the fallback only fires for a
+        // bundle built before the routing step exported km (#10)
+        const km = mk[sid] ?? (min / 60) * FALLBACK_SPEED_KMH;
+        cand.push({ site: parseInt(sid, 10), minutes: min, km });
       }
       cand.sort((a, b) => a.minutes - b.minutes);
       this.clusterCand.push(cand);
@@ -375,11 +385,17 @@ export class Sim {
         const c = clusters[cl]!;
         for (const cand of this.clusterCand[cl]!) {
           const s = bundle.matrix.sites[cand.site]!;
-          if (near(c.lon, c.lat, s.lon, s.lat)) cand.minutes *= params.roadClosure.factor;
+          // a closure detour is longer in distance as well as time, so scale both
+          if (near(c.lon, c.lat, s.lon, s.lat)) {
+            cand.minutes *= params.roadClosure.factor;
+            cand.km *= params.roadClosure.factor;
+          }
         }
       }
     }
-    // A5 assumption lever: global travel-time scale
+    // A5 assumption lever: global travel-TIME scale. It moves speed, not geography, so
+    // distances are deliberately left alone (before #10 they moved with it, silently
+    // rescaling the freight task whenever the user touched the speed lever).
     const tts = params.travelTimeScale ?? 1;
     if (tts !== 1) {
       for (let cl = 0; cl < this.nClusters; cl++) {
@@ -414,6 +430,7 @@ export class Sim {
           payloadT: params.truckPayloadT,
           doneAt: 0,
           legMin: 0,
+          legKm: 0,
           legStart: 0,
         });
       }
@@ -431,6 +448,7 @@ export class Sim {
         payloadT: params.linehaulPayloadT ?? 45,
         doneAt: 0,
         legMin: 0,
+        legKm: 0,
         legStart: 0,
       });
     }
@@ -439,7 +457,7 @@ export class Sim {
       for (let k = 0; k < 2; k++) {
         this.trucks.push({
           id: id++, kind: 1, state: T_IDLE, cluster: -1, site: -1, destPort: -1,
-          commodity: -1, loadT: 0, payloadT: 1600, doneAt: 0, legMin: 0, legStart: 0,
+          commodity: -1, loadT: 0, payloadT: 1600, doneAt: 0, legMin: 0, legKm: 0, legStart: 0,
         });
       }
     }
@@ -589,11 +607,11 @@ export class Sim {
   }
 
   // ---------- site choice ----------
-  private chooseSite(cl: number, c: number): { site: number; minutes: number } | null {
+  private chooseSite(cl: number, c: number): { site: number; minutes: number; km: number } | null {
     const p = this.params;
     const cand = this.clusterCand[cl]!;
     const weights: number[] = [];
-    const opts: { site: number; minutes: number }[] = [];
+    const opts: { site: number; minutes: number; km: number }[] = [];
     // Growers deliver to a site they can realistically reach, or cart direct to port.
     // Without this window a shallow power-law over ~21 candidates sends most traffic to
     // mid-distance sites (measured: 62 min mean leg against a 24 min nearest-accepting
@@ -745,6 +763,7 @@ export class Sim {
         tr.site = choice.site;
         this.siteInbound[choice.site] = (this.siteInbound[choice.site] ?? 0) + 1;
         tr.legMin = choice.minutes;
+        tr.legKm = choice.km;
         tr.state = T_LOAD;
         tr.doneAt = tick + Math.ceil((30 * this.rng.range(0.8, 1.3)) / TICK_MIN);
         return;
@@ -755,8 +774,8 @@ export class Sim {
           tr.legStart = tick;
           tr.doneAt = tick + Math.ceil(tr.legMin / TICK_MIN);
           this.truckTravelMin += tr.legMin * 2; // out + return
-          const km = (tr.legMin / 60) * ROAD_SPEED_KMH; // mean 75 km/h (A5-derived)
-          this.tonneKm += km * tr.loadT;
+          this.truckKm += tr.legKm * 2; // loaded out, empty back
+          this.tonneKm += tr.legKm * tr.loadT; // only the loaded direction carries tonnes
           const key = `c:${tr.cluster}-${tr.site}`;
           this.tripTonnesByPath.set(key, (this.tripTonnesByPath.get(key) ?? 0) + tr.loadT);
         }
@@ -835,8 +854,14 @@ export class Sim {
         if (src < 0 || srcT < 100) return;
         const roadMin = this.bundle.matrix.site_minutes[src]![bestPort]! * (this.params.travelTimeScale ?? 1);
         if (roadMin <= 0) return;
-        // trains follow the same alignment but at rail line speed, not road speed (A21)
-        const minutes = isTrain ? roadMin * (ROAD_SPEED_KMH / RAIL_SPEED_KMH) : roadMin;
+        // routed network distance for this leg; both vehicles cover the same ground (#10)
+        const legKm =
+          this.bundle.matrix.site_km?.[src]?.[bestPort] ??
+          (this.bundle.matrix.site_minutes[src]![bestPort]! / 60) * FALLBACK_SPEED_KMH;
+        // trains follow the same alignment but at rail line speed (A21), so their transit
+        // comes off the distance, not off the road minutes -- the A5 road-speed lever is
+        // not a lever on narrow-gauge line speed
+        const minutes = isTrain ? (legKm / RAIL_SPEED_KMH) * 60 : roadMin;
         const load = Math.min(tr.payloadT, srcT); // road train ~45 t net; trainset 1,600 t
         const s = this.sites[src]!;
         s.stock[srcC] = s.stock[srcC]! - load;
@@ -845,6 +870,7 @@ export class Sim {
         tr.site = src;
         tr.destPort = bestPort;
         tr.legMin = minutes;
+        tr.legKm = legKm;
         tr.state = T_GO;
         tr.legStart = tick;
         // handling: ~1 h for a road train; ~4 h combined load/unload for a 1,600 t
@@ -853,13 +879,13 @@ export class Sim {
         const handlingMin = isTrain ? 240 : 60;
         tr.doneAt = tick + Math.ceil((minutes + handlingMin) / TICK_MIN);
         // distance is the same either way; only the vehicle and the time differ
-        const km = (roadMin / 60) * ROAD_SPEED_KMH;
         if (isTrain) {
           this.railTravelMin += minutes * 2;
-          this.railTonneKm += km * load;
+          this.railTonneKm += legKm * load;
         } else {
           this.truckTravelMin += minutes * 2;
-          this.tonneKm += km * load;
+          this.truckKm += legKm * 2; // loaded out, empty back
+          this.tonneKm += legKm * load;
         }
         // the corridor layer is a TRUCK-flow heatmap: trainset tonnes are not road traffic,
         // and the rail corridors are exactly the ones this scenario is meant to empty
@@ -1068,7 +1094,7 @@ export class Sim {
         vesselsWaiting,
         tonneKm: Math.round(this.tonneKm),
         railTonneKm: Math.round(this.railTonneKm),
-        truckKm: Math.round((this.truckTravelMin / 60) * ROAD_SPEED_KMH),
+        truckKm: Math.round(this.truckKm),
         meanWaitH: Math.round(this.meanVesselWaitHNow() * 10) / 10,
         peakQueue: this.peakQueue,
         vesselsArrived: this.vessels.reduce((a, v) => a + (v.state !== V_PENDING ? 1 : 0), 0),

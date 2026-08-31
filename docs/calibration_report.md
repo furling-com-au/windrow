@@ -38,7 +38,7 @@ delivery damping, T-Ports inland bunkers closed in 2024/25 (A15).
 | season | role | sim total (Mt) | obs total (Mt) | total err | weekly RMSE / mean weekly | PL vessels sim / AIS |
 |---|---|---|---|---|---|---|
 | 2023/24 | calibration | 1.835 | 1.864 | -1.6 % | 63 % | 86 / 86 |
-| 2024/25 | **held out** | 1.501 | 1.507 | -0.4 % | 63 % | 45 / 53 |
+| 2024/25 | **held out** | 1.501 | 1.507 | -0.4 % | 63 % | 53 / 53 |
 | 2025/26 | calibration | 2.227 | 2.249 | -1.0 % | 50 % | 51 / 51 |
 
 \* 2022/23 has no AIS vessel schedule (pre-coverage); its vessel program is synthetic,
@@ -50,7 +50,7 @@ so only the receivals side is meaningful.
 |---|---|---|---|
 | season total error | -0.4 % | ±5 % | **PASS** |
 | weekly RMSE / mean weekly | 63 % | ≤15 % band (see note) | see note |
-| vessel call count | -15.1 % | ±10 % | **FAIL** |
+| vessel call count | +0.0 % | ±10 % | **PASS** |
 
 **Note on the weekly band.** The spec's "±15 % weekly RMSE band" is ambiguous for weeks
 where observed values swing 80–490 kt; we report RMSE as a share of the mean weekly

@@ -28,7 +28,7 @@ presented as measured data.
 - **Sensitivity**: farm→site payload is linear on truck counts and largely absorbed by
   the fitted fleet size (see A1 note in docs/calibration_report.md). Line-haul payload is
   NOT absorbed: it drives truck-km directly, and the rail scenario's headline saving
-  falls from ~2.2 M truck-km (45 t) to ~1.1 M (72 t) to ~0.9 M (85 t) on 2025/26. Loaded
+  falls from ~2.4 M truck-km (45 t) to ~1.2 M (72 t) to ~1.0 M (85 t) on 2025/26. Loaded
   tonne-km — and therefore the freight dollar figures — barely move, since the same
   grain travels the same distance either way.
 - **Upgrade path**: operator turnaround/weighbridge data; truck-spec tare sheets; RAVnet
@@ -85,6 +85,16 @@ presented as measured data.
 - **Reasoning**: SA road-train limit 100 km/h (Eyre Hwy) / 90 km/h elsewhere (2011 DTEI
   guide, historical); loaded B-doubles practically cruise below limits on rural seal.
 - **Sensitivity**: linear on cycle times; absorbed partly by fleet-size calibration.
+- **Distances are routed, not inferred from these speeds**: `pipeline/p2_build_matrix.py`
+  carries the OSM network distance along each fastest path out beside the minutes
+  (`matrix.json` `site_km` / `cluster_site_km`), and the engine accumulates those km. Do
+  not reintroduce a `km = minutes x speed` shortcut anywhere: until 2026-08-31 the engine
+  used a single flat 75 km/h for exactly that (issue #10), which understated trunk
+  line-haul ~15 % and overstated slow low-class farm legs by up to 25 %. Fixing it raised
+  the measured road task ~12 % (baseline 2025/26: 300 -> 336 M tonne-km, 17.5 -> 19.5 M
+  truck-km). Realised leg speeds now span 40-91 km/h, median ~82 (farm legs) / ~86
+  (site->port). `travelTimeScale` is a speed lever and moves minutes only; a road-closure
+  detour scales both, since a detour is longer as well as slower.
 
 ## A6 — climate source: ERA5 (open-meteo) instead of SILO/BOM point data
 - **Value**: daily rain/tmax/RH/wind at 8 district points from the open-meteo ERA5
@@ -205,11 +215,12 @@ presented as measured data.
 ## A21 — rail-reinstatement scenario parameters
 - **Value**: 2 trainsets × 1,600 t net, serving only the historically rail-served silos
   (Cummins, Kimba, Wudinna) into Port Lincoln; no timetable — dispatch is demand-driven
-  like the road shuttle; combined load/unload handling 4 h; line speed 40 km/h against
-  the matrix's 75 km/h road mean, so a trainset covers the same distance as the trucks
-  it replaces but takes ~1.9× as long; road line-haul fleet cut by one-third in the
-  scenario. Cycle time = 2 × transit + 4 h handling, which works out at **~1.8
-  cycles/day on the Kimba and Wudinna lines and ~3.6 on the short Cummins run** — 1.5
+  like the road shuttle; combined load/unload handling 4 h; line speed 40 km/h applied to
+  the ROUTED distance of the leg (A5), so a trainset covers the same ground as the trucks
+  it replaces at 40 km/h instead of that route's road speed — ~2.2× as long on these three
+  lines (Cummins 63 km, Kimba 214 km, Wudinna 213 km); road line-haul fleet cut by
+  one-third in the scenario. Cycle time = 2 × transit + 4 h handling, which works out at
+  **~1.6 cycles/day on the Kimba and Wudinna lines and ~3.4 on the short Cummins run** — 1.4
   per trainset per active day as actually dispatched on 2025/26 (a demand-driven
   shuttle idles when port stocks are covered). There is no hard cycle cap: an earlier
   version of this entry claimed a "≈2 cycles/day ceiling" that the engine never
@@ -222,6 +233,9 @@ presented as measured data.
   track-capacity limits are modelling choices, not citations; the EP narrow gauge was
   slow and speed-restricted, and 40 km/h door to door is a judgement, not a measurement.
   Rail distance is proxied by the road matrix (no rail alignment lengths in the bundle).
+  Before the #10 distance fix, train transit was derived from road MINUTES × 75/40, which
+  made trainsets faster than 40 km/h on any route whose real road speed exceeded 75; they
+  now run against real km, so the A5 road-speed lever no longer moves line speed.
 - **Accounting**: trainset tonne-km accumulate in a separate `railTonneKm` counter and
   trainset kilometres are excluded from `truckKm`. Only ROAD tonne-km are priced at the
   A18 cartage rate — the road rate does not describe rail haulage, and the cost of
@@ -230,7 +244,7 @@ presented as measured data.
   traffic only.
 - **Sensitivity**: affects only the rail scenario's truck-km savings and queue relief —
   and those are dominated by the line-haul payload the trains displace (A1): the saving
-  falls from ~2.2 M truck-km at 45 t/load to ~0.9 M at 85 t. Report it as a range.
+  falls from ~2.4 M truck-km at 45 t/load to ~1.0 M at 85 t. Report it as a range.
 - **Upgrade path**: a real reinstatement proposal (consist sizes, timetable, loop
   lengths) would replace all of this.
 

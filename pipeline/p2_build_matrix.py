@@ -2,12 +2,15 @@
 
 - Parcels (2.5 km demand cells) are grouped into ~12 km catchment CLUSTERS: the unit for
   truck logistics (spec: "paddock-cluster -> site" matrix).
-- Drive minutes computed on the OSM graph with A5 speeds.
+- Drive minutes computed on the OSM graph with A5 speeds; the network distance ALONG the
+  same fastest path is carried out with them, so the sim never has to back out km from
+  minutes at a single blended speed (that understated trunk hauls and overstated farm legs).
 - Route POLYLINES (simplified) are emitted for every cluster->candidate-site pair and
   site->port pair so the browser renders trucks along real roads without routing.
 
 Outputs (app/public/data/):
-  matrix.json  {sites[], site_minutes[][], clusters[], cluster_site_minutes{cid:{sid:min}}}
+  matrix.json  {sites[], site_minutes[][], site_km[][], clusters[],
+                cluster_site_minutes{cid:{sid:min}}, cluster_site_km{cid:{sid:km}}}
   paths.json   {cluster_site: {"cid-sid": [[lon,lat],...]}, site_site: {"i-j": [...]}}
   parcels.json (updated in place with cluster_id per parcel)
 """
@@ -64,11 +67,12 @@ def main():
     nodes = g["nodes"]
     edges = g["edges"]
     geometry = g["geometry"]
-    adj: dict[str, list[tuple[str, float, int]]] = defaultdict(list)
+    adj: dict[str, list[tuple[str, float, float, int]]] = defaultdict(list)
     for ei, (u, v, length_m, hw) in enumerate(edges):
-        minutes = (length_m / 1000.0) / SPEED_KMH.get(hw, 60.0) * 60.0
-        adj[u].append((v, minutes, ei))
-        adj[v].append((u, minutes, ei))
+        km = length_m / 1000.0
+        minutes = km / SPEED_KMH.get(hw, 60.0) * 60.0
+        adj[u].append((v, minutes, km, ei))
+        adj[v].append((u, minutes, km, ei))
 
     cell = 0.05
     grid: dict[tuple[int, int], list[str]] = defaultdict(list)
@@ -94,20 +98,24 @@ def main():
         return best
 
     def dijkstra(src: str):
+        """Least-TIME tree. `kms` is the network distance along that same chosen path --
+        not a shortest-distance tree -- so minutes and km always describe one route."""
         dist = {src: 0.0}
+        kms = {src: 0.0}
         prev: dict[str, tuple[str, int]] = {}
         pq = [(0.0, src)]
         while pq:
             d, n = heapq.heappop(pq)
             if d > dist.get(n, 1e18):
                 continue
-            for m, w, ei in adj[n]:
+            for m, w, km, ei in adj[n]:
                 nd = d + w
                 if nd < dist.get(m, 1e18):
                     dist[m] = nd
+                    kms[m] = kms[n] + km
                     prev[m] = (n, ei)
                     heapq.heappush(pq, (nd, m))
-        return dist, prev
+        return dist, prev, kms
 
     def path_polyline(prev, src: str, dst: str) -> list[list[float]]:
         if dst not in prev and dst != src:
@@ -150,6 +158,7 @@ def main():
     site_results = [dijkstra(nd) for nd in site_nodes]
     n = len(sites)
     site_minutes = [[round(site_results[i][0].get(site_nodes[j], -1.0), 1) for j in range(n)] for i in range(n)]
+    site_km = [[round(site_results[i][2].get(site_nodes[j], -1.0), 2) for j in range(n)] for i in range(n)]
 
     # clusters from parcels
     pj = json.loads((APP_DATA / "parcels.json").read_text(encoding="utf-8"))
@@ -180,6 +189,7 @@ def main():
     port_idx = [i for i, s in enumerate(sites) if s["role"] == "port"]
 
     cluster_site_minutes: dict[str, dict[str, float]] = {}
+    cluster_site_km: dict[str, dict[str, float]] = {}
     paths_cs: dict[str, list[list[float]]] = {}
     for ci, cn in enumerate(cluster_nodes):
         times = []
@@ -190,6 +200,9 @@ def main():
         times.sort()
         chosen = {si for _, si in times[:N_CANDIDATES]} | set(port_idx)
         cluster_site_minutes[str(ci)] = {str(si): round(t, 1) for t, si in times if si in chosen}
+        cluster_site_km[str(ci)] = {
+            str(si): round(site_results[si][2].get(cn, -1.0), 2) for _, si in times if si in chosen
+        }
         for t, si in times:
             if si in chosen:
                 poly = path_polyline(site_results[si][1], site_nodes[si], cn)
@@ -207,11 +220,15 @@ def main():
 
     matrix = {
         "meta": {"speeds_kmh": SPEED_KMH, "cluster_deg": CLUSTER_DEG,
-                 "note": "drive minutes on OSM network (ODbL (c) OpenStreetMap contributors); speeds = assumption A5"},
+                 "note": "drive minutes on OSM network (ODbL (c) OpenStreetMap contributors); speeds = assumption A5",
+                 "km_note": "*_km are network distances along the same fastest path as *_minutes, "
+                            "summed from OSM way lengths -- do not re-derive km from minutes"},
         "sites": sites,
         "site_minutes": site_minutes,
+        "site_km": site_km,
         "clusters": clusters,
         "cluster_site_minutes": cluster_site_minutes,
+        "cluster_site_km": cluster_site_km,
     }
     (APP_DATA / "matrix.json").write_text(json.dumps(matrix), encoding="utf-8")
     (APP_DATA / "paths.json").write_text(json.dumps({"cluster_site": paths_cs, "site_port": paths_ss}), encoding="utf-8")
@@ -219,8 +236,10 @@ def main():
 
     def sidx(name):
         return next(i for i, s in enumerate(sites) if name.lower() in s["name"].lower())
-    print(f"Cummins -> Port Lincoln: {site_minutes[sidx('Cummins')][sidx('Port Lincoln')]} min")
-    print(f"Kimba -> Lucky Bay: {site_minutes[sidx('Kimba')][sidx('Lucky Bay')]} min")
+    for a, b in (("Cummins", "Port Lincoln"), ("Kimba", "Lucky Bay")):
+        i, j = sidx(a), sidx(b)
+        mins, km = site_minutes[i][j], site_km[i][j]
+        print(f"{a} -> {b}: {mins} min, {km} km ({km / (mins / 60):.0f} km/h implied)")
 
 
 if __name__ == "__main__":

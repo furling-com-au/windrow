@@ -15,8 +15,15 @@ export function tinyBundle(): Bundle {
         [0, 60],
         [60, 0],
       ],
+      site_km: [
+        [0, 84],
+        [84, 0],
+      ],
       clusters: [{ id: 0, lon: 135.7, lat: -34.0, cropping_ha: 400, district: "LEP", n_parcels: 1 }],
       cluster_site_minutes: { "0": { "0": 15, "1": 70 } },
+      // routed km, deliberately NOT minutes x one blended speed (#10): the short farm leg
+      // is on slower low-class road, the long port run mostly on trunk
+      cluster_site_km: { "0": { "0": 15, "1": 98 } },
     },
     vessels: {
       season: "2025/26",

@@ -31,7 +31,7 @@ interface ScenarioOut {
   vesselCount: number;
   meanVesselWaitH: number;
   peakQueue: number;
-  truckKmProxy: number; // road truck travel minutes -> km (farm + line-haul; excludes trainsets)
+  truckKm: number; // road truck km, loaded + empty (farm + line-haul; excludes trainsets)
   roadTonneKmM: number; // loaded ROAD tonne-km (Mt-km) — the task priced at A18
   railTonneKmM: number; // loaded RAIL tonne-km (Mt-km), rail scenario only
   peakWeekKt: number;
@@ -53,7 +53,7 @@ for (const sc of SCENARIOS) {
     vesselCount: res.vesselCount,
     meanVesselWaitH: +res.meanVesselWaitH.toFixed(1),
     peakQueue: res.peakQueue,
-    truckKmProxy: Math.round(sim.truckTravelMin * (75 / 60)), // minutes -> ~km at 75 km/h mean
+    truckKm: Math.round(sim.truckKm), // summed routed leg distances, not minutes x a mean speed
     roadTonneKmM: +(sim.tonneKm / 1e6).toFixed(1),
     railTonneKmM: +(sim.railTonneKm / 1e6).toFixed(1),
     peakWeekKt: Math.round(peakWeek / 1000),

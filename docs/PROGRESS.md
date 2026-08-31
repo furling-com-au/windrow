@@ -155,6 +155,36 @@ This file is the canonical record of where the project is. Updated as work proce
   `defaultParams()` (60 → 40), matching `scripts/scenarios.ts` instead of a hardcoded 32.
 - `docs/scenarios.md` regenerated: its table also predated the `c08513c` recalibration.
 
+### 2026-08-31 (#10: an undocumented flat 75 km/h was setting every distance)
+
+- **Distances are now routed, not inferred.** `engine.ts` turned every leg's minutes into
+  kilometres at a hardcoded `ROAD_SPEED_KMH = 75` — a constant that appeared in no
+  assumption entry and silently overrode A5's actual class speeds (90/80/70/60/40). Real
+  routed speeds span 40–91 km/h (median 82 on farm legs, 86 site→port), so trunk
+  line-haul was understated ~15 % and slow low-class farm legs overstated by up to 25 %,
+  with the error concentrated exactly where the tonnage is.
+- **Fix at the source**: `pipeline/p2_build_matrix.py` now carries the OSM network
+  distance along each fastest path out beside the minutes (`matrix.json` gains `site_km`
+  and `cluster_site_km`), and the engine accumulates `truckKm` / `tonneKm` from those
+  routed distances. The 75 survives only as `FALLBACK_SPEED_KMH` for a pre-#10 bundle.
+- **Effect on 2025/26 baseline**: road task 300 → **336 M tonne-km**, truck-km 17.5 →
+  **19.5 M** (+12 %); the rail saving grows 2.19 → **2.38 M truck-km** and −$4.9 M →
+  **−$5.3 M** freight. Tonnage, queues and vessel outcomes are unchanged — minutes, and
+  therefore routing and cycle times, never depended on the constant.
+- **Two silent couplings fell out with it.** The A5 travel-time lever was rescaling the
+  freight *task* as well as speeds (distance moved with minutes); it now moves minutes
+  only, and the tooltip says so. Trainset transit was `road minutes × 75/40`, which ran
+  the trains above their stated 40 km/h line speed on any route faster than 75; A21 rail
+  time now comes off real km (Cummins 95 min, Kimba 322, Wudinna 320 → 1.4 cycles per
+  trainset per active day, was 1.5). A road-closure detour still scales both, since a
+  detour is longer as well as slower.
+- A5 and A21 rewritten to register all of this, with an explicit "do not re-derive km
+  from minutes" note; `docs/scenarios.md`, `scenarios_data.json` and the app's rail story
+  regenerated. `scripts/scenarios.ts` no longer reports a `truckKmProxy`.
+- `docs/calibration_report.md` regenerated in passing — it was stale from before the `#6`
+  vessel give-up fix and still showed 2024/25 at 45/53 vessel calls (a **FAIL** on the
+  ±10 % check); the current engine gives 53/53, **PASS**. Unrelated to this fix.
+
 ## Key decisions
 
 - Repo root = `C:\Users\justi\grain_simulation` (spec layout §10). `data/raw/` git-ignored, manifest committed.

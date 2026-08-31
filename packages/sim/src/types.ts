@@ -37,8 +37,13 @@ export interface BundleCluster {
 export interface Matrix {
   sites: BundleSite[];
   site_minutes: number[][];
+  /** routed network km along the SAME fastest path as `site_minutes` (A5 class speeds).
+   *  Optional only so a bundle built before #10 still loads; use it, never minutes x speed. */
+  site_km?: number[][];
   clusters: BundleCluster[];
   cluster_site_minutes: Record<string, Record<string, number>>;
+  /** routed network km matching `cluster_site_minutes` (see `site_km`) */
+  cluster_site_km?: Record<string, Record<string, number>>;
 }
 
 export interface VesselVisit {
@@ -167,7 +172,8 @@ export interface Snapshot {
     vesselsWaiting: number;
     tonneKm: number; // loaded ROAD tonne-km to date (the freight task A18 prices)
     railTonneKm: number; // loaded RAIL tonne-km to date (rail scenario; not road freight)
-    truckKm: number; // total ROAD truck km (loaded + empty) to date — excludes trainsets
+    truckKm: number; // total ROAD truck km (loaded + empty) to date, from routed leg
+    // distances — excludes trainsets
     meanWaitH: number; // mean vessel anchorage wait so far (h/vessel arrived)
     peakQueue: number; // worst single-site truck queue so far
     vesselsArrived: number;
