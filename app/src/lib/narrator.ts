@@ -29,8 +29,12 @@ export function narrate(
   const rainNow = (observed?.annotations ?? []).some((a) => a.kind === "rain" && Math.abs(a.day - day) <= 1);
   const berthed = snap.vessels.find((v) => v.state === 2);
   const port = berthed ? sites[berthed.port] : null;
+  // The name is a date-window join from monthly archived stem PDFs, and the tonnage is a
+  // monthly port total divided across that month's calls — both plausible, neither a
+  // measurement, so this is the single most checkable sentence in the app and hedges
+  // accordingly (F34) rather than asserting a name and a figure as fact.
   const shipClause = berthed
-    ? ` ${berthed.name ? `The ${berthed.name}` : "A ship"} is loading ${Math.round(berthed.targetT / 1000)},000 t at ${port?.name.replace(" (T-Ports port)", "") ?? "port"}.`
+    ? ` ${berthed.name ? `A ship (likely the ${berthed.name})` : "A ship"} is loading — about ${Math.round(berthed.targetT / 1000)},000 t modelled — at ${port?.name.replace(" (T-Ports port)", "") ?? "port"}.`
     : "";
   const started = snap.kpi.receivedT > 3000;
   const harvestOver = day > 110 && recent < 8000 && snap.kpi.harvestedT > 100000;

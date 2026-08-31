@@ -66,7 +66,7 @@
           <div class="vessel">
             <span class="vname">{v.name}</span>
             <div class="bar"><div class="fill" style="width:{v.pct}%"></div></div>
-            <span class="vt" title="loaded / planned cargo, thousand tonnes">{(v.loadedT / 1000).toFixed(0)}k / {(v.targetT / 1000).toFixed(0)}k t</span>
+            <span class="vt" title="loaded / modelled cargo, thousand tonnes — allocated from the monthly port total, not a shipping plan">{(v.loadedT / 1000).toFixed(0)}k / {(v.targetT / 1000).toFixed(0)}k t</span>
           </div>
         {:else}
           <div class="idle">{live ? "no shipping schedule yet" : "berth idle"}</div>
