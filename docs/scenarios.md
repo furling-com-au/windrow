@@ -114,5 +114,3 @@ straight-line heuristic — see engine comment; a routed-detour version is futur
 - Vessel programs are held at observed 2025/26 arrivals in every scenario.
 - Queue counts inherit the site service-time assumption (A2); treat them as relative
   indicators between scenarios, not absolute truck counts.
-- No carry-in stocks at season start (README limitations), so absolute PL shipped
-  figures sit below the observed shipping year in all scenarios.

@@ -133,9 +133,9 @@ receivals; 2024/25 (the drought year) is held out for validation.
 - District-level demand (not paddock-level) in v1; Sentinel-2 segmentation is a stretch goal.
 - Vessel names are heuristic date-window joins from ~monthly archived stem snapshots.
 - Site service times and truck cycle details are assumptions calibrated in aggregate.
-- No carry-in stocks: each season starts empty, so early-season (Oct–Nov) vessels load
-  from new-crop only and the simulated shipping year under-ships by roughly the real
-  carry-over (~0.2–0.3 Mt).
+- Carry-in (opening) stocks are a lower bound, not a stocktake — see A17: they count
+  only old crop that left by ship in Oct–Nov, so on-farm and non-grain-port carry-over
+  isn't captured.
 - The AMSA-derived vessel layer carries a **CC BY-NC 3.0 AU** licence at source — this
   project is non-commercial research; keep it that way or replace that layer.
 
