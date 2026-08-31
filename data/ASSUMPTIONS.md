@@ -28,7 +28,7 @@ presented as measured data.
 - **Sensitivity**: farm→site payload is linear on truck counts and largely absorbed by
   the fitted fleet size (see A1 note in docs/calibration_report.md). Line-haul payload is
   NOT absorbed: it drives truck-km directly, and the rail scenario's headline saving
-  falls from ~2.4 M truck-km (45 t) to ~1.2 M (72 t) to ~1.0 M (85 t) on 2025/26. Loaded
+  falls from ~2.2 M truck-km (45 t) to ~1.1 M (72 t) to ~0.8 M (85 t) on 2025/26. Loaded
   tonne-km — and therefore the freight dollar figures — barely move, since the same
   grain travels the same distance either way.
 - **Upgrade path**: operator turnaround/weighbridge data; truck-spec tare sheets; RAVnet
@@ -36,8 +36,9 @@ presented as measured data.
 
 ## A2 — receival site service times and bay counts
 - **Value**: sample + weigh + tip cycle 12 min/truck/bay; **4 tipping bays at an upcountry
-  site, 5 at a port terminal** (`countryBays`, `portBays`; both fitted, port bays sit on
-  the floor of the physical band derived below).
+  site, 6 at a port terminal** (`countryBays`, `portBays`; both fitted). Since the #22
+  refit both sit inside their search ranges; port bays previously fitted to 5, the floor
+  of the physical band derived below, which said more about the bound than about the data.
 - **Reasoning**: not published anywhere in minutes. Bounded by physics against the one
   published throughput anchor — the Port Lincoln site record of **13,148/13,512 t/day
   (Nov 2020) and 13,675 t/day (2022/23)**: at ~40 t average load that is ~340 truck
@@ -57,10 +58,14 @@ presented as measured data.
   Lincoln was 13,694 t, at the top of the published band, because Cummins and Tumby Bay
   saturated at 120,000 t and pushed carting past them to the port. Under A4's district
   allocation the lower-EP sites hold 162,900 t, stop being the binding constraint, and the
-  peak day falls to **9,950 t** — and adding bays barely moves it (10,502 t at 6 port
+  peak day fell to **9,950 t** — and adding bays barely moved it (10,502 t at 6 port
   bays, 11,302 t at 7). So the model no longer reproduces the published daily record, and
   the reason is upcountry storage near the port, not tipping capacity at it. Recorded
   rather than tuned away: the earlier agreement rested on a capacity we now think wrong.
+  **Re-measured after #22's refit** (which moved the fitted port bays 5 → 6): the peak day
+  is **10,160 t**, and the bay count still barely touches it — 10,109 t at 5 bays, 10,160
+  at 6, 10,180 at 7. A 2 % spread across the whole physical band is as clean a statement
+  as this model can make that tipping capacity is not what caps that port.
 - **Related finding**: with bays under-provisioned the calibration objective is monotone
   in fleet size (more trucks always scored better, to 900+), and only the engine's own
   `QUEUE INSANE` invariant (>400 trucks at one site) bounded it. Fleet size is therefore
@@ -117,8 +122,11 @@ presented as measured data.
   intake are both downstream of where this capacity sits, so the district allocation
   is a structural input and the knobs were refitted with it
   (docs/calibration_report.md). Moving the same 2.5 Mt from flat to district-allocated
-  takes the 2025/26 baseline from **33.1 % direct-to-port and a 139-truck peak queue to
-  30.7 % and 135**, and right-sizes the far west: Witera, Streaky Bay, Wirrulla and
+  took the 2025/26 baseline from **33.1 % direct-to-port and a 139-truck peak queue to
+  30.7 % and 135** (at #22's refit the same baseline reads **30.9 % and 105**, and
+  `upcountryCapScale` 1.5 still moves it to 24.3 % and 42 — the lever's direction and
+  rough size survive a complete change of parameter vector), and right-sizes the far
+  west: Witera, Streaky Bay, Wirrulla and
   Poochera go from 30–56 % peak fill to 64–98 %. It also costs the model Port Lincoln's
   published peak receival day — see A2.
 - **History**: until 2026-08-31 this entry described the allocation above but the engine
@@ -179,6 +187,19 @@ presented as measured data.
 - **Reasoning**: ESCOSA 2019: "~75 % of Viterra receivals go to upcountry sites". EP has
   a large port-adjacent catchment (lower EP), so Western share may be higher. Free
   parameter in calibration.
+- **This is a prior on an OUTPUT, not on a knob.** Nothing in the model sets the share
+  directly. `portAttractBias` is the fitted knob; the share falls out of it together with
+  the A4 storage allocation and the Huff choice radius — which is why the A4 capacity
+  lever moves it further than the attractiveness knob does.
+- **Realised in the model (measured 2026-08-31 at the #22 parameter set, seed 42)**:
+  2023/24 **26.6 %**, 2024/25 (held out) **24.4 %**, 2025/26 **30.9 %** — grower tips at
+  the two Bunge port terminals as a share of all Bunge grower tips (line-haul deliveries
+  are not receivals and are excluded). All three sit inside this entry's 15–35 % band;
+  the two non-drought seasons sit above the 25 % central figure, in the direction this
+  entry's own reasoning predicts. The numbers are stable across refits: they read
+  26.2 / 24.4 / 30.7 % at the pre-#22 parameter set, i.e. they barely moved while eleven
+  of twelve knobs did. The binding constraint is A4 upcountry storage, not the
+  attractiveness knob — `upcountryCapScale` 1.5 takes 2025/26 to 24.3 %.
 
 ## A10 — Thevenard vessel calls: grain share
 - **Value**: grain vessels at Thevenard identified by month-weighting AIS calls with
@@ -264,16 +285,18 @@ presented as measured data.
   Lincoln took no dry-bulk call at all in October 2022.
 - **Sensitivity**: not inert, and not confined to shipping. Carry-in occupies storage
   the engine's capacity gates then police, so it pushes deliveries between sites and
-  into the receivals series. Measured at the post-#20 calibrated knobs, `carryInScale`
-  1 → 0: 2023/24 receivals 1.868 → 1.908 Mt, which moves the season-total error against
-  the operator's published figure from +0.2 % to +2.4 % — larger than the whole
-  post-#20 residual on any season; direct-to-port 26.4 → 23.5 %, peak queue 75 → 51,
-  mean vessel wait 31.4 → 44.0 h. 2025/26: 2.236 → 2.258 Mt (−0.6 % → +0.4 % error),
-  direct-to-port 30.8 → 28.7 %, peak queue 133 → 80, wait 27.7 → 33.1 h. Held-out
-  2024/25 barely moves (1.501 → 1.502 Mt) because its carry-in is only 72 kt. The
+  into the receivals series. Re-measured at the post-#22 calibrated knobs, `carryInScale`
+  1 → 0: 2023/24 receivals 1.856 → 1.892 Mt, which moves the season-total error against
+  the operator's published figure from −0.4 % to +1.5 % — several times the whole
+  post-#22 residual on any season; direct-to-port 26.6 → 24.5 %, peak queue 57 → 39,
+  mean vessel wait 28.8 → 31.1 h. 2025/26: 2.247 → 2.268 Mt (−0.1 % → +0.8 % error),
+  direct-to-port 30.9 → 28.9 %, peak queue 105 → 80, wait unchanged at 27.7 h. Held-out
+  2024/25 barely moves (1.502 → 1.503 Mt) because its carry-in is only 72 kt. The
   earlier claim here — "receivals calibration unaffected (carry-in is never
   'received')" — was false: carry-in is indeed never received, but it displaces what
-  can be.
+  can be. (#21 first measured this at the post-#20 knobs, where the same A/B read
+  +0.2 % → +2.4 % on 2023/24 and −0.6 % → +0.4 % on 2025/26; the effect survives a
+  complete change of parameter vector, which is the point.)
 
 ## A18 — road grain freight rate (economics layer, indicative)
 - **Value**: A$0.10 per tonne-km (range 0.07–0.13).
@@ -347,9 +370,23 @@ presented as measured data.
 ## A23 — site-attractiveness ⇄ cash-premium translation (economics layer, indicative)
 - **Value**: a Lucky Bay attractiveness multiplier m is displayed as an equivalent cash
   premium of `90 min × (1 − m^(−1/β)) × (80/60 km/min) × A18 freight rate` A$/t, with
-  β the calibrated choiceBeta (1.965). Default constants: representative eastern-EP
-  haul 90 generalized minutes (drive + queue + service), 80 km/h effective speed.
-  Example: the 2.5× scenario ≈ +$6/t at the default 10¢/t·km rate.
+  β the calibrated choiceBeta (**2.806** since #22). Default constants: representative
+  eastern-EP haul 90 generalized minutes (drive + queue + service), 80 km/h effective
+  speed. The "Lucky Bay share ×2.5" scenario sets the lever to an **absolute** 0.885 →
+  2.5, i.e. m = 2.5 / calibrated `luckyBayBias` = **2.8×** the fitted baseline, worth
+  **≈ +$4/t** at the default 10¢/t·km rate.
+- **Two calibrated numbers sit inside this translation, and both move on every refit.**
+  m is measured against the fitted `luckyBayBias`, and the exponent is the fitted
+  `choiceBeta`; the app reads both from the calibrated set at runtime, so the displayed
+  $/t figure changes with a recalibration even though the lever position does not. The
+  same lever position computes to $6.67/t at the post-#20 parameter set (β 2.06, baseline
+  0.469) and $7.28 at the pre-#20 one (β 1.965, baseline 0.40) — this entry's previous
+  "≈ +$6/t" was itself a stale round-down. Treat the figure as an order of magnitude, not
+  a price. What it is **not** is anchored
+  to a knob clipped at its search bound: `luckyBayBias` fitted to the floor of its range
+  (0.40) before #20, sat just above it (0.469) after, and now fits well inside it
+  (0.885) — the F22 review's framing of this entry as resting on a pinned value was true
+  when written and is no longer.
 - **Used in**: app only (Lucky Bay lever readout, scenario story, About). Never affects
   sim behaviour — site choice stays `attract / cost^β` on minutes.
 - **Reasoning**: in a Huff-style power-law choice, multiplying attractiveness by m is
@@ -363,6 +400,73 @@ presented as measured data.
 - **Upgrade path**: v2 net-price site choice using the captured daily cash-bid series
   (data/processed/cash_prices/) once a harvest of EP bids exists — then premiums are
   data, not a translation.
+
+## A24 — on-farm retention share (fitted; and what the residual actually leaves it)
+- **Value**: `retentionShare` = **0.0553** (fitted; search range 0.05–0.28). The share of
+  EP production that never reaches *either* receival network in the season — seed held
+  back, on-farm stockfeed, and grain sold into channels the model does not represent
+  (domestic mills, container packers).
+- **Used in**: `engine.ts` harvest step (`retained = h * retentionShare`, removed before
+  any truck sees it); exposed in the app as the "Crop kept on farm / sold elsewhere"
+  assumption lever. It is the single largest lever on total network tonnage — the
+  deliverable pool, and so season receivals, is linear in `1 − retentionShare`.
+- **The 20–23 % residual is NOT this number.** `CALIBRATION.md` records a Western
+  receivals ÷ EP production ratio of 0.77–0.80 and calls the residual "on-farm retention
+  + T-Ports intake + domestic/container". Read as a check on this knob alone (as the F22
+  review read it: "0.10 against an observed 20–23 %") that double-counts, because T-Ports
+  intake is a *separately modelled flow* — its own sites, its own fitted `luckyBayBias`,
+  its own accounting (`receivedLbT`), and deliberately outside `seasonReceivedT`, which
+  is Bunge-only. The model also carries a season-end tail: grain harvested but still on
+  farm or on a truck at day 365. Decomposing the observed residual against the run:
+
+  | season | EP prod | obs Bunge receivals | residual | modelled T-Ports | season-end tail¹ | leaves |
+  |---|---|---|---|---|---|---|
+  | 2023/24 | 2.588 Mt | 1.864 Mt | 28.0 % | 19.7 pp | 2.9 pp | **5.5 pp** |
+  | 2024/25 | 1.889 Mt | 1.507 Mt | 20.2 % | 11.7 pp | 3.1 pp | **5.5 pp** |
+  | 2025/26 | 2.907 Mt | 2.249 Mt | 22.6 % | 14.3 pp | 2.9 pp | **5.5 pp** |
+
+  ¹ net of A17 carry-in, which enters the same identity from the other side.
+  So the honest comparison for this knob is single digits, not 20–23 %. At the *pre-#22*
+  parameter set the same decomposition left 9.6–10.3 pp against a fitted 0.10 — which is
+  why 0.10 clipped on the old search floor of exactly 0.10: the floor sat on top of the
+  answer, not 10 points below it. The review's arithmetic was an oversimplification; the
+  *symptom* it flagged was real.
+- **Known limit — this knob and `luckyBayBias` are not separately identified.** The model
+  obeys `production = retained + Bunge receivals + T-Ports receivals + tail − carry-in`,
+  and only the Bunge term is fitted against data. Every tonne taken off retention has to
+  reappear at Lucky Bay (or in the tail), so the objective can trade the two at almost no
+  cost. Three parameter sets, all fitted the same way, on 2025/26:
+
+  | parameter set | objective | `retentionShare` | T-Ports intake | Bunge total err | held-out 2024/25 |
+  |---|---|---|---|---|---|
+  | pre-#22 | 1.115 | 0.100 | 0.312 Mt (10.7 %) | −0.6 % | −0.4 % |
+  | #22, 300 evals | 1.0802 | 0.069 | 0.407 Mt (14.0 %) | −1.1 % | −3.2 % |
+  | #22, 600 evals (shipped) | 1.0800 | 0.055 | 0.416 Mt (14.3 %) | −0.2 % | −0.3 % |
+
+  Down the table retention falls 10.0 → 5.5 % of production while T-Ports intake rises
+  10.7 → 14.3 % — the trade, in the open. The last two rows are the sharper evidence: two
+  searches over identical ranges, differing only in evaluation budget, reach the same
+  objective to three decimals (1.080) at retention 0.069 and 0.055, with held-out errors
+  of −3.2 % and −0.3 %. Widening the floor recovered a *direction* (the fit wants less
+  retention than 0.10) but not an identified *value*, and the report now flags the knob as
+  sitting near its floor rather than presenting 0.055 as a measurement.
+- **Plausibility check on the other side of the trade.** Pushing retention down pushes
+  T-Ports intake up, and that side does have an external anchor: ACCC records ~20 Lucky
+  Bay shipments in 15 months (~16/season) and A16 bounds AIS anchorage stays at ~15/season
+  (an upper bound — it includes non-grain anchor calls). 0.416 Mt over ~16 shipments is
+  ~26 kt each, a credible transshipment parcel but **at the top of what that evidence
+  supports**; 2023/24's 0.511 Mt (bunkers open, A15) is ~32 kt each and higher still. The
+  fit is buying part of its Bunge match with T-Ports throughput that nothing in the
+  calibration data constrains. Treat both knobs as a *pair* with a plausible joint range,
+  not as two measurements.
+- **Reasoning for the 0.05 search floor**: 0.10 had no published basis *as a floor* — it
+  was the lower end of a plausibility guess, and using a plausibility guess as a hard
+  bound is what produced the clipping. 0.05 is below seed plus on-farm stockfeed for a
+  cereal-dominant system, so it cannot bind for a physical reason, and it matches the
+  lower stop already offered on the app's own retention lever (0.05–0.25).
+- **Sensitivity**: near-linear on season receivals — a 1 pp change is ~29 kt on 2025/26.
+- **Upgrade path**: published T-Ports intake, or an ABARES/PIRSA on-farm-use estimate for
+  EP — either one identifies the pair, because the identity then has only one unknown.
 
 ## A13 — vessel arrival schedules for seasons before stem coverage
 - **Value**: for seasons where archived stem snapshots are sparse (2021/22–2023/24

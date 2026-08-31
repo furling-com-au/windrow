@@ -1,5 +1,5 @@
 /**
- * Headless calibration (spec Phase 3): random search over 11 free scalars, fitted
+ * Headless calibration (spec Phase 3): random search over the `Knobs` scalars, fitted
  * against data/CALIBRATION.md targets on 2023/24 + 2025/26; 2024/25 is HELD OUT.
  *
  *   npx tsx scripts/calibrate.ts [nSamples]
@@ -82,18 +82,48 @@ function score(bundles: Bundle[], k: Knobs): { total: number; parts: Record<stri
 
 const bundles = CAL_SEASONS.map((s) => loadBundle(s));
 const rng = new Rng(2026);
+/**
+ * Search ranges. `rng.range(lo,hi)` is continuous, so a fitted value landing EXACTLY on
+ * a bound can only come from the refinement clamp below — it means the optimiser wanted
+ * to go further and was clipped, and the value then measures the range, not the data
+ * (issue #22). Every bound here has to be a physical or documented claim, so that when
+ * a knob does sit on one, "the constraint binds" is a finding and not an artefact.
+ * `report.ts` reads these ranges back out of the search log and flags every knob sitting
+ * on — or within 5 % of the span of — its bound.
+ *
+ * Widened 2026-08-31 for the three knobs that were pinned on their floors after the
+ * #20/#21 refits:
+ *   matShift        -4  -> -12  the prior maturity dates are 1-Oct-relative and the
+ *                              earliest EP first receival on record is 25 Sep (2023/24,
+ *                              Thevenard — CALIBRATION.md). At -12 the median far-west
+ *                              lentil parcel (base 14 + WEP -8) ripens on exactly that
+ *                              date; earlier than the record has no anchor.
+ *   harvestRampDays  5  ->  1   this ramp is WITHIN a parcel. The regional ramp is
+ *                              already produced by the +-6 d per-parcel maturity jitter
+ *                              and the +-8 d district offsets; a single paddock is cut
+ *                              at header capacity from the first day, so 1 d is the
+ *                              physical floor, not 5.
+ *   retentionShare  0.10 -> 0.05  0.10 had no published basis as a FLOOR. The observed
+ *                              residual (EP production minus Bunge Western receivals,
+ *                              CALIBRATION.md) is 20-28 %, but T-Ports intake and the
+ *                              season-end delivery tail are both modelled separately, so
+ *                              the share left for this knob is ~9.6-10.3 % — i.e. 0.10
+ *                              was sitting on top of the answer, which is precisely why
+ *                              it clipped. 0.05 is below seed + on-farm feed and cannot
+ *                              bind for a physical reason. See ASSUMPTIONS.md A24.
+ */
 const ranges: Record<keyof Knobs, [number, number]> = {
   fleetTrucks: [300, 900],
   linehaulTrucks: [25, 80],
   rateScale: [0.7, 2.2],
-  matShift: [-4, 16],
-  harvestRampDays: [5, 22],
-  retentionShare: [0.1, 0.28],
+  matShift: [-12, 16],
+  harvestRampDays: [1, 22],
+  retentionShare: [0.05, 0.28],
   portAttractBias: [0.8, 2.8],
   choiceBeta: [1.1, 3.5],
   choiceRadius: [1.05, 3.0],
   countryBays: [3, 5],
-  portBays: [5, 7],
+  portBays: [5, 7], // A2: 5 is the PHYSICAL floor (the published PL peak day needs >=5)
   luckyBayBias: [0.4, 2.2],
 };
 

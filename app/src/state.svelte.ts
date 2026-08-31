@@ -45,19 +45,19 @@ export const SCENARIOS: { id: ScenarioId; label: string; story: string; levers: 
   { id: "bumper", label: "Bumper harvest (+30%)", story: "A big year. Watch silos fill toward their limits, truck queues build at the peak, and surplus grain spill toward Lucky Bay.", levers: { productionScale: 1.3 } },
   { id: "drought", label: "Drought (−40%)", story: "A small crop against an unchanged shipping program: the roads and silos relax, but ships sit at anchor waiting for grain that never comes.", levers: { productionScale: 0.6 } },
   { id: "rail", label: "Bring back the trains", story: "Two trainsets return to the old Cummins–Kimba–Wudinna lines and take over part of the silo-to-port shuttle. How much trucking that saves depends on how big the trucks it replaces are: about 2.4 million truck-km against 45 t loads, but only ~1.0 million against the 85 t road trains SA law actually permits. Either way, the figures below count only the trucking saved — NOT what rebuilding and running a railway would cost, which is why the real line closed in 2019.", levers: { rail: true } },
-  { id: "luckybay", label: "More grain to Lucky Bay", story: "T-Ports' Lucky Bay made 2.5× more attractive — like posting roughly a $6/t cash premium at a typical eastern-peninsula farm (A23). Grain drains away from the main network.", levers: { luckyBayBias: 2.5 } },
+  { id: "luckybay", label: "More grain to Lucky Bay", story: "T-Ports' Lucky Bay made ~2.8× more attractive than the calibrated baseline — like posting roughly a $4/t cash premium at a typical eastern-peninsula farm (A23). Grain drains away from the main network.", levers: { luckyBayBias: 2.5 } },
   { id: "outage", label: "Port Lincoln closed a week", story: "The port terminal shuts for a week at harvest peak. Deliveries redirect to country silos — the system holds, at a queueing price.", levers: { outage: true } },
   { id: "roadclosure", label: "Tod Highway closed", story: "The peninsula's central spine is impassable (detours = 2.5× travel time). Trucks re-sort toward Lincoln Highway sites.", levers: { roadClosure: true } },
 ];
 
-/** assumption levers: defaults = the registered assumptions (A1/A2/A5/A7/A12/A17/A4) */
+/** assumption levers: defaults = the registered assumptions (A1/A2/A5/A7/A24/A17/A4) */
 export interface AssumpLevers {
   payloadT: number; // A1 (farm -> site)
   lhPayloadT: number; // A1 (site -> port line-haul)
   serviceMin: number; // A2
   travelScale: number; // A5
   rainStopMm: number; // A7
-  retention: number; // A12 (fitted, but a model guess growers may dispute)
+  retention: number; // A24 (fitted, but a model guess growers may dispute)
   carryInScale: number; // A17
   capScale: number; // A4
 }

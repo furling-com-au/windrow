@@ -23,20 +23,25 @@ This file is the canonical record of where the project is. Updated as work proce
 
 ## Validation headline (see docs/calibration_report.md)
 
-- Held-out 2024/25: season total **−0.4 %** (spec ±5 % ✓); weekly RMSE 61 % of mean weekly
+- Held-out 2024/25: season total **−0.3 %** (spec ±5 % ✓); weekly RMSE 64 % of mean weekly
   (timing-dominated; the late-Nov 2024 rain collapse is missing from ERA5 at the A6
   points — documented). Vessel counts = AIS schedule by construction.
-- 2023/24 **+0.2 %**, 2025/26 **−0.6 %** (calibration seasons; 2026-08-31 refit on the A4
-  district capacities — all three seasons inside ±1 % for the first time).
-- Port Lincoln peak grower-receival day **9,950 t** against the published record of
+- 2023/24 **−0.4 %**, 2025/26 **−0.2 %** (calibration seasons; 2026-08-31 refit on #22's
+  widened search bounds — all three seasons inside ±0.5 %, and no knob now fits to a
+  bound of its search range).
+- **No knob is clipped**, and the report says so per knob. Three were fitting to the exact
+  floor of their ranges before #22 (`matShift`, `retentionShare`, `harvestRampDays`);
+  `retentionShare` is still flagged "near floor" at 0.055 against a 0.05 floor.
+- Port Lincoln peak grower-receival day **10,160 t** against the published record of
   13,148–13,675 t — **no longer reproduced**. It was (13,694 t) while upcountry capacity
   was a flat 120 kt everywhere: the lower-EP sites filled and pushed carting past them to
   the port. Under A4's district allocation they hold 162,900 t and stop saturating. Bays
-  are not the constraint any more (10,502 t at 6 port bays, 11,302 t at 7) — see A2.
-- Mean vessel wait 30.7 h vs 26.8 h AIS-observed; peak network queue 135 trucks.
-- 2022/23 bumper still exceeds the validity envelope entirely (upcountry capacity fills;
-  the queue guard fires at Lucky Bay, 542 trucks). Excluded from the UI; recorded as
-  skipped in the report.
+  are not the constraint any more — 10,109 / 10,160 / 10,180 t at 5 / 6 / 7 port bays,
+  a 2 % spread across the whole physical band. See A2.
+- Mean vessel wait 27.7 h vs 26.8 h AIS-observed; peak network queue 105 trucks.
+- 2022/23 bumper now **completes** (it used to trip the queue guard at Lucky Bay) but
+  reads −33.8 %: that bundle has no vessel program at all, so the ports never outload,
+  17 of 21 open sites end the season full and the network jams. Land-side replay only.
 
 ## Phase 1 acceptance criteria — status
 
@@ -224,6 +229,52 @@ This file is the canonical record of where the project is. Updated as work proce
   A2, A4, A14, README and the app's capacity lever/site panel copy updated. The site
   panel now reads the capacity the run enforces (new `SiteView.capacityT`) instead of the
   raw bundle figure, so it no longer contradicts the capacity lever.
+
+### 2026-08-31 (#22: three knobs were fitting to their search floors, not to the data)
+
+- **A fitted value sitting exactly on a search bound is not a measurement.** `rng.range`
+  is continuous, so probability zero — the only route there is the refinement clamp in
+  `calibrate.ts`, i.e. the optimiser pushed past the bound and was clipped. After the
+  #20/#21 refits three knobs sat exactly on their floors: `matShift` −4, `retentionShare`
+  0.10 and `harvestRampDays` 5 (the last newly pinned, a side effect of those refits;
+  `rateScale`, `portAttractBias` and `luckyBayBias`, which F22 also flagged, had already
+  moved off theirs).
+- **Each floor was replaced with a physical one and the fit re-run.** `matShift` −4 →
+  **−12**: at −12 the median far-west lentil parcel ripens on 25 Sep, the earliest EP
+  first receival on record — nothing earlier has an anchor. `harvestRampDays` 5 → **1**:
+  the ramp is *within* a parcel and a paddock is cut at header capacity from day one; the
+  regional ramp already comes from the ±6 d parcel jitter and ±8 d district offsets.
+  `retentionShare` 0.10 → **0.05**, below seed plus on-farm stockfeed, matching the lower
+  stop the app's own retention lever already offered.
+- **All three moved into the interior** (−7.40, 10.32, 0.0553) and the objective improved
+  1.115 → **1.080**; season totals 2023/24 −0.4 %, 2025/26 −0.2 %, held-out 2024/25
+  −0.3 %. Weekly RMSE 40 / 66 / 64 %. `portBays` also came off the floor (5 → 6).
+- **The bigger finding is that the objective does not identify these knobs.** Two searches
+  over the same ranges (300 and 600 evaluations) reached 1.0802 and 1.0800 — the same
+  objective to four decimals — at fleet 618 vs 555, ramp 16.2 vs 10.3, choice β 1.32 vs
+  2.81, retention 0.069 vs 0.055, and holdout errors of −3.2 % vs −0.3 %. Widening a floor
+  recovers a *direction*, not a value.
+- **`retentionShare` and `luckyBayBias` are the sharpest case**, and F22's arithmetic on
+  it was wrong in an instructive way. CALIBRATION.md's 20–23 % residual is *not* a check
+  on retention alone: T-Ports intake is modelled separately and excluded from
+  `seasonReceivedT`, and there is a season-end delivery tail. Netting both leaves ~10 pp
+  at the pre-#22 fit — so the old 0.10 floor sat *on top of* the answer, which is exactly
+  why it clipped. The two knobs then trade one-for-one through the mass identity: the
+  fit moved 4.5 pp of EP production off retention and onto Lucky Bay at no cost to the
+  objective, taking modelled T-Ports intake to 0.416 Mt (2025/26) — ~26 kt per shipment
+  against ACCC's ~16 shipments/season, credible but at the top of that evidence. New
+  register entry **A24** carries the decomposition, the three-parameter-set table and the
+  plausibility check.
+- `calibration_report.md` now generates its knob count and prose list from the knob object
+  (it hardcoded "11 free scalars" against a 12-row table, `portBays` missing) and prints a
+  **search range and an "at a bound?" flag per knob**, read from the search log the same
+  run wrote. README's "Nine calibration knobs" and params.ts's "~10 starred values" were
+  the same defect and are now 12.
+- A2, A4, A9, A17, A23 re-measured at the new parameter set; A9 gains the realised
+  direct-to-port share it never recorded (26.6 / 24.4 / 30.9 %, stable across the refit
+  while eleven knobs moved). `scenarios.md` / `scenarios_data.json` / `calibration_report.md`
+  / `docs/img/*.svg` regenerated; About and lever copy updated for the new fleet, RMSE
+  band and $/t premium.
 
 ## Key decisions
 
