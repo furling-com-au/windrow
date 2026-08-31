@@ -17,6 +17,7 @@ let curSeason = "";
 let curPatch: Partial<Params> = {};
 let curSeed = 42;
 let dataBase = "/data/";
+let seekSeq = 0; // bumped on every seek request; an in-flight seek bails out if it's superseded
 
 const FRAME_MS = 33;
 
@@ -80,13 +81,24 @@ function frame() {
 /** headless baseline (default params, seed 42) daily series for the takeaways panel */
 const baselineCache = new Map<string, unknown>();
 
-function computeBaseline(season: string) {
+const yield0 = () => new Promise<void>((r) => setTimeout(r, 0));
+
+/**
+ * Runs in small day-sized chunks with a yield every 20 days rather than one long
+ * synchronous loop — a synchronous 365-day loop blocks this worker for its full
+ * duration (~1.4s desktop, longer on mobile), during which the "play" message that
+ * already told the UI it's playing can't be serviced, so the map freezes even though
+ * the Pause button is showing (#17). Yielding lets frame() keep the sim advancing
+ * (and later "play"/"pause"/"seek" messages get handled) while this computes.
+ */
+async function computeBaseline(season: string) {
   if (!bundle) return;
   if (baselineCache.has(season)) {
     post({ type: "baseline", season, data: baselineCache.get(season) });
     return;
   }
-  const b = new Sim(bundle, defaultParams(), 42);
+  const myBundle = bundle;
+  const b = new Sim(myBundle, defaultParams(), 42);
   const receivedByDay: number[] = [];
   const shippedByDay: number[] = [];
   const tonneKmByDay: number[] = [];
@@ -108,6 +120,8 @@ function computeBaseline(season: string) {
     queueByDay.push(s.kpi.peakQueue);
     arrivedByDay.push(s.kpi.vesselsArrived);
     onFarmTdByDay.push(s.kpi.onFarmTd);
+    if (d % 20 === 19) await yield0();
+    if (bundle !== myBundle) return; // season changed mid-compute; this baseline is stale
   }
   const data = { receivedByDay, shippedByDay, tonneKmByDay, truckKmByDay, lbByDay, waitByDay, queueByDay, arrivedByDay, onFarmTdByDay };
   baselineCache.set(season, data);
@@ -161,18 +175,67 @@ self.onmessage = async (ev: MessageEvent) => {
         if (sim) post({ type: "heatmap", data: sim.getTripTonnes() });
         break;
       case "seek": {
-        // deterministic scrub: re-init and fast-forward to target day
-        if (!bundle) break;
+        // Deterministic scrub: re-init and step day by day to the target, capturing each
+        // day's KPIs along the way. A single big sim.step() to the target only ever gives
+        // us the FINAL day's numbers — resetHistories() on the main thread then had nothing
+        // to backfill days 0..target-1 with, leaving every earlier index a hole (#15), which
+        // in turn made the "recent deliveries" narrator check see the full-season cumulative
+        // instead of ~0 (permanently reporting "peak harvest") and collapsed the money
+        // chart's line to a single point (#18). Posting the whole day-by-day series here lets
+        // the main thread backfill for real instead of guessing.
+        if (!bundle) {
+          // a seek can race a still-in-flight "init" (e.g. dismissing the intro the
+          // instant it appears); the main thread waits on a reply to clear its
+          // "seeking" flag, so it must get one even when there's nothing to seek yet
+          post({ type: "seekResult", notReady: true });
+          break;
+        }
         playing = false;
+        const mySeq = ++seekSeq;
+        const myBundle = bundle;
         const params: Params = { ...defaultParams(), ...curPatch };
-        sim = new Sim(bundle, params, curSeed);
-        const target = Math.max(0, Math.min(364, m.day)) * DAY_TICKS;
+        // operate on locally-captured refs, not the shared `sim`/`bundle` — a concurrent
+        // "init" (season/scenario change) landing while this loop is paused at a yield
+        // would otherwise reassign them out from under this in-flight seek
+        const mySim = new Sim(myBundle, params, curSeed);
+        sim = mySim;
+        const target = Math.max(0, Math.min(364, m.day));
+        const plIdx = myBundle.matrix.sites.findIndex((s) => s.name.includes("Lincoln"));
+        const receivedByDay: number[] = [];
+        const shippedByDay: number[] = [];
+        const plBerthedByDay: number[] = [];
+        const siteReceivedByDay: number[][] = myBundle.matrix.sites.map(() => []);
+        // day-index d must line up with what App.svelte's own dailyReceived[snap.day] means:
+        // the state AT day d, not after it. So day 0 is captured pre-step (matching the very
+        // first sendSnapshot() in init(), before any ticks run) and only d>=1 steps first —
+        // stepping unconditionally at d=0 would land seek(0) one day past where the rest of
+        // the app expects day 0 to be (verified in-browser: dismissing the intro landed on
+        // 3 Oct instead of 1 Oct before this was corrected).
+        const capture = (d: number) => {
+          const s = mySim.snapshot();
+          receivedByDay[d] = s.kpi.receivedT;
+          shippedByDay[d] = s.kpi.shippedT;
+          plBerthedByDay[d] = plIdx >= 0 ? s.vessels.filter((v) => v.port === plIdx && v.state === 2).length : 0;
+          for (let i = 0; i < s.sites.length; i++) siteReceivedByDay[i]![d] = s.sites[i]!.cumReceivedT;
+        };
         try {
-          sim.step(target);
+          capture(0);
+          for (let d = 1; d <= target; d++) {
+            mySim.step(DAY_TICKS);
+            capture(d);
+            if (d % 40 === 0) await yield0();
+            // a newer seek, or a season/scenario change, superseded this one — abandon it silently
+            if (mySeq !== seekSeq || bundle !== myBundle) return;
+          }
         } catch (e) {
           post({ type: "error", msg: String(e) });
+          break;
         }
-        sendSnapshot();
+        const finalSnap = mySim.snapshot();
+        post(
+          { type: "seekResult", snap: finalSnap, series: { receivedByDay, shippedByDay, plBerthedByDay, siteReceivedByDay } },
+          [finalSnap.parcelHarvestFrac.buffer],
+        );
         break;
       }
     }

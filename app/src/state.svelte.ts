@@ -147,6 +147,7 @@ class AppState {
   heatmapOn = $state(false);
   heatmap = $state<Record<string, number> | null>(null);
   loading = $state(true);
+  seeking = $state(false);
   error = $state<string | null>(null);
   done = $state(false);
   showAbout = $state(false);

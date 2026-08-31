@@ -29,6 +29,21 @@
   let lastDay = -1;
   let plPortIdx = -1;
 
+  // local scrub state so dragging the date slider doesn't fight the sim's own snapshots
+  // (F16) — it only tracks app.snap.day while the user isn't actively dragging
+  let scrubDay = $state(0);
+  let dragging = false;
+  $effect(() => {
+    if (!dragging && app.snap) scrubDay = app.snap.day;
+  });
+
+  type SeekSeries = {
+    receivedByDay: number[];
+    shippedByDay: number[];
+    plBerthedByDay: number[];
+    siteReceivedByDay: number[][];
+  };
+
   const SPEEDS = [
     { label: "1 h/s", v: 3600 },
     { label: "6 h/s", v: 21600 },
@@ -56,24 +71,26 @@
       app.done = false;
       app.playing = false; // worker pauses itself on init; keep the UI in sync
       resetHistories();
+      // clear a still-running quiet-months auto-speedup so it can't leak into the next
+      // run as an unlabelled speed (#18) — but leave a genuine user speed choice alone
+      if (!userTouchedSpeed) setSpeed(86400, false);
       const dataBase = new URL(import.meta.env.BASE_URL + "data/", location.href).toString();
       post({ type: "init", season: app.season, paramsPatch: leversToPatch(app.levers, app.assump), seed: 42, dataBase });
     }, debounceMs);
   }
 
   function onSnapshot(snap: Snapshot) {
+    // Normal playback only: day advances by a tick or (rarely, after a lag spike) a
+    // few days at once, never backward and never by a scrub-sized jump — seeks are
+    // handled entirely by onSeekResult below instead, with a real backfilled series
+    // rather than guessed values, so this no longer needs to special-case jumps (#15).
     app.snap = snap;
     if (snap.day !== lastDay) {
-      if (snap.day < lastDay || snap.day > lastDay + 3) {
-        // scrub jump: keep series sparse rather than flood-filling with post-jump values
-        resetHistories();
-        lastDay = snap.day - 1;
-      }
       // once harvest is over, quietly fast-forward the shipping months (unless the
       // viewer chose a speed themselves)
       if (!userTouchedSpeed && app.speed === 86400 && snap.day >= 130) {
         const recent = snap.kpi.receivedT - (dailyReceived[Math.max(0, snap.day - 7)] ?? 0);
-        if (recent < 8000) setSpeed(345600, false); // 4 d/s through the quiet months
+        if (recent < 8000) setSpeed(259200, false); // 3 d/s (a real, highlightable speed) through the quiet months
       }
       for (let d = Math.max(0, lastDay + 1); d <= snap.day; d++) {
         dailyReceived[d] = snap.kpi.receivedT;
@@ -91,6 +108,18 @@
     map?.update(snap, app.heatmapOn ? app.heatmap : null);
   }
 
+  /** a scrub landed: the worker replayed day 0..target and sent the real per-day series
+   *  back, so this replaces (not patches) the histories rather than leaving holes (#15) */
+  function onSeekResult(snap: Snapshot, series: SeekSeries) {
+    app.snap = snap;
+    dailyReceived = series.receivedByDay;
+    dailyShipped = series.shippedByDay;
+    plBerthedByDay = series.plBerthedByDay;
+    siteHistory = series.siteReceivedByDay;
+    lastDay = snap.day;
+    map?.update(snap, app.heatmapOn ? app.heatmap : null);
+  }
+
   function togglePlay() {
     app.playing = !app.playing;
     post({ type: app.playing ? "play" : "pause" });
@@ -102,8 +131,10 @@
     post({ type: "speed", value: v });
   }
 
-  function seek(day: number) {
-    app.playing = false;
+  function seek(day: number, { resume = false }: { resume?: boolean } = {}) {
+    app.done = false; // otherwise scrubbing back from a finished run leaves no play control at all (#18)
+    app.playing = resume; // manual scrub pauses; replay/intro-dismiss keep playing once the seek lands
+    app.seeking = true;
     post({ type: "seek", day });
   }
 
@@ -120,10 +151,18 @@
   }
 
   function replay() {
-    seek(0);
-    app.done = false;
-    app.playing = true;
-    post({ type: "play" });
+    if (!userTouchedSpeed) setSpeed(86400, false);
+    seek(0, { resume: true });
+  }
+
+  /** the sim keeps running (by design — "the map should live immediately") while the
+   *  intro's opaque backdrop hides it, so a slow first-time reader can dismiss it 40-60s
+   *  in, past the season's first delivery (#14). Land back at day 0 rather than delay the
+   *  clock, so the ambient motion behind the modal stays, but watching starts at the start. */
+  function dismissIntro() {
+    showIntro = false;
+    if (!userTouchedSpeed) setSpeed(86400, false);
+    seek(0, { resume: true });
   }
 
   function setScenario(id: ScenarioId) {
@@ -201,6 +240,12 @@
           case "snapshot":
             onSnapshot(m.snap);
             break;
+          case "seekResult":
+            app.seeking = false;
+            if (m.notReady) break; // raced the worker's own init; nothing to apply
+            onSeekResult(m.snap, m.series);
+            if (app.playing) post({ type: "play" }); // resume (replay / intro dismiss) now that the seek has landed
+            break;
           case "done":
             app.playing = false;
             app.done = true;
@@ -208,6 +253,7 @@
           case "error":
             app.error = m.msg;
             app.playing = false;
+            app.seeking = false;
             break;
         }
       };
@@ -227,9 +273,12 @@
 
   const fmtMt = (t: number) => (t / 1e6).toFixed(2) + " Mt";
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  // driven by scrubDay (not app.snap.day) so the date label tracks the thumb live while
+  // dragging, instead of only updating once a scrub commits (#16)
   let prettyDate = $derived.by(() => {
     if (!app.snap) return "…";
-    const d = new Date(app.snap.dateIso + "T00:00:00Z");
+    const start = Date.UTC(parseInt(app.season.slice(0, 4)), 9, 1);
+    const d = new Date(start + scrubDay * 86400000);
     return `${d.getUTCDate()} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
   });
   let narratorText = $derived(
@@ -286,7 +335,7 @@
     {#if app.done}
       <button class="play" onclick={replay}>↺ Replay season</button>
     {:else}
-      <button class="play" onclick={togglePlay} disabled={app.loading}>
+      <button class="play" onclick={togglePlay} disabled={app.loading || app.seeking}>
         {app.playing ? "⏸ Pause" : "▶ Play"}
       </button>
     {/if}
@@ -302,8 +351,15 @@
         type="range"
         min="0"
         max="364"
-        value={app.snap?.day ?? 0}
-        oninput={(e) => seek(parseInt(e.currentTarget.value))}
+        value={scrubDay}
+        oninput={(e) => {
+          dragging = true;
+          scrubDay = parseInt(e.currentTarget.value);
+        }}
+        onchange={(e) => {
+          dragging = false;
+          seek(parseInt(e.currentTarget.value));
+        }}
       />
       <div class="phases"><span class="ph h">harvest</span><span class="ph s">shipping</span></div>
     </div>
@@ -340,7 +396,7 @@
         </div>
       {/if}
     </div>
-    <MoneyChart {dailyReceived} observed={app.observed} season={app.season} day={app.snap.day} />
+    <MoneyChart {dailyReceived} observed={app.observed} season={app.season} day={scrubDay} />
   {/if}
 
   <LeversPanel onchange={() => initSim(350)} />
@@ -354,6 +410,7 @@
 
   {#if app.error}<div class="err">{app.error}</div>{/if}
   {#if app.loading}<div class="loading">loading bundle…</div>{/if}
+  {#if app.seeking}<div class="loading">seeking…</div>{/if}
 
   <footer>
     <button class="link" onclick={() => (app.showAbout = true)}>About & data sources</button>
@@ -368,7 +425,7 @@
 <PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} />
 <SiteDetail {siteHistory} />
 <Tour />
-{#if showIntro}<Intro onwatch={() => (showIntro = false)} />{/if}
+{#if showIntro}<Intro onwatch={dismissIntro} />{/if}
 
 {#if legendOpen}
   <div class="legend">
