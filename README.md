@@ -28,7 +28,7 @@ export any run as CSV.
 
 | Piece | Where | What |
 |---|---|---|
-| Evidence base | `data/` | `SOURCES.md` (14 datasets, licences, retrieval dates), `ASSUMPTIONS.md` (A1–A16), `CALIBRATION.md` (targets + tolerances), `trucks.md`, processed parquet/geojson |
+| Evidence base | `data/` | `SOURCES.md` (14 datasets, licences, retrieval dates), `ASSUMPTIONS.md` (A1–A24), `CALIBRATION.md` (targets + tolerances), `trucks.md`, processed parquet/geojson |
 | Data pipeline | `pipeline/` | Python (uv): scrapers + builders, idempotent, polite (≥2 s/host, robots.txt honoured) |
 | Sim core | `packages/sim/` | Pure deterministic TypeScript: 5-minute tick engine, seeded sfc32 RNG, daily mass-conservation invariants, unit tests |
 | Browser app | `app/` | Svelte 5 + Vite + deck.gl (self-contained vector basemap — no tile server), sim in a Web Worker |
@@ -52,7 +52,7 @@ npm --workspace packages/sim run test
 npx tsx packages/sim/scripts/run_headless.ts 2025/26 42
 
 # calibration search (writes packages/sim/src/calibrated.json)
-npx tsx packages/sim/scripts/calibrate.ts 100
+npx tsx packages/sim/scripts/calibrate.ts 400
 
 # scenarios sweep
 npx tsx packages/sim/scripts/scenarios.ts 2025/26
@@ -121,8 +121,10 @@ queue time)^β, seeded-random tie-breaks) over a precomputed OSM travel-time mat
 with queue feedback. Sites have tipping bays, service times, and storage caps;
 line-haul trucks keep port stocks ahead of the vessel program; vessels (from AIS-derived
 schedules with stem-joined names) berth, load at published shiploader rates, and sail.
-Nine calibration knobs are fitted headless against 2023/24 + 2025/26 weekly Western
-receivals; 2024/25 (the drought year) is held out for validation.
+Twelve calibration knobs are fitted headless against 2023/24 + 2025/26 weekly Western
+receivals; 2024/25 (the drought year) is held out for validation. `calibration_report.md`
+lists each knob with its search range and flags any that fitted to a bound — a value
+sitting on a bound measures the range, not the data.
 
 ## Known limitations
 

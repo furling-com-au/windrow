@@ -498,7 +498,7 @@
       <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
         oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="Nobody publishes the real fleet size. ~730 is FITTED: the fleet that makes simulated weekly deliveries match the published ones at an assumed ~38 t average load. It is only WEAKLY identified — fleet size and load size trade off, so ~900 small trucks or ~500 road trains fit the same data equally well. What is really pinned down is the flow: ~1,850 loads/day at the peak. Fewer trucks = grain waits on farm; more = longer silo queues.">
+    <label title="Nobody publishes the real fleet size. ~555 is FITTED: the fleet that makes simulated weekly deliveries match the published ones at an assumed ~38 t average load. It is only WEAKLY identified — fleet size and load size trade off, so ~900 small trucks or ~400 road trains fit the same data equally well, and two refits of the same knobs landed on 618 and 555 at the same objective value. What is really pinned down is the flow: ~1,850 loads/day at the peak. Fewer trucks = grain waits on farm; more = longer silo queues.">
       <span>How many trucks working the harvest? <b>{Math.round(app.levers.fleetTrucks)} — {fleetDesc}</b></span>
       <input type="range" min={FLEET_MIN} max={FLEET_MAX} step="10" value={app.levers.fleetTrucks}
         oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
@@ -549,7 +549,7 @@
           <span>Rain that stops harvest <b>{app.assump.rainStopMm} mm</b></span>
           <input type="range" min="2" max="10" step="0.5" value={app.assump.rainStopMm} oninput={(e) => setA("rainStopMm", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A12 (fitted): share of the crop that never enters this network — seed, feed, on-farm storage, other buyers.">
+        <label title="A24 (fitted): share of the crop that never enters this network — seed, feed, on-farm storage, other buyers. Not the whole gap between EP production and network receivals: T-Ports intake is modelled separately.">
           <span>Crop kept on farm / sold elsewhere <b>{Math.round(app.assump.retention * 100)}%</b></span>
           <input type="range" min="0.05" max="0.25" step="0.01" value={app.assump.retention} oninput={(e) => setA("retention", parseFloat(e.currentTarget.value))} />
         </label>
@@ -598,7 +598,7 @@
           reports begin (usually mid-October).
         </p>
       {:else}
-        <p class="verdict">Season totals land within 1.6% of the operator's published figures, across three simulated seasons.</p>
+        <p class="verdict">Season totals land within 0.5% of the operator's published figures, across three simulated seasons.</p>
         {#if simVsActual?.ready}
           <p class="verdict soft">
             As at week ending {fmtWeekEnding(simVsActual.weekEnding)}: {(simVsActual.sim / 1e6).toFixed(2)} million t

@@ -28,16 +28,16 @@
     <h3>How well does it match reality?</h3>
     <p>
       Season totals are close: on the held-out 2024/25 season the simulation's total
-      tonnage was within <strong>0.4%</strong> of published receivals, and Port Lincoln
+      tonnage was within <strong>0.3%</strong> of published receivals, and Port Lincoln
       vessel call counts matched exactly. The weaker spot is
-      <strong>within-season timing</strong> — weekly RMSE runs 46–63% of the mean weekly
+      <strong>within-season timing</strong> — weekly RMSE runs 40–66% of the mean weekly
       tonnage, mostly because the exact week the harvest peak lands in can shift by a
       week or more even when the season's shape is right. Full numbers are in
       <code>docs/calibration_report.md</code> in the repository.
     </p>
     <h3>How do we know the truck numbers?</h3>
     <p>
-      We don't count trucks — nobody publishes the fleet. The <strong>~730-truck fleet is
+      We don't count trucks — nobody publishes the fleet. The <strong>~555-truck fleet is
       fitted</strong>: it's the size that makes the simulated weekly deliveries match the
       operator's published weekly figures across two seasons (validated on a third,
       held-out season). The <strong>~38&nbsp;t average load is an assumption</strong> built
@@ -49,10 +49,12 @@
       Treat that count as <strong>weakly identified</strong> and read it together with the
       load size. What the published data really pins down is the <em>flow</em>: the peak week
       moved ~490,000&nbsp;t, about 1,850 loads a day. Fleet size and average load trade off
-      almost exactly, so ~900 small trucks, ~730 average ones or ~500 road trains all
+      almost exactly, so ~900 small trucks, ~555 average ones or ~400 road trains all
       reproduce the same season. The fleet is bounded below by what it takes to move that
       peak week, and above by queues staying believable — not by the fit, which keeps
-      improving as trucks are added.
+      improving as trucks are added. Two independent refits of the same twelve knobs
+      landed on 618 and 555 trucks at the <em>same</em> objective value, which is what
+      "weakly identified" looks like in practice.
     </p>
     <h3>How the dollar figures are estimated</h3>
     <p>

@@ -18,15 +18,15 @@
       2.2
     ],
     "matShift": [
-      -4,
+      -12,
       16
     ],
     "harvestRampDays": [
-      5,
+      1,
       22
     ],
     "retentionShare": [
-      0.1,
+      0.05,
       0.28
     ],
     "portAttractBias": [
@@ -54,20 +54,20 @@
       2.2
     ]
   },
-  "evaluations": 300,
+  "evaluations": 600,
   "best": {
-    "fleetTrucks": 690.7601983956993,
-    "linehaulTrucks": 63.917607271019364,
-    "rateScale": 0.8810744783189147,
-    "matShift": -4,
-    "harvestRampDays": 5,
-    "retentionShare": 0.1,
-    "portAttractBias": 1.4745477937534455,
-    "choiceBeta": 2.05991799197346,
-    "choiceRadius": 2.639763329409062,
-    "countryBays": 3.573412701878696,
-    "portBays": 5.0345851624943325,
-    "luckyBayBias": 0.4694349017292262
+    "fleetTrucks": 555.1122059114277,
+    "linehaulTrucks": 56.82992500495166,
+    "rateScale": 0.8179666039207949,
+    "matShift": -7.396255851499735,
+    "harvestRampDays": 10.318866970157252,
+    "retentionShare": 0.05532267685551197,
+    "portAttractBias": 2.2133870693296194,
+    "choiceBeta": 2.8058382860571145,
+    "choiceRadius": 2.5792846291568132,
+    "countryBays": 3.6213166484422983,
+    "portBays": 6.456335449144245,
+    "luckyBayBias": 0.885388470677659
   },
-  "bestScore": 1.1147980345564297
+  "bestScore": 1.0800065756919366
 }
