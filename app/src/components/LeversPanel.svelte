@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { DAY_TICKS } from "@windrow/sim";
   import { CASH_BIDS, FARMGATE_PER_T, biasToPremiumPerT, fmtMoney } from "../lib/economics";
   import { DEFAULT_ASSUMP, DEFAULT_ECON, DEFAULT_LEVERS, FLEET_MAX, FLEET_MIN, SCENARIOS, app } from "../state.svelte";
 
@@ -241,14 +242,32 @@
     const b = app.baseline;
     if (!s || !b || b.receivedByDay.length === 0) return null;
     const i = Math.max(0, Math.min(s.day - 1, b.receivedByDay.length - 1));
-    const baseRec = b.receivedByDay[i] ?? 0;
+    // F12: the live snapshot updates continuously through the day, but each baseline
+    // series only has one value per day (its cumulative at day's end). Comparing "right
+    // now" against a fixed day-start figure made every delta ramp up through the day and
+    // snap back at midnight — up to 68% overstated at the peak (#12). For the cumulative
+    // flows (received, shipped, tonne-km...), interpolate the baseline linearly across
+    // today using how far through the day the live tick is, so both sides are estimating
+    // the same instant. Day -1 is the season start, where every cumulative total is
+    // genuinely zero. Queue/wait are running maxima and averages, not flows — a "peak
+    // queue so far" doesn't have a meaningful midpoint between yesterday's and today's
+    // peak, so those stay on the plain day index below.
+    const dayFrac = ((s.tick % DAY_TICKS) + DAY_TICKS) % DAY_TICKS / DAY_TICKS;
+    const atDay = (series: (number | undefined)[] | undefined, day: number) =>
+      day < 0 ? 0 : (series?.[Math.min(day, (series?.length ?? 1) - 1)] ?? 0);
+    const sameInstant = (series: (number | undefined)[] | undefined) => {
+      const startOfToday = atDay(series, s.day - 1);
+      const endOfToday = atDay(series, s.day);
+      return startOfToday + (endOfToday - startOfToday) * dayFrac;
+    };
+    const baseRec = sameInstant(b.receivedByDay);
     const dRec = s.kpi.receivedT - baseRec;
-    const dLb = s.kpi.receivedLbT - (b.lbByDay[i] ?? 0);
-    const dShip = s.kpi.shippedT - (b.shippedByDay[i] ?? 0);
-    const dTkm = s.kpi.tonneKm - (b.tonneKmByDay[i] ?? 0);
+    const dLb = s.kpi.receivedLbT - sameInstant(b.lbByDay);
+    const dShip = s.kpi.shippedT - sameInstant(b.shippedByDay);
+    const dTkm = s.kpi.tonneKm - sameInstant(b.tonneKmByDay);
     const freight = dTkm * app.econ.freightPerTKm;
     // vehicle-km, not tonne-km: what actually changes when a trainset replaces truck trips
-    const dTruckKm = s.kpi.truckKm - (b.truckKmByDay?.[i] ?? 0);
+    const dTruckKm = s.kpi.truckKm - sameInstant(b.truckKmByDay);
     const baseQ = b.queueByDay[i] ?? 0;
     const dQrel = baseQ > 20 ? (s.kpi.peakQueue - baseQ) / baseQ : 0;
     const waitDays = (s.kpi.meanWaitH * s.kpi.vesselsArrived) / 24;
@@ -268,7 +287,7 @@
       // baseline plateaued below it) — there's no day to compare against, so don't guess one
       paceLagDays = j >= b.receivedByDay.length ? null : s.day - j; // positive = behind the modelled normal season
     }
-    const dOnFarmTd = s.kpi.onFarmTd - (b.onFarmTdByDay?.[i] ?? 0);
+    const dOnFarmTd = s.kpi.onFarmTd - sameInstant(b.onFarmTdByDay);
     const holding = dOnFarmTd * app.econ.holdingPerTDay;
     return { i, baseRec, dRec, relRec: baseRec > 50000 ? dRec / baseRec : 0, dLb, dShip, dTkm, freight, dTruckKm, baseQ, dQrel, demurrage, farmgate, waitNow: s.kpi.meanWaitH, waitBase: b.waitByDay[i] ?? 0, paceLagDays, dOnFarmTd, holding };
   });
