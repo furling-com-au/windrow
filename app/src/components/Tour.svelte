@@ -1,5 +1,6 @@
 <script lang="ts">
   import { app } from "../state.svelte";
+  import { dialog } from "../lib/a11y";
 
   const STEPS = [
     {
@@ -36,10 +37,21 @@
 
 {#if app.showTour}
   <div class="wrap">
-    <div class="card">
-      <div class="step">{app.tourStep + 1} / {STEPS.length}</div>
-      <h3>{STEPS[app.tourStep]!.title}</h3>
-      <p>{STEPS[app.tourStep]!.text}</p>
+    <!-- Stepping through the tour swaps the card's text while focus stays on "Next", so the
+         step is a live region: without it a screen reader user would hear nothing change. -->
+    <div
+      class="card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tour-title"
+      tabindex="-1"
+      use:dialog={{ onclose: close }}
+    >
+      <div aria-live="polite" aria-atomic="true">
+        <div class="step">Step {app.tourStep + 1} of {STEPS.length}</div>
+        <h3 id="tour-title">{STEPS[app.tourStep]!.title}</h3>
+        <p>{STEPS[app.tourStep]!.text}</p>
+      </div>
       <div class="btns">
         <button class="skip" onclick={close}>Skip</button>
         <div>
@@ -113,5 +125,16 @@
     border: none;
     color: #708396;
     margin-left: 0;
+  }
+  .card:focus {
+    outline: none;
+  }
+  .card:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 3px;
+  }
+  button:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 2px;
   }
 </style>

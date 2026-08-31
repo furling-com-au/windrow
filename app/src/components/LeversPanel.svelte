@@ -2,6 +2,7 @@
   import { DAY_TICKS } from "@windrow/sim";
   import { CASH_BIDS, FARMGATE_PER_T, biasToPremiumPerT, fmtMoney } from "../lib/economics";
   import { DEFAULT_ASSUMP, DEFAULT_ECON, DEFAULT_LEVERS, FLEET_MAX, FLEET_MIN, SCENARIOS, app } from "../state.svelte";
+  import InfoTip from "./InfoTip.svelte";
 
   let showAssump = $state(false);
 
@@ -519,31 +520,65 @@
 
   {#if app.viewMode === "advanced"}
     <div class="fine how">Drag a lever and the whole season instantly re-runs with that change. “What changed” below compares it against the modelled normal season.</div>
-    <label title="Scales how much grain grows on every paddock. 100% = what was really harvested.">
-      <span>How big is the crop? <b>{Math.round(app.levers.productionScale * 100)}%{cropMt ? ` ≈ ${cropMt.toFixed(1)} million t` : ""}</b></span>
+    <label>
+      <span
+        >How big is the crop? <b>{Math.round(app.levers.productionScale * 100)}%{cropMt ? ` ≈ ${cropMt.toFixed(1)} million t` : ""}</b
+        ><InfoTip
+          label="how big is the crop"
+          text="Scales how much grain grows on every paddock. 100% = what was really harvested."
+        /></span
+      >
       <input type="range" min="0.5" max="1.4" step="0.05" value={app.levers.productionScale}
+        aria-label="How big is the crop?"
+        aria-valuetext="{Math.round(app.levers.productionScale * 100)}% of the real crop{cropMt ? `, about ${cropMt.toFixed(1)} million tonnes` : ''}"
         oninput={(e) => set("productionScale", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="Nobody publishes the real fleet size. ~555 is FITTED: the fleet that makes simulated weekly deliveries match the published ones at an assumed ~38 t average load. It is only WEAKLY identified — fleet size and load size trade off, so ~900 small trucks or ~400 road trains fit the same data equally well, and two refits of the same knobs landed on 618 and 555 at the same objective value. What is really pinned down is the flow: ~1,850 loads/day at the peak. Fewer trucks = grain waits on farm; more = longer silo queues.">
-      <span>How many trucks working the harvest? <b>{Math.round(app.levers.fleetTrucks)} — {fleetDesc}</b></span>
+    <label>
+      <span
+        >How many trucks working the harvest? <b>{Math.round(app.levers.fleetTrucks)} — {fleetDesc}</b><InfoTip
+          label="how many trucks are working the harvest"
+          text="Nobody publishes the real fleet size. ~555 is FITTED: the fleet that makes simulated weekly deliveries match the published ones at an assumed ~38 t average load. It is only WEAKLY identified — fleet size and load size trade off, so ~900 small trucks or ~400 road trains fit the same data equally well, and two refits of the same knobs landed on 618 and 555 at the same objective value. What is really pinned down is the flow: ~1,850 loads/day at the peak. Fewer trucks = grain waits on farm; more = longer silo queues."
+        /></span
+      >
       <input type="range" min={FLEET_MIN} max={FLEET_MAX} step="10" value={app.levers.fleetTrucks}
+        aria-label="How many trucks working the harvest?"
+        aria-valuetext="{Math.round(app.levers.fleetTrucks)} trucks — {fleetDesc}"
         oninput={(e) => set("fleetTrucks", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="How strongly the competing T-Ports Lucky Bay system attracts nearby farmers (price incentives, service). Push it up and eastern-peninsula grain drains away from the main network. The $/t figure translates the pull into an equivalent cash premium for a typical eastern-peninsula farm (90 min generalized haul, priced at the freight rate — A23).">
-      <span>Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, DEFAULT_LEVERS.luckyBayBias)}{Math.abs(lbPremium) >= 0.5 ? ` ≈ ${lbPremium > 0 ? "+" : "−"}$${Math.abs(lbPremium).toFixed(0)}/t premium` : ""}</b></span>
+    <label>
+      <span
+        >Lucky Bay's pull on farmers: <b>{strength(app.levers.luckyBayBias, DEFAULT_LEVERS.luckyBayBias)}{Math.abs(lbPremium) >= 0.5 ? ` ≈ ${lbPremium > 0 ? "+" : "−"}$${Math.abs(lbPremium).toFixed(0)}/t premium` : ""}</b
+        ><InfoTip
+          label="Lucky Bay's pull on farmers"
+          text="How strongly the competing T-Ports Lucky Bay system attracts nearby farmers (price incentives, service). Push it up and eastern-peninsula grain drains away from the main network. The $/t figure translates the pull into an equivalent cash premium for a typical eastern-peninsula farm (90 min generalized haul, priced at the freight rate — A23)."
+        /></span
+      >
       <input type="range" min="0.2" max="3" step="0.1" value={app.levers.luckyBayBias}
+        aria-label="Lucky Bay's pull on farmers"
+        aria-valuetext="{strength(app.levers.luckyBayBias, DEFAULT_LEVERS.luckyBayBias)}{Math.abs(lbPremium) >= 0.5 ? `, about ${lbPremium > 0 ? 'a ' : 'a negative '}$${Math.abs(lbPremium).toFixed(0)} per tonne premium` : ''}"
         oninput={(e) => set("luckyBayBias", parseFloat(e.currentTarget.value))} />
     </label>
-    <label title="How willing farmers are to drive past their local silo and cart directly to the port. More direct carting = longer farm trips but less double-handling.">
-      <span>Carting straight to port: <b>{strength(app.levers.portAttractBias, DEFAULT_LEVERS.portAttractBias)}</b></span>
+    <label>
+      <span
+        >Carting straight to port: <b>{strength(app.levers.portAttractBias, DEFAULT_LEVERS.portAttractBias)}</b><InfoTip
+          label="carting straight to port"
+          text="How willing farmers are to drive past their local silo and cart directly to the port. More direct carting = longer farm trips but less double-handling."
+        /></span
+      >
       <input type="range" min="0.4" max="2.5" step="0.1" value={app.levers.portAttractBias}
+        aria-label="Carting straight to port"
+        aria-valuetext={strength(app.levers.portAttractBias, DEFAULT_LEVERS.portAttractBias)}
         oninput={(e) => set("portAttractBias", parseFloat(e.currentTarget.value))} />
     </label>
-    <div class="toggles">
-      <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, at narrow-gauge line speed rather than road speed, which works out at ~1.5 cycles a day each (assumption A21). How much trucking this saves depends strongly on the silo-to-port load assumption (see Model assumptions)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
-      <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
-      <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
+    <div class="toggles" role="group" aria-label="What-if switches">
+      <button class:on={app.levers.rail} aria-pressed={app.levers.rail} onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
+      <button class:on={app.levers.outage} aria-pressed={app.levers.outage} onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
+      <button class:on={app.levers.roadClosure} aria-pressed={app.levers.roadClosure} onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>
+    <InfoTip
+      label="the three what-if switches"
+      text="Bring back trains: two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, at narrow-gauge line speed rather than road speed, which works out at ~1.5 cycles a day each (assumption A21); how much trucking this saves depends strongly on the silo-to-port load assumption below. · Port closed 1 wk: closes the Port Lincoln terminal for 7 days at harvest peak (mid-December). · Tod Hwy closed: makes the Tod Highway, the peninsula's central spine, impassable — detours take 2.5× as long."
+    />
 
     <button class="assump-toggle" onclick={() => (showAssump = !showAssump)}>
       {showAssump ? "▾" : "▸"} Model assumptions — stress-test them
@@ -555,63 +590,148 @@
           flips when you nudge one, treat it with care. Defaults are the registered assumptions
           (A-numbers in ASSUMPTIONS.md). <button class="reset mini" onclick={resetAssump}>reset all</button>
         </div>
-        <label title="A1: average net tonnes per farm-truck load. Not published — built from industry mass-limit charts and load-size studies.">
-          <span>Average truck load <b>{app.assump.payloadT} t</b></span>
-          <input type="range" min="28" max="48" step="1" value={app.assump.payloadT} oninput={(e) => setA("payloadT", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Average truck load <b>{app.assump.payloadT} t</b><InfoTip
+              label="average truck load"
+              text="A1: average net tonnes per farm-truck load. Not published — built from industry mass-limit charts and load-size studies."
+            /></span
+          >
+          <input type="range" min="28" max="48" step="1" value={app.assump.payloadT}
+            aria-label="Average truck load" aria-valuetext="{app.assump.payloadT} tonnes"
+            oninput={(e) => setA("payloadT", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A1: average net tonnes per silo-to-port road-train load. Our 45 t is anchored to Viterra's 2019 rail-replacement statement (48 loaded trucks/day for ~2,100-2,200 t/day). SA law permits much heavier: Type 2 road trains run to 142 t gross (~85 t net) where highways are on the pre-approved 53.5 m network. Raising this shrinks the trucking a railway would save.">
-          <span>Silo-to-port road-train load <b>{app.assump.lhPayloadT} t</b></span>
-          <input type="range" min="40" max="90" step="5" value={app.assump.lhPayloadT} oninput={(e) => setA("lhPayloadT", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Silo-to-port road-train load <b>{app.assump.lhPayloadT} t</b><InfoTip
+              label="silo-to-port road-train load"
+              text="A1: average net tonnes per silo-to-port road-train load. Our 45 t is anchored to Viterra's 2019 rail-replacement statement (48 loaded trucks/day for ~2,100-2,200 t/day). SA law permits much heavier: Type 2 road trains run to 142 t gross (~85 t net) where highways are on the pre-approved 53.5 m network. Raising this shrinks the trucking a railway would save."
+            /></span
+          >
+          <input type="range" min="40" max="90" step="5" value={app.assump.lhPayloadT}
+            aria-label="Silo-to-port road-train load" aria-valuetext="{app.assump.lhPayloadT} tonnes"
+            oninput={(e) => setA("lhPayloadT", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A2: minutes to sample, weigh and tip one truck at a silo bay. Nowhere published — the single most influential guess behind queue numbers.">
-          <span>Silo unload cycle <b>{app.assump.serviceMin} min</b></span>
-          <input type="range" min="6" max="25" step="1" value={app.assump.serviceMin} oninput={(e) => setA("serviceMin", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Silo unload cycle <b>{app.assump.serviceMin} min</b><InfoTip
+              label="silo unload cycle"
+              text="A2: minutes to sample, weigh and tip one truck at a silo bay. Nowhere published — the single most influential guess behind queue numbers."
+            /></span
+          >
+          <input type="range" min="6" max="25" step="1" value={app.assump.serviceMin}
+            aria-label="Silo unload cycle" aria-valuetext="{app.assump.serviceMin} minutes"
+            oninput={(e) => setA("serviceMin", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A5: scales every drive time (default speeds: 90 km/h highways down to 60 on minor roads). Distances are routed on the real road network and do not move with this lever, so the kilometre figure is unaffected. Freight can still shift a little — slower or faster travel changes which sites look most attractive, not how far apart anything is.">
-          <span>Travel times <b>×{app.assump.travelScale.toFixed(2)}</b></span>
-          <input type="range" min="0.8" max="1.3" step="0.05" value={app.assump.travelScale} oninput={(e) => setA("travelScale", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Travel times <b>×{app.assump.travelScale.toFixed(2)}</b><InfoTip
+              label="travel times"
+              text="A5: scales every drive time (default speeds: 90 km/h highways down to 60 on minor roads). Distances are routed on the real road network and do not move with this lever, so the kilometre figure is unaffected. Freight can still shift a little — slower or faster travel changes which sites look most attractive, not how far apart anything is."
+            /></span
+          >
+          <input type="range" min="0.8" max="1.3" step="0.05" value={app.assump.travelScale}
+            aria-label="Travel times" aria-valuetext="{app.assump.travelScale.toFixed(2)} times the modelled drive time"
+            oninput={(e) => setA("travelScale", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A7: daily rain that halts harvest (and, scaled, the day-after hangover).">
-          <span>Rain that stops harvest <b>{app.assump.rainStopMm} mm</b></span>
-          <input type="range" min="2" max="10" step="0.5" value={app.assump.rainStopMm} oninput={(e) => setA("rainStopMm", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Rain that stops harvest <b>{app.assump.rainStopMm} mm</b><InfoTip
+              label="rain that stops harvest"
+              text="A7: daily rain that halts harvest (and, scaled, the day-after hangover)."
+            /></span
+          >
+          <input type="range" min="2" max="10" step="0.5" value={app.assump.rainStopMm}
+            aria-label="Rain that stops harvest" aria-valuetext="{app.assump.rainStopMm} millimetres"
+            oninput={(e) => setA("rainStopMm", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A24 (fitted): share of the crop that never enters this network — seed, feed, on-farm storage, other buyers. Not the whole gap between EP production and network receivals: T-Ports intake is modelled separately.">
-          <span>Crop kept on farm / sold elsewhere <b>{Math.round(app.assump.retention * 100)}%</b></span>
-          <input type="range" min="0.05" max="0.25" step="0.01" value={app.assump.retention} oninput={(e) => setA("retention", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Crop kept on farm / sold elsewhere <b>{Math.round(app.assump.retention * 100)}%</b><InfoTip
+              label="crop kept on farm or sold elsewhere"
+              text="A24 (fitted): share of the crop that never enters this network — seed, feed, on-farm storage, other buyers. Not the whole gap between EP production and network receivals: T-Ports intake is modelled separately."
+            /></span
+          >
+          <input type="range" min="0.05" max="0.25" step="0.01" value={app.assump.retention}
+            aria-label="Crop kept on farm or sold elsewhere" aria-valuetext="{Math.round(app.assump.retention * 100)}% of the crop"
+            oninput={(e) => setA("retention", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A17: opening stocks are a lower bound, not a stocktake — the old crop the ports shipped out in Oct-Nov, which misses whatever was still in the shed. Scale them to test how much that uncertainty matters.">
-          <span>Last season's carry-over <b>×{app.assump.carryInScale.toFixed(1)}</b></span>
-          <input type="range" min="0" max="2" step="0.1" value={app.assump.carryInScale} oninput={(e) => setA("carryInScale", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Last season's carry-over <b>×{app.assump.carryInScale.toFixed(1)}</b><InfoTip
+              label="last season's carry-over"
+              text="A17: opening stocks are a lower bound, not a stocktake — the old crop the ports shipped out in Oct-Nov, which misses whatever was still in the shed. Scale them to test how much that uncertainty matters."
+            /></span
+          >
+          <input type="range" min="0" max="2" step="0.1" value={app.assump.carryInScale}
+            aria-label="Last season's carry-over" aria-valuetext="{app.assump.carryInScale.toFixed(1)} times the estimated opening stocks"
+            oninput={(e) => setA("carryInScale", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A4: country silo capacities are unpublished. Each is estimated from its PIRSA district's share of long-run receivals (73 kt far west, 163 kt lower EP, 166 kt eastern EP). Published port and T-Ports capacities are NOT scaled.">
-          <span>Estimated silo capacities <b>×{app.assump.capScale.toFixed(1)}</b></span>
-          <input type="range" min="0.5" max="1.5" step="0.1" value={app.assump.capScale} oninput={(e) => setA("capScale", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Estimated silo capacities <b>×{app.assump.capScale.toFixed(1)}</b><InfoTip
+              label="estimated silo capacities"
+              text="A4: country silo capacities are unpublished. Each is estimated from its PIRSA district's share of long-run receivals (73 kt far west, 163 kt lower EP, 166 kt eastern EP). Published port and T-Ports capacities are NOT scaled."
+            /></span
+          >
+          <input type="range" min="0.5" max="1.5" step="0.1" value={app.assump.capScale}
+            aria-label="Estimated silo capacities" aria-valuetext="{app.assump.capScale.toFixed(1)} times the estimated capacity"
+            oninput={(e) => setA("capScale", parseFloat(e.currentTarget.value))} />
         </label>
         <div class="econ-head">Dollar rates (display only — the sim doesn't use money)</div>
-        <label title="A18: road grain freight rate.">
-          <span>Freight <b>{(app.econ.freightPerTKm * 100).toFixed(0)}¢ /t·km</b></span>
-          <input type="range" min="0.07" max="0.13" step="0.005" value={app.econ.freightPerTKm} oninput={(e) => setE("freightPerTKm", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Freight <b>{(app.econ.freightPerTKm * 100).toFixed(0)}¢ /t·km</b><InfoTip
+              label="the freight rate"
+              text="A18: road grain freight rate."
+            /></span
+          >
+          <input type="range" min="0.07" max="0.13" step="0.005" value={app.econ.freightPerTKm}
+            aria-label="Freight rate" aria-valuetext="{(app.econ.freightPerTKm * 100).toFixed(1)} cents per tonne-kilometre"
+            oninput={(e) => setE("freightPerTKm", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A19: cost of a ship waiting per day (demurrage-equivalent).">
-          <span>Ship waiting <b>A${(app.econ.shipDayCost / 1000).toFixed(0)}k /day</b></span>
-          <input type="range" min="15000" max="45000" step="1000" value={app.econ.shipDayCost} oninput={(e) => setE("shipDayCost", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >Ship waiting <b>A${(app.econ.shipDayCost / 1000).toFixed(0)}k /day</b><InfoTip
+              label="the ship waiting cost"
+              text="A19: cost of a ship waiting per day (demurrage-equivalent)."
+            /></span
+          >
+          <input type="range" min="15000" max="45000" step="1000" value={app.econ.shipDayCost}
+            aria-label="Ship waiting cost" aria-valuetext="{(app.econ.shipDayCost / 1000).toFixed(0)} thousand Australian dollars per day"
+            oninput={(e) => setE("shipDayCost", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A22: financing cost of harvested grain waiting on farm.">
-          <span>On-farm holding <b>{(app.econ.holdingPerTDay * 100).toFixed(0)}¢ /t/day</b></span>
-          <input type="range" min="0.05" max="0.15" step="0.005" value={app.econ.holdingPerTDay} oninput={(e) => setE("holdingPerTDay", parseFloat(e.currentTarget.value))} />
+        <label>
+          <span
+            >On-farm holding <b>{(app.econ.holdingPerTDay * 100).toFixed(0)}¢ /t/day</b><InfoTip
+              label="the on-farm holding cost"
+              text="A22: financing cost of harvested grain waiting on farm."
+            /></span
+          >
+          <input type="range" min="0.05" max="0.15" step="0.005" value={app.econ.holdingPerTDay}
+            aria-label="On-farm holding cost" aria-valuetext="{(app.econ.holdingPerTDay * 100).toFixed(1)} cents per tonne per day"
+            oninput={(e) => setE("holdingPerTDay", parseFloat(e.currentTarget.value))} />
         </label>
         {#if CASH_BIDS}
-          <div class="fine" title="Median of the buyers' posted site bids on the operator's public cash-pricing board (captured daily — see About). Off-season these are mid-north SA / Mallee / Vic sites; buyers post at Eyre Peninsula sites around harvest.">
+          <div class="fine">
             What grain actually sells for — posted cash bids, {CASH_BIDS.date}
             ({CASH_BIDS.bids} bids{CASH_BIDS.epBids > 0 ? `, ${CASH_BIDS.epBids} at EP sites` : ", none at EP sites off-season"}):
-            {Object.entries(CASH_BIDS.medianPerT).map(([c, v]) => `${c.toLowerCase()} ~$${Math.round(v)}/t`).join(" · ")}.
+            {Object.entries(CASH_BIDS.medianPerT).map(([c, v]) => `${c.toLowerCase()} ~$${Math.round(v)}/t`).join(" · ")}.<InfoTip
+              label="where the posted cash bids come from"
+              text="Median of the buyers' posted site bids on the operator's public cash-pricing board (captured daily — see About). Off-season these are mid-north SA / Mallee / Vic sites; buyers post at Eyre Peninsula sites around harvest."
+            />
           </div>
         {/if}
         <div class="fine">Not adjustable (baked into the data): district boundaries (A14), climate source (A6), demand spreading (A3), AIS geofences (A8) — see ASSUMPTIONS.md.</div>
       </div>
     {/if}
   {:else}
-    <div class="fine hint">Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself.</div>
+    <!-- what Advanced adds used to be a title="..." on the Advanced button itself, i.e.
+         mouse-hover only; it belongs in the sentence that already points there (#31) -->
+    <div class="fine hint">
+      Pick a scenario above to change the season — or switch to <b>Advanced</b> (top of panel) to drag the levers yourself,
+      with dollar takeaways, the truck-flow heatmap and CSV export.
+    </div>
   {/if}
 
   {#if app.scenario === "baseline" && !assumpDirty}
@@ -667,15 +787,17 @@
         <div class="fine">Computing the modelled normal season baseline…</div>
       {:else}
         {#each fixedRows as r}
-          <div class="row {colorClass(r.dir, r.goodWhenUp)}" class:dim={r.dim} title={ROW_TIPS[r.label] ?? ""}>
-            <span class="rl">{r.label}<span class="q">?</span></span>
+          <div class="row {colorClass(r.dir, r.goodWhenUp)}" class:dim={r.dim}>
+            <span class="rl">{r.label}{#if ROW_TIPS[r.label]}<InfoTip label={r.label} text={ROW_TIPS[r.label]!} />{/if}</span>
             <span class="money">{r.val}{r.money ? ` · ${r.money}` : ""}</span>
           </div>
         {/each}
         {#if deltas && deltas.farmgate !== 0}
           <div class="tkt" style="margin-top:8px">Season total <span class="live">· not a running total — the whole crop's value, whatever the date</span></div>
-          <div class="row {colorClass(deltas.farmgate > 0 ? 'up' : 'down', true)}" title={ROW_TIPS["Crop value (farm gate)"]}>
-            <span class="rl">Crop value (farm gate)<span class="q">?</span></span>
+          <div class="row {colorClass(deltas.farmgate > 0 ? 'up' : 'down', true)}">
+            <span class="rl"
+              >Crop value (farm gate)<InfoTip label="crop value at the farm gate" text={ROW_TIPS["Crop value (farm gate)"]!} /></span
+            >
             <span class="money">{deltas.farmgate > 0 ? "+" : "−"}{fmtMoney(Math.abs(deltas.farmgate))}</span>
           </div>
         {/if}
@@ -773,6 +895,20 @@
     gap: 8px;
     font-size: 11.5px;
     padding: 2px 0;
+    position: relative;
+  }
+  /* a row's explanation is opened from a chip in its left-hand column, but the column is
+     only as wide as the label — float the text across the full row instead of wrapping it
+     into a ~180px strip */
+  .row :global(.tip) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 2;
+    border: 1px solid #31465e;
+    border-left-width: 2px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
   }
   .row.up {
     color: #7dd3a8;
@@ -800,20 +936,6 @@
   .row .money {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-  }
-  .row .q {
-    display: inline-block;
-    margin-left: 4px;
-    width: 11px;
-    height: 11px;
-    line-height: 11px;
-    text-align: center;
-    border-radius: 50%;
-    background: #223650;
-    color: #7d93a9;
-    font-size: 8px;
-    vertical-align: 1px;
-    cursor: help;
   }
   .fine {
     color: #64788c;

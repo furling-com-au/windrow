@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ObservedFile } from "@windrow/sim";
+  import InfoTip from "./InfoTip.svelte";
 
   let { dailyReceived, observed, season, day }: {
     dailyReceived: number[];
@@ -54,14 +55,45 @@
     { d: 92, l: "Jan" },
     { d: 123, l: "Feb" },
   ];
+
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const dayLabel = (d: number) => {
+    const dt = new Date(Date.UTC(parseInt(season.slice(0, 4)), 9, 1) + d * 86400000);
+    return `${dt.getUTCDate()} ${MON[dt.getUTCMonth()]}`;
+  };
+
+  /** The chart is an SVG of two lines: nothing in it is readable without sight, and the
+   *  marker labels were reachable only by hovering an SVG <title> (#31). This is the same
+   *  information as one sentence, used as the image's accessible description. */
+  let chartSummary = $derived.by(() => {
+    const sim = dailyReceived.length ? (dailyReceived[Math.min(day, dailyReceived.length - 1)] ?? 0) : 0;
+    const lastObs = obsPts.length ? obsPts[obsPts.length - 1]! : null;
+    const parts = [
+      `Line chart of cumulative grain delivered from October to mid-February, in million tonnes.`,
+      `Simulated: ${(sim / 1e6).toFixed(2)} million tonnes by ${dayLabel(day)}.`,
+    ];
+    if (lastObs) parts.push(`Actual reported: ${(lastObs.cum / 1e6).toFixed(2)} million tonnes by ${dayLabel(lastObs.d)}.`);
+    return parts.join(" ");
+  });
+
+  let annList = $derived(
+    (observed?.annotations ?? [])
+      .filter((a) => a.day >= 0 && a.day <= X_DAYS)
+      .sort((a, b) => a.day - b.day)
+      .map((a) => `${a.label} (${dayLabel(a.day)})`)
+      .join(" · "),
+  );
 </script>
 
 <div class="chart">
-  <div class="title" title="Cumulative grain delivered into the network's Eyre Peninsula sites">
+  <div class="title">
     Grain delivered — <span class="sim">simulated</span> vs <span class="obs">actual</span>
-    <span class="unit">million tonnes</span>
+    <span class="unit">million tonnes</span><InfoTip
+      label="what this chart plots"
+      text="Cumulative grain delivered into the network's Eyre Peninsula sites, season to date. The solid line is the simulation; the dashed gold line is the operator's published weekly receivals."
+    />
   </div>
-  <svg viewBox="0 0 {W} {H}">
+  <svg viewBox="0 0 {W} {H}" role="img" aria-label={chartSummary}>
     {#each [0.25, 0.5, 0.75, 1] as g}
       <line x1={PAD.l} x2={W - PAD.r} y1={y(maxY * g)} y2={y(maxY * g)} class="grid" />
       <text x={PAD.l - 3} y={y(maxY * g) + 3} class="ylab">{(maxY * g / 1e6).toFixed(1)}</text>
@@ -86,7 +118,7 @@
   <div class="annkey">
     <span class="k first">●</span> first delivery
     <span class="k record">●</span> record week
-    <span class="k rain">●</span> rain event — hover markers
+    <span class="k rain">●</span> rain event{#if annList}<InfoTip label="what the markers on the chart say" text={annList} />{/if}
   </div>
 </div>
 

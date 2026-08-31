@@ -20,8 +20,9 @@ test("loads, auto-plays, KPIs move, pause works", async ({ page }) => {
   // the sim auto-plays at 1 d/s: the date advances past the season start
   await expect(page.locator(".date")).not.toHaveText("1 Oct 2025", { timeout: 30000 });
 
-  // speed up and let harvest begin
-  await page.getByRole("button", { name: "3 d/s" }).click();
+  // speed up and let harvest begin ("3 d/s" is the visible label; the accessible name
+  // spells the unit out, since "d/s" is unreadable aloud — see a11y.spec.ts)
+  await page.getByRole("button", { name: "Simulation speed: 3 days per second" }).click();
   await expect(page.locator(".date")).toHaveText(/(Nov|Dec) 2025|2026/, { timeout: 30000 });
 
   // pause and check KPIs moved

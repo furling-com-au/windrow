@@ -1,6 +1,7 @@
 <script lang="ts">
   import { COMMODITIES } from "@windrow/sim";
   import { app } from "../state.svelte";
+  import InfoTip from "./InfoTip.svelte";
 
   let { siteHistory }: { siteHistory: number[][] } = $props();
 
@@ -27,10 +28,10 @@
 </script>
 
 {#if site && view}
-  <div class="detail">
+  <div class="detail" role="region" aria-label="Site detail: {site.name}">
     <div class="head">
       <span class="name">{site.name}</span>
-      <button class="x" onclick={() => (app.selectedSite = null)}>×</button>
+      <button class="x" aria-label="Close the {site.name} detail" onclick={() => (app.selectedSite = null)}>×</button>
     </div>
     <div class="sub">{site.operator} · {site.role} · {site.status.replaceAll("_", " ")}</div>
     <div class="chips">
@@ -40,17 +41,21 @@
 
     <div class="row">
       <span
-        title={capAssumed
-          ? "grain in storage / storage capacity. This site's capacity is not published: it is an estimate — the unpublished upcountry storage total split between PIRSA districts by long-run receivals, then evenly within the district (ASSUMPTIONS A4)."
-          : "grain in storage / published storage capacity"}
-        >{(Math.round(view.stockT / 100) * 100).toLocaleString()} t of {capT.toLocaleString()} t {capAssumed ? "(capacity estimated)" : ""}</span
+        >{(Math.round(view.stockT / 100) * 100).toLocaleString()} t of {capT.toLocaleString()} t {capAssumed ? "(capacity estimated)" : ""}<InfoTip
+          label="the storage figure"
+          text={capAssumed
+            ? "Grain in storage, against storage capacity. This site's capacity is not published: it is an estimate — the unpublished upcountry storage total split between PIRSA districts by long-run receivals, then evenly within the district (ASSUMPTIONS A4)."
+            : "Grain in storage, against this site's published storage capacity."}
+        /></span
       >
       <span class="q" class:hot={view.queue > 15}>{view.queue} trucks queued</span>
     </div>
-    <div class="stack">
+    <!-- the bar segments were mouse-only: their commodity split is now spelled out in the
+         legend row underneath, which every reader gets (#31) -->
+    <div class="stack" aria-hidden="true">
       {#each view.stockByC as t, i}
         {#if t > 500}
-          <div class="seg" style="width:{Math.max(2, (100 * t) / Math.max(1, view.stockT))}%;background:{C_COLORS[i]}" title="{COMMODITIES[i]} {Math.round(t / 1000)} kt"></div>
+          <div class="seg" style="width:{Math.max(2, (100 * t) / Math.max(1, view.stockT))}%;background:{C_COLORS[i]}"></div>
         {/if}
       {/each}
     </div>
@@ -125,6 +130,23 @@
     justify-content: space-between;
     font-size: 11px;
     color: #9db1c5;
+    position: relative;
+  }
+  /* the explanation opens from the left-hand column, which is far too narrow for it —
+     float it across the whole panel instead */
+  .row :global(.tip) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 2;
+    border: 1px solid #31465e;
+    border-left-width: 2px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  }
+  .x:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 2px;
   }
   .q.hot {
     color: #ff8d80;
