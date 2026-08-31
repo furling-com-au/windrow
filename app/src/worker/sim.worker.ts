@@ -5,7 +5,7 @@
  *          (worker -> main): ready | snapshot | done | error
  */
 import { DAY_TICKS, Sim, TICK_MIN, defaultParams } from "@windrow/sim";
-import type { Bundle, Params, Snapshot } from "@windrow/sim";
+import type { Bundle, Params, PathsFile, Snapshot } from "@windrow/sim";
 
 let sim: Sim | null = null;
 let bundle: Bundle | null = null;
@@ -27,13 +27,23 @@ async function fetchJson(url: string) {
   return r.json();
 }
 
+/** paths.json is season-independent and the biggest file the worker touches, so it is
+ *  fetched and parsed once rather than on every season change. The sim needs it for the
+ *  road-closure scenario (#28); the main thread fetches the same URL for rendering. */
+let pathsPromise: Promise<PathsFile | null> | null = null;
+function loadPaths(): Promise<PathsFile | null> {
+  pathsPromise ??= fetchJson(dataBase + "paths.json").catch(() => null);
+  return pathsPromise;
+}
+
 async function loadBundle(season: string): Promise<Bundle> {
   const sid = season.replace("/", "-");
   const base = dataBase;
-  const [parcels, demand, matrix, weather, observed] = await Promise.all([
+  const [parcels, demand, matrix, paths, weather, observed] = await Promise.all([
     fetchJson(base + "parcels.json"),
     fetchJson(base + `demand_${sid}.json`),
     fetchJson(base + "matrix.json"),
+    loadPaths(),
     fetchJson(base + `weather_${sid}.json`),
     fetchJson(base + `observed_${sid}.json`),
   ]);
@@ -43,7 +53,7 @@ async function loadBundle(season: string): Promise<Bundle> {
   } catch {
     vessels = null;
   }
-  return { season, parcels: parcels.parcels, demand, matrix, vessels, weather, observed };
+  return { season, parcels: parcels.parcels, demand, matrix, paths, vessels, weather, observed };
 }
 
 function post(msg: unknown, transfer?: Transferable[]) {

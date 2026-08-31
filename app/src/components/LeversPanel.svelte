@@ -542,7 +542,7 @@
     <div class="toggles">
       <button class:on={app.levers.rail} title="Two 1,600 t trainsets return to the railway closed in 2019 (Cummins/Kimba/Wudinna into Port Lincoln), replacing a third of the road shuttle. No timetable — they run when port stocks need topping up, at narrow-gauge line speed rather than road speed, which works out at ~1.5 cycles a day each (assumption A21). How much trucking this saves depends strongly on the silo-to-port load assumption (see Model assumptions)." onclick={() => set("rail", !app.levers.rail)}>bring back trains</button>
       <button class:on={app.levers.outage} title="Close the Port Lincoln terminal for 7 days at harvest peak (mid-December)" onclick={() => set("outage", !app.levers.outage)}>port closed 1 wk</button>
-      <button class:on={app.levers.roadClosure} title="Make the Tod Highway (the peninsula's central spine) impassable — detours take 2.5x as long" onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
+      <button class:on={app.levers.roadClosure} title="Close the Tod Highway (the peninsula's central spine, Port Lincoln to Wudinna). Farm and silo-to-port legs alike are charged an assumed 2.5x on the share of each leg that ran on the closed road — the detour is a penalty, not a re-routed path." onclick={() => set("roadClosure", !app.levers.roadClosure)}>Tod Hwy closed</button>
     </div>
 
     <button class="assump-toggle" onclick={() => (showAssump = !showAssump)}>

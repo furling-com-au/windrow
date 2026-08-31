@@ -91,8 +91,9 @@ outage and road-closure scenarios; everything reproducible and citable.
 
 **Missing:** corridor heatmap (above) with absolute movement counts and a validation
 hook against traffic counts (DIT publishes AADT for state roads — a joinable open
-dataset) [M]. Road-closure realism: currently a straight-line heuristic ×2.5; a routed
-detour on the actual graph is straightforward in the pipeline [M].
+dataset) [M]. Road-closure realism: which legs use a closed corridor, and how much of
+each one does, is now read off the real routed paths (#28), but the ×2.5 detour penalty
+itself is still assumed rather than routed on the graph [M].
 
 ## 6. PIRSA / agricultural policy
 
@@ -178,7 +179,7 @@ spec's degrade-gracefully item is only partly done) [M].
 | — | Interactive what-if levers + plain-language takeaways with indicative $ (A18–A19) | M | everyone | **done** |
 | — | Live 2026/27 season machinery + weekly refresh workflow | M | everyone | **done** (provisional until harvest) |
 | 10 | LB transshipment weather downtime from ERA5 wind | M | 3 | open |
-| 11 | Routed road-closure detours (replace straight-line heuristic) | M | 5 | open |
+| 11 | Routed road-closure detours (replace the assumed ×2.5 penalty) | M | 5 | partial (#28: corridor assignment now uses the routed paths; the detour itself is still assumed) |
 | 12 | Site-mention time series from report narratives (per-site anchors) | M | 1, 2 | open |
 | 13 | Daily stem-derived vessel-program dataset from 75 archived PDFs | M | 8, 9 | open |
 | 14 | Mobile layout pass (panel collapses; legend hidden < 800 px) | M | 10 | partial |

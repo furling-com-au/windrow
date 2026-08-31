@@ -8,19 +8,27 @@ they show how the *land side* copes, and where the fixed export program breaks.
 | scenario | Bunge received (Mt) | T-Ports intake (Mt) | PL shipped (Mt) | peak site queue | mean vessel wait | truck-km (M) | peak week (kt) |
 |---|---|---|---|---|---|---|---|
 | Baseline replay | 2.25 | 0.41 | 1.20 | 98 | 27.7 h | 18.87 | 358 |
-| Bumper (+30 %) | 2.90 | 0.56 | 1.20 | **377** | 27.7 h | 21.30 | 377 |
+| Bumper (+30 %) | 2.90 | 0.56 | 1.20 | **217** | 27.7 h | 21.16 | 377 |
 | Drought (−40 %) | 1.39 | 0.21 | 1.15 | 40 | 84.4 h | 14.75 | 217 |
 | Rail reinstated | 2.25 | 0.41 | 1.20 | 105 | 27.7 h | **16.63** | 359 |
 | Lucky Bay share ×2.5 | **2.17** | **0.49** | 1.20 | 89 | 27.7 h | 19.00 | 349 |
 | PL outage (7 d @ day 70) | 2.23 | 0.43 | 1.20 | **115** | 28.1 h | 19.29 | 358 |
-| Tod Hwy closure (×2.5) | 2.24 | 0.43 | 1.20 | 96 | 27.7 h | 20.16 | 351 |
+| Tod Hwy closure (×2.5) | 2.22 | 0.44 | 1.20 | 93 | 27.7 h | **23.40** | 351 |
 
-(Numbers include A17 carry-in stocks; regenerated 2026-08-31 on the `#24` engine — the
+(Numbers include A17 carry-in stocks; regenerated 2026-08-31 on the `#28` engine. Two
+rows moved since the last regeneration and only one of them is `#28`'s: the Tod Highway
+row, for the reasons under its reading below, and the bumper peak queue (377 → 217, and
+21.30 → 21.16 M truck-km), which is `#26`/`#27`'s balk-fallback fix landing in a table
+that had not been re-run since. Every other row is byte-identical, and the two
+calibration seasons' event-log hashes are unchanged — the closure is a scenario switch,
+off in the baseline and in every calibration run. The rest of this note is from the `#24`
+regeneration and still holds: the
 flat "cut 25 % when tmax ≥ 38 °C" harvest rule was replaced with a fire-danger rule
 against the SA Grain Harvesting Code of Practice's published GFDI 35 cease-harvest
 trigger (A7). The fitted knobs are unchanged from `#22` — #24's refit was run and
-rejected, see calibration_report.md — so every movement on this page comes from the
-weather rule alone, and it is small: peak week 372 → 358 kt, baseline peak queue 105 → 98.
+rejected, see calibration_report.md — so every movement in *that* regeneration came from
+the weather rule alone, and it was small: peak week 372 → 358 kt, baseline peak queue
+105 → 98.
 The truck-km column is ROAD vehicle-kilometres only — trainset kilometres are tracked separately and excluded. Every
 kilometre figure on this page is ~12 % higher than the pre-`#10` version: distances now
 come from the OSM routing step instead of being back-derived from drive minutes at a flat
@@ -48,7 +56,7 @@ export program outruns the crop, moves it materially.
 ## Readings
 
 **Bumper (+30 %).** The extra 0.65 Mt is absorbed, but with carry-in stock already
-occupying storage the worst site-hour queue nearly quadruples (98 → 377 trucks) and more
+occupying storage the worst site-hour queue more than doubles (98 → 217 trucks) and more
 grain spills to the T-Ports system (+0.14 Mt) as Bunge sites cap out. Port Lincoln shipping is unchanged — the vessel
 program, not the land side, is the export bottleneck in a big year. (Real-world
 response would be more vessels; the fixed program isolates the landside effect.)
@@ -122,11 +130,49 @@ the buffer does its job at a price: the worst site queue spikes to 115 trucks as
 direct-to-port deliveries redirect to Cummins/Tumby Bay, and line-haul catches up
 afterwards (+0.42 M truck-km).
 
-**Tod Highway closure.** With cluster→site travel times ×2.5 along the corridor, trucks
-re-sort to Lincoln-Highway-side sites; total receivals are almost unchanged but the
-detours add **+1.29 M truck-km** (+7 %, ≈ a few hundred thousand dollars of cartage at
-A18 rates). (Corridor assignment is a
-straight-line heuristic — see engine comment; a routed-detour version is future work.)
+**Tod Highway closure.** Trucks re-sort to Lincoln-Highway-side sites and more grain
+spills to the T-Ports system (0.41 → 0.44 Mt); total Bunge receivals are almost unchanged
+(−0.03 Mt) but the detours add **+4.54 M truck-km** (+24 %) and **+93 M road tonne-km**
+(+29 %), ≈ **$9 M** of extra cartage at the A18 rate. Read that as a whole-season figure
+for a corridor held shut from October to harvest's end, which is the scenario's own
+strong assumption — a real closure lasts days.
+
+That is roughly 3.5× the +1.29 M truck-km this page reported before `#28`, for two
+reasons. The first is that the line-haul leg was never adjusted at all: only farm→site
+candidates were scaled, so silo→port road trains kept running the closed corridor at full
+speed. Seven of the network's silo→Port Lincoln runs are the Tod Highway end to end
+(Wudinna, Warramboo, Lock ×2, Yeelanna, Cummins, Edillilie) and four more use it for
+half a leg or better; all eleven were unpenalised. The second is the corridor test itself
+— see below.
+
+**How "on the corridor" is decided.** Each leg is now scored on the *share of its actual
+routed length* that runs inside the closed corridor, and its minutes and km are scaled by
+`1 + share × (factor − 1)`: a leg that runs the highway end to end pays the full ×2.5, a
+leg that only crosses it pays a few per cent. Two pieces of geometry make that possible
+and neither is a straight line — the corridor is a polyline traced along the highway's
+real OSM alignment (`packages/sim/src/corridors.ts`), and the leg is the routed polyline
+the pipeline already exports for rendering (`paths.json`).
+
+The corridor is also now the whole highway, Port Lincoln to Wudinna; the old axis started
+at Cummins and so exempted the southern third of the road the scenario says is shut.
+
+The previous test asked whether the straight-line **midpoint** of a leg fell within 0.18°
+(~18 km) of a straight-line corridor axis. Both halves of that were wrong, and they
+failed in opposite directions: the Tod Highway bows up to 18 km east of the straight line
+through its endpoints, so the tolerance had to be wide enough to swallow unrelated
+roads, while a single midpoint decided the whole leg — Streaky Bay→Lucky Bay qualified
+on a midpoint that happens to sit near the axis despite the route never going near the
+highway, and Poochera→Port Lincoln (77 % of it on the Tod Highway) did not qualify at
+all. On the farm side the effect is mostly redistribution: 1,607 of 3,380 candidate legs
+now carry a penalty proportioned to how much of them is closed, in place of 517 carrying
+the full ×2.5 and everything else carrying none — 64,000 affected candidate-km against
+47,000 before, out of 430,000 in all.
+
+This is still an approximation, and the honest statement of it is narrower than "detours
+take 2.5× as long": the model knows which legs use the closed road and how much of each
+one does, but it does not route the detour. The ×2.5 is an assumed penalty on the closed
+stretch, not a measured alternative path, and the ~5 km corridor band means a road running
+close and parallel to the highway counts as closed with it.
 
 ## Caveats
 
