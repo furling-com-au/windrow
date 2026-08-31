@@ -4,7 +4,7 @@
   const STEPS = [
     {
       title: "Welcome to Windrow",
-      text: "This is a working simulation of how grain moves across the Eyre Peninsula each harvest — from paddocks, by truck to country silos, then to Port Lincoln and onto ships. It's built only from public data, and everything modelled is checked against what really happened.",
+      text: "This is a working simulation of how grain moves across the Eyre Peninsula each harvest — from paddocks, by truck to country silos, then to Port Lincoln and onto ships. It's built only from public data, and the season totals are checked against what farmers actually delivered each week — more on how well that holds up, and what's still assumed, as we go.",
     },
     {
       title: "The map",
