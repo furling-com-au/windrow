@@ -16,6 +16,11 @@
   let showIntro = $state(false);
   let userTouchedSpeed = false;
   let legendOpen = $state(typeof window !== "undefined" && window.innerWidth > 900);
+  // the map is the app's core content, not a decorative flourish, so this doesn't turn
+  // the animation off — it just stops auto-starting it against a stated preference (F32).
+  // A visitor who wants to watch can still press Play.
+  const prefersReducedMotion =
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   let mapEl: HTMLDivElement;
   let map: DeckMap | null = null;
@@ -246,9 +251,11 @@
             app.clusters = m.clusters;
             plPortIdx = app.sites.findIndex((s) => s.name.includes("Lincoln"));
             resetHistories();
-            // the map should live immediately — a frozen dashboard reads as broken
-            app.playing = true;
-            post({ type: "play" });
+            if (!prefersReducedMotion) {
+              // the map should live immediately — a frozen dashboard reads as broken
+              app.playing = true;
+              post({ type: "play" });
+            }
             break;
           case "baseline":
             if (m.season === app.season) app.baseline = m.data;
@@ -409,7 +416,7 @@
         >
           <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
           <span class="l">million t shipped out</span>
-          {#if app.snap.kpi.carryInT > 10000}<span class="o">incl. {(app.snap.kpi.carryInT / 1e6).toFixed(2)} carry-over</span>{/if}
+          {#if app.snap.kpi.carryInT > 10000}<span class="o">season opened with {(app.snap.kpi.carryInT / 1e6).toFixed(2)} carried over</span>{/if}
         </div>
         <div class="kpi" title="Trucks waiting to unload across all sites right now">
           <span class="v">{app.snap.kpi.queueTrucks}</span>
@@ -467,11 +474,11 @@
     <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: green = crop standing, gold = harvested</div>
     <div class="lg-sub">moving dots are trucks, coloured by their load:</div>
     <div class="chips">
-      <span><i style="background:#ebc85a"></i>wheat</span>
-      <span><i style="background:#d6a864"></i>barley</span>
-      <span><i style="background:#fadc28"></i>canola</span>
-      <span><i style="background:#c85a50"></i>lentils</span>
-      <span><i style="background:#96b45a"></i>beans</span>
+      <span><i style="background:#e69f00"></i>wheat</span>
+      <span><i style="background:#cc79a7"></i>barley</span>
+      <span><i style="background:#f0e442"></i>canola</span>
+      <span><i style="background:#d55e00"></i>lentils</span>
+      <span><i style="background:#009e73"></i>beans</span>
       <span><i style="background:#5ac8eb"></i>silo→port shuttle</span>
     </div>
     <div><span class="sw ring"></span> silo/site: turns bright blue as storage fills · red ring = trucks queued · click it for detail</div>

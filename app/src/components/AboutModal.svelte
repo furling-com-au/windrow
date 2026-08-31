@@ -18,6 +18,11 @@
       Bay as alternative gateways. It is built entirely on open or freely published data and is
       calibrated against published weekly receivals and port statistics.
     </p>
+    <p class="fine">
+      A windrow is the raked line of cut crop a header picks up as it harvests — the name is a
+      harvest reference, not a claim that windrowing itself is modelled; the simulation starts at
+      the header, not the rake.
+    </p>
     <p>
       Two things stop a header in the model, as in the paddock. <strong>Rain</strong> — 5&nbsp;mm
       halts the day, and wet ground keeps costing for two more. And <strong>fire danger</strong>:

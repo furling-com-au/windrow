@@ -59,11 +59,34 @@ export function biasToPremiumPerT(mult: number, freightPerTKm: number): number {
   return minutesSaved * (REP_SPEED_KMH / 60) * freightPerTKm;
 }
 
+/** Rounds to 2 significant figures, e.g. 441.9 -> "440", 7.9 -> "7.9", 25.3 -> "25". */
+function round2sf(x: number): string {
+  if (x === 0) return "0";
+  const mag = Math.pow(10, Math.floor(Math.log10(x)) - 1);
+  const rounded = Math.round(x / mag) * mag;
+  return rounded < 10 ? rounded.toFixed(1) : Math.round(rounded).toString();
+}
+
+// The panel calls every dollar figure a "rough, order-of-magnitude estimate" two lines
+// away from a number rendered to 4 significant figures ("$441.9m") — false precision
+// the reader has no way to know is false (F35). $m/$b figures now round to 2 s.f. with a
+// leading "~"; $k and under are already coarse enough that 2 s.f. would just be noisy.
 export function fmtMoney(aud: number): string {
   const a = Math.abs(aud);
   const sign = aud < 0 ? "−" : "";
-  if (a >= 1e9) return `${sign}$${(a / 1e9).toFixed(1)}b`;
-  if (a >= 1e6) return `${sign}$${(a / 1e6).toFixed(1)}m`;
+  if (a >= 1e9) return `${sign}~$${round2sf(a / 1e9)}b`;
+  if (a >= 1e6) return `${sign}~$${round2sf(a / 1e6)}m`;
   if (a >= 1e3) return `${sign}$${(a / 1e3).toFixed(0)}k`;
   return `${sign}$${a.toFixed(0)}`;
+}
+
+// One tonnage convention for the whole app instead of five (F35): "2.23 million t",
+// "35k t", "824 t" depending on scale, always rounded — never the raw exact tonne count
+// a display like this can't actually be more precise than its inputs support.
+export function fmtTonnes(t: number): string {
+  const a = Math.abs(t);
+  const sign = t < 0 ? "−" : "";
+  if (a >= 950000) return `${sign}${(a / 1e6).toFixed(2)} million t`;
+  if (a >= 1000) return `${sign}${Math.round(a / 1000).toLocaleString()}k t`;
+  return `${sign}${Math.round(a).toLocaleString()} t`;
 }

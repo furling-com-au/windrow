@@ -28,12 +28,17 @@ const ROAD_COLORS: Record<string, [number, number, number, number]> = {
   tertiary: [78, 96, 116, 120],
 };
 
+// Okabe-Ito colour-blind-safe qualitative palette (pairwise distinguishable under
+// protanopia, deuteranopia and tritanopia) — the previous set was five hues clustered
+// in the yellow-tan-olive band with no lightness separation, indistinguishable under
+// red-green colour blindness (F32). Must stay in sync with the legend chips in
+// App.svelte and SiteDetail.svelte's C_COLORS.
 const COMMODITY_COLORS: [number, number, number][] = [
-  [235, 200, 90], // wheat
-  [214, 168, 100], // barley
-  [250, 220, 40], // canola
-  [200, 90, 80], // lentils
-  [150, 180, 90], // beans
+  [230, 159, 0], // wheat — orange
+  [204, 121, 167], // barley — reddish purple
+  [240, 228, 66], // canola — yellow
+  [213, 94, 0], // lentils — vermillion
+  [0, 158, 115], // beans — bluish green
   [170, 170, 170], // other
 ];
 
@@ -171,12 +176,19 @@ export class DeckMap {
       layers.push(
         new ScatterplotLayer({
           id: "parcels",
-          data: d.parcels.map((p, i) => ({ ...p, f: frac[i] ?? 0 })),
+          // d.parcels is a stable reference, set once and never rebuilt — every earlier
+          // version of this layer remapped it into a fresh 5,324-object array (with a
+          // per-object spread) on every snapshot, forcing deck.gl to re-upload geometry
+          // that never moves, purely to smuggle the one changing field (harvest fraction)
+          // in per-object (F32). The accessor's (object, {index}) form reads that field
+          // straight off the current `frac` typed array by position instead, so `data`
+          // never needs to change identity — updateTriggers alone drives the recolour.
+          data: d.parcels,
           getPosition: (p: { lon: number; lat: number }) => [p.lon, p.lat],
           getRadius: 1250,
           radiusUnits: "meters",
-          getFillColor: (p: { f: number; cropping_ha: number }) => {
-            const f = p.f;
+          getFillColor: (p: { cropping_ha: number }, { index }: { index: number }) => {
+            const f = frac[index] ?? 0;
             // unharvested crop green -> harvested stubble gold (kept muted so the
             // infrastructure layer reads on top)
             const r = 58 + (172 - 58) * f;
@@ -225,12 +237,15 @@ export class DeckMap {
         const queue = sv?.queue ?? 0;
         // the capacity the run enforces, so the fill ring tracks the A4 capacity lever
         const cap = sv?.capacityT ?? s.capacity_t ?? 120000;
+        // SiteDetail already flags an unpublished capacity as "(capacity estimated)" —
+        // the map hover showed the identical invented number with no such flag (F35)
+        const capFlag = (s.capacity_estimated ?? s.capacity_t == null) ? " (estimated)" : "";
         return {
           ...s,
           stock,
           queue,
           fill: Math.min(1, stock / cap),
-          __tip: `${s.name}\nstock ${Math.round(stock / 1000)} kt / ${Math.round(cap / 1000)} kt\nqueue ${queue} trucks`,
+          __tip: `${s.name}\nstock ${Math.round(stock / 1000)} kt / ${Math.round(cap / 1000)} kt${capFlag}\nqueue ${queue} trucks`,
         };
       });
       layers.push(

@@ -43,7 +43,9 @@ export const V_PENDING = 0,
   V_BERTH = 2,
   V_DONE = 3;
 
-const SEG_TO_COMMODITY: Record<string, Commodity> = {
+// exported (not just used internally) so the app can decode segregation codes for
+// display instead of showing raw codes like "WH" / "BA" verbatim (F35)
+export const SEG_TO_COMMODITY: Record<string, Commodity> = {
   WH: "wheat",
   BA: "barley",
   CA: "canola",

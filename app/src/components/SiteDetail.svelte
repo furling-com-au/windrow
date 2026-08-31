@@ -1,10 +1,22 @@
 <script lang="ts">
-  import { COMMODITIES } from "@windrow/sim";
+  import { COMMODITIES, SEG_TO_COMMODITY } from "@windrow/sim";
   import { app } from "../state.svelte";
+  import { fmtTonnes } from "../lib/economics";
+
+  // "WH" / "BA" are the operator's raw segregation codes, not something a reader should
+  // have to decode themselves two lines above this component's own spelled-out legend
+  // (F35). Title-cased for a chip; falls back to the raw code for anything unmapped
+  // (T-Ports segregations use different codes and aren't in this table).
+  const commodityLabel = (code: string) => {
+    const c = SEG_TO_COMMODITY[code];
+    return c ? c[0]!.toUpperCase() + c.slice(1) : code;
+  };
 
   let { siteHistory }: { siteHistory: number[][] } = $props();
 
-  const C_COLORS = ["#ebc85a", "#d6a864", "#fadc28", "#c85a50", "#96b45a", "#aaaaaa"];
+  // Okabe-Ito colour-blind-safe palette — keep in sync with deckmap.ts's COMMODITY_COLORS
+  // and App.svelte's legend chips (F32)
+  const C_COLORS = ["#e69f00", "#cc79a7", "#f0e442", "#d55e00", "#009e73", "#aaaaaa"];
 
   let site = $derived(app.selectedSite != null ? app.sites[app.selectedSite] : null);
   let view = $derived(app.selectedSite != null && app.snap ? app.snap.sites[app.selectedSite] : null);
@@ -32,10 +44,10 @@
       <span class="name">{site.name}</span>
       <button class="x" onclick={() => (app.selectedSite = null)}>×</button>
     </div>
-    <div class="sub">{site.operator} · {site.role} · {site.status.replaceAll("_", " ")}</div>
+    <div class="sub">{site.operator} · {site.role} · {site.status.replace(/_(\d{4})_(\d{2})(?=_|$)/g, " $1/$2").replaceAll("_", " ")}</div>
     <div class="chips">
-      {#each site.commodities as c}<span class="chip">{c}</span>{/each}
-      {#if !site.commodities.length}<span class="chip dim">no 25/26 segregations</span>{/if}
+      {#each site.commodities as c}<span class="chip">{commodityLabel(c)}</span>{/each}
+      {#if !site.commodities.length}<span class="chip dim">no {app.season} segregations</span>{/if}
     </div>
 
     <div class="row">
@@ -60,7 +72,7 @@
       {/each}
     </div>
 
-    <div class="row2">delivered here this season (sim): <b>{view.cumReceivedT.toLocaleString()} t</b></div>
+    <div class="row2">delivered here this season (sim): <b>{fmtTonnes(view.cumReceivedT)}</b></div>
     {#if spark}
       <svg viewBox="0 0 220 34"><polyline points={spark} fill="none" stroke="#6fd3a0" stroke-width="1.6" /></svg>
       <div class="fine">cumulative receivals over the season (simulated)</div>

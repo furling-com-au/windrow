@@ -51,6 +51,8 @@
   }
   .card {
     width: min(520px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
     background: #101c2c;
     border: 1px solid #3e73b3;
     border-radius: 14px;
