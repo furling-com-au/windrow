@@ -88,6 +88,12 @@ export interface CarryIn {
   port_lincoln_t: number;
   thevenard_t: number;
   upcountry_t: number;
+  /** how each port's figure was arrived at (A17): "observed" when both Oct and Nov
+   *  workbooks were parsed, "prior-mean-of-covered-seasons" when one was missing and
+   *  the named prior filled in, "unavailable" when no prior could be built. */
+  basis?: { port_lincoln: string; thevenard: string };
+  /** "YYYY-MM" months in the Oct+Nov window with no parsed Flinders workbook */
+  source_months_missing?: string[];
   provenance: string;
 }
 

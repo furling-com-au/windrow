@@ -553,7 +553,7 @@
           <span>Crop kept on farm / sold elsewhere <b>{Math.round(app.assump.retention * 100)}%</b></span>
           <input type="range" min="0.05" max="0.25" step="0.01" value={app.assump.retention} oninput={(e) => setA("retention", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A17: opening stocks measured from Oct-Nov shipments; scale them to test sensitivity.">
+        <label title="A17: opening stocks are a lower bound, not a stocktake — the old crop the ports shipped out in Oct-Nov, which misses whatever was still in the shed. Scale them to test how much that uncertainty matters.">
           <span>Last season's carry-over <b>×{app.assump.carryInScale.toFixed(1)}</b></span>
           <input type="range" min="0" max="2" step="0.1" value={app.assump.carryInScale} oninput={(e) => setA("carryInScale", parseFloat(e.currentTarget.value))} />
         </label>

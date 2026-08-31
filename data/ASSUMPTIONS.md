@@ -235,15 +235,45 @@ presented as measured data.
 - **Used in**: vessels_{season}.json (LB arrival schedule is indicative only).
 
 ## A17 — carry-in (opening) stocks
-- **Value**: each season opens with stocks = that season's observed Oct+Nov grain
-  shipments at Port Lincoln and Thevenard (Flinders statistics), +20 % assigned to
-  upcountry sites; commodity split wheat 55 / barley 30 / lentils 15.
+- **Value**: each season opens with stocks = that season's Oct+Nov grain shipments at
+  Port Lincoln and Thevenard (Flinders statistics), +20 % assigned to upcountry sites;
+  commodity split wheat 55 / barley 30 / lentils 15. Per season, Port Lincoln /
+  Thevenard: 2022/23 0 / 23,930 t, 2023/24 320,504 / 81,956 t, 2024/25 60,334 / 0 t,
+  2025/26 67,585 / 22,050 t.
 - **Used in**: engine seeding; `observed_{season}.json.carry_in`.
 - **Reasoning**: October–November vessels load almost entirely old crop (new-crop
-  receivals only begin mid-October), so those shipments are a direct, season-specific
-  measurement of the carry-over actually drawn down.
-- **Sensitivity**: sets early-season shipping feasibility; receivals calibration
-  unaffected (carry-in is never "received").
+  receivals only begin mid-October), so those shipments are a season-specific *lower
+  bound* on the old crop the ports were holding on 1 October. It is not a stocktake and
+  is not presented as one: it counts only old crop that left by ship inside a two-month
+  window, so it misses stock still in the shed on 30 November and Flinders'
+  separately-reported "Vegetables Legumes and Oilseeds" group — Port Lincoln shipped
+  9,652 t of pulses/oilseeds in October 2025 that this figure excludes, even though the
+  commodity split then assigns 15 % of carry-in to lentils. Reading it as a measured opening stock also has it
+  backwards at the top end: 2023/24's 320,504 t is 81 % of Port Lincoln's published
+  395,600 t storage on day one, whereas a real port is drawn *down* before harvest.
+  Treat the lever (`carryInScale`) as the honest range, not the point estimate.
+- **Source coverage**: a Flinders monthly workbook is one sheet covering every Flinders
+  port, and the parser keeps only nonzero rows, so "port has no grain row" and "no
+  workbook for that month" both arrive as a silent 0. `p2_build_observed.py` therefore
+  checks month coverage before summing: a season missing either month falls back to a
+  named prior (that port's mean Oct+Nov total over the fully-covered seasons) and says
+  so in `carry_in.provenance` and `carry_in.basis`, rather than seeding zero. All four
+  built seasons currently have both months present, so every figure above is observed;
+  the zeros at Port Lincoln (Oct+Nov 2022) and Thevenard (Oct+Nov 2024) are observed
+  zeros — the workbooks list those ports with other cargo but no grain, and Port
+  Lincoln took no dry-bulk call at all in October 2022.
+- **Sensitivity**: not inert, and not confined to shipping. Carry-in occupies storage
+  the engine's capacity gates then police, so it pushes deliveries between sites and
+  into the receivals series. Measured at the post-#20 calibrated knobs, `carryInScale`
+  1 → 0: 2023/24 receivals 1.868 → 1.908 Mt, which moves the season-total error against
+  the operator's published figure from +0.2 % to +2.4 % — larger than the whole
+  post-#20 residual on any season; direct-to-port 26.4 → 23.5 %, peak queue 75 → 51,
+  mean vessel wait 31.4 → 44.0 h. 2025/26: 2.236 → 2.258 Mt (−0.6 % → +0.4 % error),
+  direct-to-port 30.8 → 28.7 %, peak queue 133 → 80, wait 27.7 → 33.1 h. Held-out
+  2024/25 barely moves (1.501 → 1.502 Mt) because its carry-in is only 72 kt. The
+  earlier claim here — "receivals calibration unaffected (carry-in is never
+  'received')" — was false: carry-in is indeed never received, but it displaces what
+  can be.
 
 ## A18 — road grain freight rate (economics layer, indicative)
 - **Value**: A$0.10 per tonne-km (range 0.07–0.13).

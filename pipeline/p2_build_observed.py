@@ -30,9 +30,129 @@ FIRST_DELIVERY = {  # published first-receival dates (see CALIBRATION.md sources
 }
 
 
+CARRY_PORTS = ("Port Lincoln", "Thevenard")
+CARRY_MONTHS = (10, 11)  # Oct + Nov of the season's opening calendar year
+
+
 def season_window(season: str) -> tuple[date, date]:
     y = int(season[:4])
     return date(y, 10, 1), date(y + 1, 9, 30)
+
+
+def build_carry_in(ships: pl.DataFrame, seasons: list[str]) -> dict[str, dict]:
+    """A17 opening stocks per season, with an explicit source-coverage check.
+
+    A Flinders monthly workbook is one sheet listing every Flinders port, and
+    r3_parse_flinders keeps only rows with a nonzero tonnage. Two very different
+    things therefore reach this parquet looking identical:
+
+      * the month's workbook was parsed and the port has no grain row -> the port
+        genuinely shipped no grain that month (a real observation of zero);
+      * no workbook for that month was parsed at all -> the source cache has a
+        hole, and we know nothing about any port that month.
+
+    Summing export_t collapses both to 0.0, which is how a missing month could
+    silently seed a season with zero opening stock. So coverage is checked first,
+    at the month level -- the level the source actually works at, one workbook
+    covering all ports -- and a season missing either month falls back to a named
+    prior rather than to an unearned zero.
+
+    The prior is the mean Oct+Nov total, per port, over the seasons whose months
+    are all present. Only fully-covered seasons feed it, so a gap season never
+    bootstraps itself or another gap season. A mean (rather than the nearest
+    covered season) because Oct+Nov shipments swing with the *previous* season's
+    crop -- across 2022-2025 Port Lincoln ran 0 / 320.5 / 60.3 / 67.6 kt -- so a
+    neighbouring season carries its own idiosyncrasy, while the mean is the
+    minimum-variance estimate when the season-specific observation is exactly
+    what is missing. It also matches how p2_build_live.py primes the unpublished
+    live season and how A20 fills provisional production.
+    """
+    covered = {
+        (r["year"], r["month"]) for r in ships.select("year", "month").unique().iter_rows(named=True)
+    }
+
+    obs: dict[str, dict[str, float]] = {}
+    gaps: dict[str, list[str]] = {}
+    for season in seasons:
+        y0 = int(season[:4])
+        gaps[season] = [f"{y0}-{m:02d}" for m in CARRY_MONTHS if (y0, m) not in covered]
+        agg = (
+            ships.filter(
+                pl.col("port").is_in(list(CARRY_PORTS))
+                & (pl.col("year") == y0)
+                & pl.col("month").is_in(list(CARRY_MONTHS))
+            )
+            .group_by("port")
+            .agg(pl.col("export_t").sum().alias("t"))
+        )
+        t = {r["port"]: r["t"] for r in agg.iter_rows(named=True)}
+        obs[season] = {p: t.get(p, 0.0) for p in CARRY_PORTS}
+
+    full = [s for s in seasons if not gaps[s]]
+    prior = {
+        p: (sum(obs[s][p] for s in full) / len(full) if full else None) for p in CARRY_PORTS
+    }
+
+    out: dict[str, dict] = {}
+    for season in seasons:
+        y0 = int(season[:4])
+        missing = gaps[season]
+        vals: dict[str, float] = {}
+        basis: dict[str, str] = {}
+        for p in CARRY_PORTS:
+            if not missing:
+                vals[p], basis[p] = obs[season][p], "observed"
+            elif prior[p] is not None:
+                vals[p], basis[p] = prior[p], "prior-mean-of-covered-seasons"
+            else:
+                vals[p], basis[p] = 0.0, "unavailable"
+
+        note = (
+            "A17: LOWER BOUND on port-held old-crop carry-over, not a stocktake. "
+            f"Oct+Nov {y0} grain shipments at Port Lincoln and Thevenard (Flinders "
+            "monthly statistics) are what those two ports loaded in the window before "
+            "the new crop lands; old crop still in the shed on 30 Nov is not counted, "
+            "and neither is Flinders' separately-reported 'Vegetables Legumes and "
+            "Oilseeds' group (pulses/oilseeds - e.g. Port Lincoln shipped 9,652 t of "
+            "it in Oct 2025 that this figure excludes). +20% residual assigned to "
+            "upcountry sites."
+        )
+        if not missing:
+            zeros = [p for p in CARRY_PORTS if obs[season][p] == 0.0]
+            note += (
+                f" Source coverage complete: the {y0}-10 and {y0}-11 workbooks are both "
+                "in the parsed source set."
+            )
+            if zeros:
+                note += (
+                    f" {' and '.join(zeros)} shipped no grain in either month - an observed "
+                    "zero (workbook present, no grain row), not a missing month."
+                )
+        elif prior["Port Lincoln"] is not None:
+            note += (
+                f" SOURCE GAP: no Flinders workbook parsed for {', '.join(missing)}, so a "
+                "zero here would be unearned. Both ports fall back to the named prior - "
+                "their mean Oct+Nov total over the fully-covered seasons "
+                f"({', '.join(full)}): Port Lincoln {round(prior['Port Lincoln']):,} t, "
+                f"Thevenard {round(prior['Thevenard']):,} t."
+            )
+        else:
+            note += (
+                f" SOURCE GAP: no Flinders workbook parsed for {', '.join(missing)}, and no "
+                "season has full Oct+Nov coverage to build a prior from, so opening stock is "
+                "set to zero. This is an absence of data, not a measured empty port."
+            )
+
+        pl_t, the_t = vals["Port Lincoln"], vals["Thevenard"]
+        out[season] = {
+            "port_lincoln_t": round(pl_t),
+            "thevenard_t": round(the_t),
+            "upcountry_t": round(0.2 * (pl_t + the_t)),
+            "basis": {"port_lincoln": basis["Port Lincoln"], "thevenard": basis["Thevenard"]},
+            "source_months_missing": missing,
+            "provenance": note,
+        }
+    return out
 
 
 def main():
@@ -41,6 +161,14 @@ def main():
     calls_off = pl.read_parquet(PROCESSED / "port_vessel_calls_monthly.parquet")
     visits = pl.read_parquet(PROCESSED / "vessel_calls.parquet")
     prod = pl.read_parquet(PROCESSED / "production_districts.parquet")
+
+    carry_ins = build_carry_in(ships, SEASONS)
+    for season, ci in carry_ins.items():
+        flag = "" if not ci["source_months_missing"] else f"  GAP {ci['source_months_missing']}"
+        print(
+            f"carry-in {season}: PL {ci['port_lincoln_t']:,} t ({ci['basis']['port_lincoln']}), "
+            f"THE {ci['thevenard_t']:,} t ({ci['basis']['thevenard']}){flag}"
+        )
 
     for season in SEASONS:
         s0, s1 = season_window(season)
@@ -86,24 +214,7 @@ def main():
         for r in pd_.filter(pl.col("crop") == "TOTAL").iter_rows(named=True):
             prod_out[r["district"]] = r["production_t"]
 
-        # carry-in stocks (A17): Oct+Nov shipments draw almost entirely on old crop
-        y0 = s0.year
-        octnov = (
-            ships.filter(
-                pl.col("port").is_in(["Port Lincoln", "Thevenard"])
-                & (pl.col("year") == y0)
-                & pl.col("month").is_in([10, 11])
-            )
-            .group_by("port")
-            .agg(pl.col("export_t").sum().alias("t"))
-        )
-        ci = {r["port"]: r["t"] for r in octnov.iter_rows(named=True)}
-        carry_in = {
-            "port_lincoln_t": round(ci.get("Port Lincoln", 0.0)),
-            "thevenard_t": round(ci.get("Thevenard", 0.0)),
-            "upcountry_t": round(0.2 * (ci.get("Port Lincoln", 0.0) + ci.get("Thevenard", 0.0))),
-            "provenance": "A17: Oct+Nov observed grain shipments (Flinders statistics) taken as old-crop carry-over; +20% residual assigned to upcountry sites",
-        }
+        carry_in = carry_ins[season]
 
         # chart annotations: first delivery, record week, EP-mean rain events
         annotations = []
