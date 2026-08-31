@@ -229,7 +229,21 @@ export class Sim {
   /** farm trucks currently en route to each site: growers can see site status/wait
    *  before committing, so the choice model must not ignore committed traffic. */
   private siteInbound: Int32Array = new Int32Array(0);
+  /** the same commitment in TONNES rather than trucks: grain that has left a farm bound
+   *  for this site and has not tipped yet (#29). `siteInbound` bounds the QUEUE; this
+   *  bounds the STORAGE. A truck reserves its load at dispatch and releases it at the
+   *  tip that puts it into `stock`, so `stock + siteInboundT <= capacityT` is an
+   *  invariant every gate below preserves — including line-haul's arrival check, which
+   *  must not spend headroom a farm truck is already rolling toward. */
+  private siteInboundT: Float64Array = new Float64Array(0);
   carryInT = 0; // opening stocks seeded from observed Oct-Nov shipments (A17)
+  /** carry-in (A17) that would not physically fit in the site it was assigned to, and was
+   *  therefore never seeded. Non-zero only when `carryInScale` is pushed far enough that
+   *  the scaled opening stock exceeds a published/estimated capacity — see A17. */
+  carryInClampedT = 0;
+  /** site-days on which stock was found above capacityT. Zero by construction (see
+   *  checkInvariants); a non-zero value means a capacity gate leaked (#29). */
+  capacityBreaches = 0;
   onFarmTonneDays = 0; // harvested grain waiting on farm x days (holding-cost basis, A22)
   /** cumulative loaded tonnes per rendered path ("cid-sid" farm, "si-pj" line-haul) */
   tripTonnesByPath = new Map<string, number>();
@@ -405,6 +419,7 @@ export class Sim {
       this.sites.push(st);
     }
     this.siteInbound = new Int32Array(this.sites.length);
+    this.siteInboundT = new Float64Array(this.sites.length);
 
     // scenario: port outage handled in step()
 
@@ -417,12 +432,31 @@ export class Sim {
         [COMMODITIES.indexOf("lentils"), 0.15],
       ];
       const ciScale = params.carryInScale ?? 1; // A17 (assumption lever)
+      // A shed cannot hold more than it holds. A17's figure is a LOWER BOUND on old crop
+      // read off Oct-Nov shipments, and the lever scales it up to 2x — at which point
+      // 2023/24's 320,504 t at Port Lincoln becomes 641,008 t against 395,600 t of
+      // published storage (162 % full on day one, #29). Seeding it anyway put a physically
+      // impossible opening stock on the map and into every capacity-derived reading.
+      // The overflow is CLAMPED, not spilled to a neighbour: A17's provenance is
+      // specifically port-held old crop shipped out of Port Lincoln and Thevenard, so
+      // moving it upcountry would invent a location the source says nothing about. What
+      // the clamp really reports is that the scaled figure is not physically realisable
+      // there — so it is counted (carryInClampedT), logged, and disclosed in A17 rather
+      // than quietly absorbed.
       const seed = (siteIdx: number, tonnes0: number) => {
         const tonnes = tonnes0 * ciScale;
         if (siteIdx < 0 || tonnes <= 0) return;
         const s = this.sites[siteIdx]!;
-        for (const [c, share] of SPLIT) s.stock[c] = s.stock[c]! + tonnes * share;
-        this.carryInT += tonnes;
+        let held = 0;
+        for (let c = 0; c < NC; c++) held += s.stock[c]!;
+        const placed = Math.min(tonnes, Math.max(0, s.capacityT - held));
+        if (placed > 0) for (const [c, share] of SPLIT) s.stock[c] = s.stock[c]! + placed * share;
+        this.carryInT += placed;
+        const spilled = tonnes - placed;
+        if (spilled > 0.01) {
+          this.carryInClampedT += spilled;
+          this.log({ t: 0, type: "carry_in_clamped", site: s.idx, name: s.name, asked_t: tonnes, placed_t: placed });
+        }
       };
       seed(this.sites.findIndex((s) => s.name.includes("Lincoln")), ci.port_lincoln_t);
       seed(this.sites.findIndex((s) => s.name.includes("Thevenard")), ci.thevenard_t);
@@ -707,8 +741,22 @@ export class Sim {
       );
     }
     for (const s of this.sites) {
+      let st = 0;
       for (let c = 0; c < NC; c++) {
         if (s.stock[c]! < -0.01) throw new Error(`NEGATIVE STOCK at ${s.name} c=${c} day ${this.day}`);
+        st += s.stock[c]!;
+      }
+      // Storage is bounded by construction now (#29): carry-in is clamped at capacity,
+      // farm trucks reserve their load at dispatch, and line-haul honours that
+      // reservation before tipping — so no path can put a site past its capacity.
+      // Counted rather than thrown, for the same reason as the queue cap below: a guard
+      // that kills a running simulation is worse for a visitor than a wrong number, and
+      // the regression sweep is where this has to be zero.
+      if (st > s.capacityT + 0.01) {
+        this.capacityBreaches++;
+        if (this.debugEvents) {
+          this.log({ t: this.tick, type: "capacity_over", site: s.idx, stock: st, cap: s.capacityT });
+        }
       }
       // Queue length is bounded by construction now: chooseSite refuses a site whose line
       // plus committed inbound already reaches siteQueueMaxTrucks, and a truck books its
@@ -751,6 +799,9 @@ export class Sim {
     const open = this.csOpen;
     const openQueueMin = this.csOpenQueueMin;
     const maxQueue = p.siteQueueMaxTrucks ?? 250;
+    // the load this truck is about to pick up is capped by its payload; the storage gate
+    // below looks that far ahead, exactly as line-haul's arrival gate does (#29)
+    const payloadT = p.truckPayloadT;
     // Growers deliver to a site they can realistically reach, or cart direct to port.
     // Without this window a shallow power-law over ~21 candidates sends most traffic to
     // mid-distance sites (measured: 62 min mean leg against a 24 min nearest-accepting
@@ -769,7 +820,17 @@ export class Sim {
       if (this.portOutageActive(s) && s.isPort) continue;
       let st = 0;
       for (let k = 0; k < NC; k++) st += s.stock[k]!;
-      if (st >= s.capacityT * 0.995) continue; // storage full
+      // Storage: what is on the ground PLUS every tonne already rolling toward it, plus
+      // the load this truck would add. Testing on-site stock alone (with a 0.5 % cushion)
+      // let a dozen trucks each read the same nearly-full site as "room for me" in the
+      // same tick, all get dispatched, and all tip — putting eight EP sites 0.2-2.2 %
+      // past published capacity in the bumper run and six past it at the calibrated
+      // baseline (#29). Once a truck is dispatched nothing stops it tipping, so the
+      // reservation has to be taken HERE, at the only point where the choice is still
+      // open. That makes `stock + siteInboundT <= capacityT` an invariant rather than a
+      // hope, and a site that is full-by-commitment now drops out of the candidate list
+      // exactly like one that is full-by-stock — including for the queue rules below.
+      if (st + this.siteInboundT[cd.site]! + payloadT > s.capacityT) continue; // storage full
       // Trucks in the line plus trucks already committed to joining it: growers can see
       // site status/wait before setting off, so the choice must not ignore traffic that
       // is loaded and rolling. Counting inbound is also what makes the cap below a hard
@@ -918,6 +979,9 @@ export class Sim {
         tr.loadT = load;
         tr.site = choice.site;
         this.siteInbound[choice.site] = (this.siteInbound[choice.site] ?? 0) + 1;
+        // book the storage as well as the place in the line (#29): released at the tip
+        // that turns it into stock, so the two never double-count
+        this.siteInboundT[choice.site] = (this.siteInboundT[choice.site] ?? 0) + load;
         tr.legMin = choice.minutes;
         tr.legKm = choice.km;
         tr.state = T_LOAD;
@@ -949,6 +1013,9 @@ export class Sim {
       case T_TIP:
         if (tick >= tr.doneAt) {
           const s = this.sites[tr.site]!;
+          // reservation -> stock: the site's committed total is unchanged by this line,
+          // which is why the gate in chooseSite can treat the sum as a hard ceiling (#29)
+          this.siteInboundT[tr.site] = Math.max(0, this.siteInboundT[tr.site]! - tr.loadT);
           s.stock[tr.commodity] = s.stock[tr.commodity]! + tr.loadT;
           s.cumReceivedT += tr.loadT;
           if (s.isBunge) this.receivedBungeT += tr.loadT;
@@ -1063,7 +1130,16 @@ export class Sim {
           const port = this.sites[tr.destPort]!;
           let stock = 0;
           for (let c = 0; c < NC; c++) stock += port.stock[c]!;
-          if (stock + tr.loadT > port.capacityT) {
+          // Room for this load: on-site stock, this truck's tonnes, and the farm loads
+          // already rolling toward this port (#29). Without that last term a
+          // line-haul truck could spend headroom a grower had already reserved, and the
+          // grower's truck tips unconditionally on arrival — so the overshoot would land
+          // on the farm side instead of being prevented. Only THIS truck's load is
+          // tested against the remainder, not every line-haul truck en route: testing the
+          // whole line-haul fleet's inbound would deadlock two trucks that each fit but do
+          // not fit together. Arrivals are processed one at a time, so sequential tips
+          // re-test against the stock the previous one just added.
+          if (stock + this.siteInboundT[tr.destPort]! + tr.loadT > port.capacityT) {
             // port full: wait a tick (rare; policy shortfall)
             tr.doneAt = tick + 6;
             return;

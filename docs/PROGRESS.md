@@ -340,6 +340,79 @@ This file is the canonical record of where the project is. Updated as work proce
   `docs/img/*.svg` regenerated at the unchanged parameter vector — every movement there
   comes from the weather rule alone and is under 10 %.
 
+### 2026-08-31 (#29: sites were reported above their own published capacity)
+
+- **Two independent paths let a site hold more grain than it holds.** Both were live on
+  master and both are physically impossible, which matters more than their size: the model
+  presents storage as a real constraint, and the site panel prints the raw pair —
+  "343,207 t of 335,925 t" at Thevenard — while the map's fill ring silently clamps at
+  100 % and hides it.
+- **Path 1 — carry-in was seeded with no capacity test at all.** The `seed()` closure in
+  the `Sim` constructor did `stock[c] += tonnes * share` unconditionally. A17's figure is a
+  lower bound and the `carryInScale` lever scales it to ×2, at which point 2023/24's
+  320,504 t at Port Lincoln becomes 641,008 t against 395,600 t of *published* storage —
+  **162 % full on day one**, from a lever the UI itself offers. Now clamped at capacity:
+  the surplus (245,408 t there) is dropped, counted in `carryInClampedT`, logged as a
+  `carry_in_clamped` event, and disclosed in A17 and the lever's own tooltip. It is **not**
+  spilled to a neighbour — A17's provenance is specifically *port-held* old crop, so
+  relocating it upcountry would invent a location the source says nothing about. What the
+  clamp reports is that the scaled figure is not physically realisable where A17 puts it.
+- **Path 2 — the site-choice gate looked only at grain already on the ground.**
+  `chooseSite` tested `st >= capacityT * 0.995` over current stock, so a dozen trucks could
+  each read the same nearly-full site as "room for me" in one tick, all be dispatched, and
+  all tip — and nothing stops a truck once it has left the farm. The queue gate next to it
+  already counted committed inbound *trucks* (#26/#27); storage counted none. Measured on
+  2025/26 seed 42: **6 of the 16 operated sites peaked at 100.1–100.9 % at the calibrated
+  baseline, and 11 at 100.1–102.2 % under the bumper preset** (Thevenard 102.2, Port
+  Lincoln 101.8, Lucky Bay 101.0).
+- **The fix is a tonnage reservation, mirroring what line-haul already did.** A farm truck
+  books its load against the destination's storage at dispatch (`siteInboundT`) and
+  releases it at the tip that turns it into stock, so the sum is unchanged by the tip and
+  `stock + siteInboundT <= capacityT` is an invariant, not an aspiration. Line-haul's
+  arrival gate now honours that reservation too — without it a road train could spend
+  headroom a grower had already reserved, and the overshoot would just move to the farm
+  side. Only the arriving truck's own load is tested there, not the whole line-haul
+  fleet's inbound: testing the sum would deadlock two trucks that each fit but do not fit
+  together. A site full-by-commitment now drops out of the candidate list exactly like one
+  full-by-stock, so the #26/#27 queue ceilings compose with it rather than fight it.
+- **Result: worst fill anywhere is 100.000 %.** Swept over 130 configurations — 5 seasons ×
+  2 seeds × 13 lever/preset combos including crop ×1.4, capacity ×0.1, carry-over ×2 and
+  "every lever against the network" — zero capacity breaches and zero queue breaches.
+  Sites still fill to within one truckload of capacity, so the constraint binds exactly as
+  hard as before; they just no longer pass it. `capacityBreaches` counts any site-day over
+  capacity and is asserted zero across the whole #26/#27 regression sweep, and three new
+  targeted tests cover the clamp, a tick-by-tick tiny-network check and the bumper season
+  — all three fail on the parent commit, the last of them reporting Thevenard at 102.2 %.
+- **Recalibration: run twice and rejected — the knobs are still #22's, a second refit
+  running.** Same tests #24 used. (1) *Near fit-neutral at fixed knobs*: the ceiling moved
+  the objective 1.0799 → 1.0844 (0.4 %) and season totals by ≤ 0.1 pt; every weekly-RMSE
+  figure in the report table is unchanged to the point (41 / 64 / 65 % before and after),
+  and the held-out total error did not move (−0.3 %). Direct-to-port
+  26.6 / 24.4 / 30.9 → **26.6 / 24.5 / 31.0 %** — a tenth of a point, on the output A9 says
+  this very constraint governs. (2) *At 900 evaluations the search returns the **identical**
+  vector it returned under #24's engine* — fleet 806.6002, β 1.300879, retention 0.0577068,
+  every knob to every digit, only the score moving (1.0639 → 1.0656). The searches are
+  seeded so they sample the same candidates; an unchanged *winner* is the informative part.
+  The capacity ceiling does not re-rank the parameter space. (3) *Both refits bought fitted
+  seasons with the held-out one*: 600 and 900 evaluations reach **1.0718** and **1.0656**
+  (1.2 % / 1.7 % gains) while held-out total error goes −0.2 % → **−2.2 %** and **−2.4 %**
+  and its weekly RMSE 64 % → 64 % and **69 %**. (4) *And broke checks the objective cannot
+  see*: direct-to-port rose to **33.8–37.4 %** and **32.8–35.9 %**, 2025/26 out the top of
+  A9's published **15–35 %** band both times, and each refit left a *different* knob clipped
+  on a floor — `retentionShare` at 0.05 here, where #24's 600-evaluation vector had clipped
+  `choiceBeta` at 1.10. Which knob clips changing between refits is the A2/A24
+  identification problem showing through, not a fact about storage. One of #24's objections
+  is **not** reused because it has lapsed: the 807-truck fleet no longer trips a queue guard
+  on the 2022/23 replay, since #26 bounded queue length by construction.
+- **Event-log hashes did change** (2023/24 `1a057677` → `1708d201`, 2025/26 `5acc83bd` →
+  `5a6455d1`, 2024/25 `657642e4` → `213b5991`), which is why a refit was run at all rather
+  than waved off: the gate binds at the calibrated baseline, not only under stress.
+- `scenarios.md` / `scenarios_data.json` / `calibration_report.md` / `docs/img/*.svg`
+  regenerated at the unchanged vector. One scenario number moves materially: the bumper
+  peak queue **377 → 217 trucks**, because a full site now turns trucks away before they
+  set off instead of taking them and overflowing, and the grain waits on farm where A22
+  already prices it. Everything else moves under 5 %.
+
 ## Key decisions
 
 - Repo root = `C:\Users\justi\grain_simulation` (spec layout §10). `data/raw/` git-ignored, manifest committed.

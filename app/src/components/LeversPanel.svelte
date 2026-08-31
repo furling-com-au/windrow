@@ -660,7 +660,7 @@
           <span
             >Last season's carry-over <b>×{app.assump.carryInScale.toFixed(1)}</b><InfoTip
               label="last season's carry-over"
-              text="A17: opening stocks are a lower bound, not a stocktake — the old crop the ports shipped out in Oct-Nov, which misses whatever was still in the shed. Scale them to test how much that uncertainty matters."
+              text="A17: opening stocks are a lower bound, not a stocktake — the old crop the ports shipped out in Oct-Nov, which misses whatever was still in the shed. Scale them to test how much that uncertainty matters. Scaled-up stock is capped at each site's storage capacity: 2023/24 at ×2 asks Port Lincoln to open 162% full, and the surplus above capacity is dropped rather than seeded."
             /></span
           >
           <input type="range" min="0" max="2" step="0.1" value={app.assump.carryInScale}

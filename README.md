@@ -120,7 +120,9 @@ does fire danger, via the McArthur grassland index against the GFDI 35 cease-har
 trigger the SA Grain Harvesting Code of Practice sets (A7). Grain accumulates on-farm,
 and a fleet of farm trucks chooses receival sites Huff-style (attractiveness ÷ (travel +
 queue time)^β, seeded-random tie-breaks) over a precomputed OSM travel-time matrix,
-with queue feedback. Sites have tipping bays, service times, and storage caps;
+with queue feedback. Sites have tipping bays, service times, and storage caps that are
+hard ceilings — a truck books its destination's storage when it leaves the farm, so a
+site is never filled past its published or estimated capacity (A4, A17);
 line-haul trucks keep port stocks ahead of the vessel program; vessels (from AIS-derived
 schedules with stem-joined names) berth, load at published shiploader rates, and sail.
 Twelve calibration knobs are fitted headless against 2023/24 + 2025/26 weekly Western

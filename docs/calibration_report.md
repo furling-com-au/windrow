@@ -14,12 +14,48 @@ ASSUMPTIONS.md/engine comments: spring-dryness maturity shift (dry Sep–Oct ⇒
 ripening), rain-hangover harvest suppression, rain-day delivery damping, fire-danger
 harvest bans (McArthur grassland index against the SA Grain Harvesting Code of
 Practice's published GFDI 35 cease-harvest trigger — A7), T-Ports inland bunkers closed
-in 2024/25 (A15). The fire-danger rule replaced a flat "cut 25 % when tmax ≥ 38 °C" cut
-on 2026-08-31 (issue #24).
+in 2024/25 (A15), and site storage capacity as a **hard** ceiling — carry-in clamped at
+capacity, and every farm load booked against its destination's storage the moment it is
+dispatched, so no site is ever filled past its A4 figure (issue #29). The fire-danger
+rule replaced a flat "cut 25 % when tmax ≥ 38 °C" cut on 2026-08-31 (issue #24).
 
-**The #24 refit was run, and rejected — the knobs below are still #22's.** This needs
+**The #29 refit was run twice, and rejected — the knobs below are still #22's.** This needs
 saying plainly, because "we changed the engine and kept the old parameters" is normally a
-smell. Three things decided it:
+smell, and this is now the second structural change in a row where the answer was to leave
+the vector alone. Four things decided it:
+
+1. *The ceiling is near fit-neutral at fixed knobs.* Holding every site inside its
+   capacity moved the objective 1.0799 → 1.0844 at the #22 vector — 0.4 %, a third of what
+   a refit finds — and moved season totals by ≤ 0.1 pt. Every weekly-RMSE figure in the
+   table below is unchanged to the point (41 / 64 / 65 % before and after), and the
+   held-out season's total error did not move at all. Direct-to-port went
+   26.6 / 24.4 / 30.9 → **26.6 / 24.5 / 31.0 %**, a tenth of a point — on the output A9
+   names this very constraint as the governor of.
+2. *At 900 evaluations the search returns the **identical** vector it returned under #24's
+   engine* — fleet 806.6002, β 1.300879, retention 0.0577068, every knob to every digit,
+   only the score moving (1.0639 → 1.0656). The capacity ceiling does not re-rank the
+   parameter space; the same point wins. (The searches are seeded, so they sample the same
+   candidates — which is exactly what makes an unchanged *winner* informative.)
+3. *Both refits bought calibration-season fit with held-out accuracy.* 600 and 900
+   evaluations reached **1.0718** and **1.0656** — a 1.2 % and 1.7 % gain — while the
+   held-out season's total error went −0.2 % → **−2.2 %** and **−2.4 %**, and its weekly
+   RMSE 64 % → 64 % and **69 %**. Improving the fitted seasons while degrading the held-out
+   one is what the held-out season is *for*.
+4. *Both refits also broke external checks the objective cannot see.* Direct-to-port rose
+   to **33.8–37.4 %** and **32.8–35.9 %**, 2025/26 out the top of A9's published
+   **15–35 %** band both times (the incumbent sits at 26.6 / 24.5 / 31.0 %); and each refit
+   left a different knob clipped on a floor — `retentionShare` at 0.05 in the
+   600-evaluation vector, where #24's had clipped `choiceBeta` at 1.10. *Which* knob
+   clips changing between refits is itself the A2/A24 identification problem showing
+   through, not a fact about storage. One of #24's objections has lapsed and is not reused:
+   the 807-truck fleet no longer trips a queue guard on the 2022/23 replay, because #26
+   bounded queue length by construction.
+
+Both refit vectors are reproducible: `calibrate.ts 400` and `calibrate.ts 600` off this
+commit. The 900-evaluation vector is the one already recorded in docs/PROGRESS.md under
+#24 — unchanged, as above.
+
+**The #24 refit was likewise run, and rejected.** Three things decided it:
 
 1. *The rule is fit-neutral at fixed knobs.* Swapping the temperature cut for the
    fire-danger one at the #22 knob vector moved the objective 1.0800 → 1.0829 and every
@@ -39,10 +75,6 @@ smell. Three things decided it:
    `choiceBeta` clipped on its search floor, the exact defect #22 closed. All of it is
    the objective wandering in the direction A2 already documents as unidentified —
    weaker distance decay plus more trucks — not evidence about fire danger.
-
-Both refit vectors are reproducible: `calibrate.ts 400` and `calibrate.ts 600` off this
-commit. The 900-evaluation vector is recorded in docs/PROGRESS.md so the call can be
-reversed without re-running the search.
 
 ## Fitted parameters
 
@@ -74,8 +106,8 @@ but close enough that the next refit could be. No knob is clipped. Near a bound:
 
 | season | role | sim total (Mt) | obs total (Mt) | total err | weekly RMSE / mean weekly | PL vessels sim / AIS |
 |---|---|---|---|---|---|---|
-| 2022/23 | replay only* | 2.151 | 3.267 | -34.2 % | 93 % | 0 / – |
-| 2023/24 | calibration | 1.858 | 1.864 | -0.3 % | 41 % | 86 / 86 |
+| 2022/23 | replay only* | 2.139 | 3.267 | -34.5 % | 94 % | 0 / – |
+| 2023/24 | calibration | 1.857 | 1.864 | -0.4 % | 41 % | 86 / 86 |
 | 2024/25 | **held out** | 1.503 | 1.507 | -0.3 % | 64 % | 53 / 53 |
 | 2025/26 | calibration | 2.244 | 2.249 | -0.2 % | 65 % | 51 / 51 |
 
