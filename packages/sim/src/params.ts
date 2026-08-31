@@ -49,6 +49,9 @@ export function defaultParams(): Params {
     countryBays: 4, // * A2: tipping bays per upcountry site
     portBays: 6, // * A2: tipping bays per port terminal
     queueBalkMin: 240, // A2: growers balk past ~4 h (worst reported EP turnaround)
+    queueBalkMaxMin: 720, // A2: ...and past one full receival day (07:00-19:00) they stop
+    //   carting altogether and the load stays in the field bin (#27)
+    siteQueueMaxTrucks: 250, // A2/#26: physical stop — ~5 km of stationary road train
     portAttractBias: 2.213, // * direct-to-port pull (A9)
     retentionShare: 0.0553, // * on-farm retention + non-network channels (A24; trades off
     //   against luckyBayBias one-for-one and is not separately identified - see A24)

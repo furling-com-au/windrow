@@ -67,9 +67,10 @@ for (const season of SEASONS) {
   try {
     res = sim.run(365);
   } catch (e) {
-    // A season can exceed the model's validity envelope (e.g. 2022/23: assumed upcountry
-    // capacities (A4) fill, traffic piles onto the remaining site and the engine's own
-    // QUEUE INSANE guard fires). Report that rather than emitting a fitted-looking number.
+    // A season can still break a hard invariant (mass conservation, negative stock).
+    // Report that rather than emitting a fitted-looking number. Queue size is no longer
+    // one of them: since #26 an over-long queue caps site joining and backs grain up on
+    // farm instead of throwing, so a jammed season (2022/23) completes and is reported.
     skipped.push(`${season} — ${String((e as Error).message)}`);
     continue;
   }

@@ -106,6 +106,8 @@ export function leversToPatch(l: Levers, a: AssumpLevers): Partial<Params> {
 }
 
 export const SEASONS = ["2023/24", "2024/25", "2025/26", "2026/27"];
+/** the season the app opens on, and the one error recovery falls back to (#26) */
+export const DEFAULT_SEASON = "2025/26";
 export const SEASON_LABELS: Record<string, string> = {
   "2023/24": "2023/24",
   "2024/25": "2024/25 — drought year",
@@ -128,7 +130,7 @@ export interface BaselineSeries {
 }
 
 class AppState {
-  season = $state("2025/26");
+  season = $state(DEFAULT_SEASON);
   scenario = $state<ScenarioId>("baseline");
   levers = $state<Levers>({ ...DEFAULT_LEVERS });
   assump = $state<AssumpLevers>({ ...DEFAULT_ASSUMP });

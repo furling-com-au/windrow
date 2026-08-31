@@ -146,6 +146,14 @@ export interface Params {
   countryBays: number; // A2: tipping bays at an upcountry site
   portBays: number; // A2: tipping bays at a port terminal
   queueBalkMin: number; // A2: queue wait (min) beyond which growers pick elsewhere
+  /** A2: the ceiling on the balk fallback. `queueBalkMin` is where a grower prefers
+   *  another site; this is where they prefer their own field bin. Bounds the wait the
+   *  model is willing to report as real (#27). */
+  queueBalkMaxMin: number;
+  /** A2: hardest limit on one site's truck line, in vehicles — the physical floor under
+   *  the behavioural thresholds above, never relaxed. Bounds queue LENGTH the way
+   *  queueBalkMaxMin bounds queue TIME (#26). */
+  siteQueueMaxTrucks: number;
   // --- assumption levers (defaults = the registered assumptions; exposed for sensitivity testing) ---
   siteServiceMin: number; // A2: sample+weigh+tip cycle per truck per bay, minutes
   travelTimeScale: number; // A5: multiplier on all drive times (1 = matrix as built)

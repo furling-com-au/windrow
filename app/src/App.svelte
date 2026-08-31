@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import type { Snapshot } from "@windrow/sim";
   import { DeckMap, type StaticData } from "./lib/deckmap";
-  import { DEFAULT_LEVERS, SCENARIOS, SEASONS, SEASON_LABELS, app, leversToPatch, type ScenarioId } from "./state.svelte";
+  import { DEFAULT_ASSUMP, DEFAULT_LEVERS, DEFAULT_SEASON, SCENARIOS, SEASONS, SEASON_LABELS, app, leversToPatch, type ScenarioId } from "./state.svelte";
   import MoneyChart from "./components/MoneyChart.svelte";
   import PortPanel from "./components/PortPanel.svelte";
   import AboutModal from "./components/AboutModal.svelte";
@@ -165,6 +165,26 @@
     seek(0, { resume: true });
   }
 
+  /**
+   * The way back out of a worker error (#26). It deliberately does NOT try to guess which
+   * lever caused it and undo that one: the engine no longer throws over queue length (it
+   * caps joining and lets the grain back up on farm instead), so what can still reach here
+   * is a missing data file or a broken model invariant — neither of which is any particular
+   * lever's fault, and silently rewinding a slider the visitor chose would be a worse lie
+   * than saying nothing. What it can honestly offer is a known-good starting point.
+   */
+  function resetToDefaults() {
+    app.error = null;
+    app.scenario = "baseline";
+    app.levers = { ...DEFAULT_LEVERS };
+    app.assump = { ...DEFAULT_ASSUMP };
+    // the season goes back too: the likeliest surviving cause of an error here is a data
+    // file that would not load, and leaving the visitor on that season would just fail again
+    app.season = DEFAULT_SEASON;
+    app.baseline = null;
+    initSim();
+  }
+
   function setScenario(id: ScenarioId) {
     app.scenario = id;
     const preset = SCENARIOS.find((s) => s.id === id);
@@ -254,6 +274,11 @@
             app.error = m.msg;
             app.playing = false;
             app.seeking = false;
+            // an error thrown inside init() never reaches "ready", which is the only other
+            // place these clear — without this the visitor gets "loading bundle…" sitting
+            // under the red text forever (#26)
+            app.loading = false;
+            app.done = false;
             break;
         }
       };
@@ -408,7 +433,13 @@
     </div>
   {/if}
 
-  {#if app.error}<div class="err">{app.error}</div>{/if}
+  {#if app.error}
+    <div class="err">
+      <b>The simulation stopped and this run can't be trusted.</b>
+      <span class="detail">{app.error}</span>
+      <button class="link" onclick={resetToDefaults}>Start again from the default scenario</button>
+    </div>
+  {/if}
   {#if app.loading}<div class="loading">loading bundle…</div>{/if}
   {#if app.seeking}<div class="loading">seeking…</div>{/if}
 
@@ -653,6 +684,15 @@
     color: #ff8d80;
     font-size: 12px;
     white-space: pre-wrap;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+  }
+  .err .detail {
+    color: #c98b83;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
   }
   .loading {
     margin-top: 8px;

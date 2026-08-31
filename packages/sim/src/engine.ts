@@ -165,6 +165,14 @@ export class Sim {
   private dailyBungeReceivals: number[] = [];
   private vesselWaitTicksTotal = 0;
   peakQueue = 0;
+  /** worst modelled turnaround at any one site, minutes — the same line as peakQueue
+   *  expressed in the units A2's balk tolerance is stated in. F27 was that this number
+   *  reached 22 h and was reported as fact; it is now bounded by queueBalkMaxMin plus the
+   *  one service slot a joining truck does not yet occupy when the gate checks it. */
+  peakQueueMin = 0;
+  /** site-days on which a queue was found above params.siteQueueMaxTrucks. Zero by
+   *  construction (see checkInvariants); a non-zero value means the join gate leaked. */
+  queueCapBreaches = 0;
   truckTravelMin = 0; // ROAD loaded+empty travel minutes (cycle-time diagnostics)
   truckKm = 0; // ROAD loaded+empty vehicle-km, summed from routed leg distances
   tonneKm = 0; // loaded ROAD tonne-km (economics layer; the only tonne-km A18 prices)
@@ -180,6 +188,11 @@ export class Sim {
 
   events: SimEvent[] = [];
   private debugEvents: boolean;
+  // chooseSite scratch (see there): hoisted so the per-truck-per-tick call allocates nothing
+  private csWeights: number[] = [];
+  private csOpts: { site: number; minutes: number; km: number }[] = [];
+  private csOpen: { site: number; minutes: number; km: number }[] = [];
+  private csOpenQueueMin: number[] = [];
   private portInboundT: Float64Array = new Float64Array(0);
   private cachedPortNeed: Float64Array = new Float64Array(0);
 
@@ -605,21 +618,58 @@ export class Sim {
       for (let c = 0; c < NC; c++) {
         if (s.stock[c]! < -0.01) throw new Error(`NEGATIVE STOCK at ${s.name} c=${c} day ${this.day}`);
       }
-      if (s.queue.length > 400) throw new Error(`QUEUE INSANE at ${s.name}: ${s.queue.length}`);
+      // Queue length is bounded by construction now: chooseSite refuses a site whose line
+      // plus committed inbound already reaches siteQueueMaxTrucks, and a truck books its
+      // place at dispatch, so the sum cannot climb past the cap. Overshooting it therefore
+      // means that gate has a bug — which is worth failing a test over, but not worth
+      // killing a running simulation over (#26). The old `throw` here escaped sim.step()
+      // into the worker and left the visitor with "Error: QUEUE INSANE at Thevenard: 408"
+      // and no way back, on lever combinations the UI itself offers. Count it instead: the
+      // regression sweep asserts this stays zero across every preset and lever extreme.
+      if (s.queue.length > (this.params.siteQueueMaxTrucks ?? 250)) {
+        this.queueCapBreaches++;
+        if (this.debugEvents) {
+          this.log({ t: this.tick, type: "queue_over_cap", site: s.idx, queue: s.queue.length });
+        }
+      }
     }
   }
 
   // ---------- site choice ----------
+  /**
+   * Where this load goes, or null for "nowhere today — it stays in the field bin".
+   *
+   * Three thresholds, in order of how hard they bite (#26/#27):
+   *   queueBalkMin (4 h)      a grower would rather drive to another site
+   *   queueBalkMaxMin (12 h)  a grower would rather not cart at all today
+   *   siteQueueMaxTrucks      the site physically cannot hold another truck
+   * The first is behavioural and soft: pass 1 relaxes it to the second when NO reachable
+   * site clears it. The third is never relaxed. Before this, pass 1 dropped the queue
+   * filter outright, so the balk rule bounded nothing whenever it actually mattered — it
+   * only moved the pile-up a few hours later, onto whichever site the Huff draw picked
+   * (#27), and the resulting 400+ truck lines tripped the engine's own guard and killed
+   * the app mid-run (#26).
+   */
   private chooseSite(cl: number, c: number): { site: number; minutes: number; km: number } | null {
     const p = this.params;
     const cand = this.clusterCand[cl]!;
-    const weights: number[] = [];
-    const opts: { site: number; minutes: number; km: number }[] = [];
+    // scratch buffers, reused across calls: chooseSite runs once per idle truck per tick
+    const weights = this.csWeights;
+    const opts = this.csOpts;
+    const open = this.csOpen;
+    const openQueueMin = this.csOpenQueueMin;
+    const maxQueue = p.siteQueueMaxTrucks ?? 250;
     // Growers deliver to a site they can realistically reach, or cart direct to port.
     // Without this window a shallow power-law over ~21 candidates sends most traffic to
     // mid-distance sites (measured: 62 min mean leg against a 24 min nearest-accepting
     // floor), which inflates cycle times, truck-km and the fitted fleet. Ports are always
     // candidates so the direct-to-port share (A9) stays governed by portAttractBias.
+    //
+    // One structural pass: everything that does not depend on the balk tolerance is
+    // decided here, so the tolerance passes below re-walk a short array instead of the
+    // full candidate list (which matters now that a jammed network can fail BOTH of them).
+    open.length = 0;
+    openQueueMin.length = 0;
     let nearest = Infinity;
     for (const cd of cand) {
       const s = this.sites[cd.site]!;
@@ -627,41 +677,50 @@ export class Sim {
       if (this.portOutageActive(s) && s.isPort) continue;
       let st = 0;
       for (let k = 0; k < NC; k++) st += s.stock[k]!;
-      if (st >= s.capacityT * 0.995) continue;
+      if (st >= s.capacityT * 0.995) continue; // storage full
+      // Trucks in the line plus trucks already committed to joining it: growers can see
+      // site status/wait before setting off, so the choice must not ignore traffic that
+      // is loaded and rolling. Counting inbound is also what makes the cap below a hard
+      // bound rather than an aspiration — a truck books its place at dispatch, so
+      // queue + inbound can never climb past maxQueue, and queue alone never can either.
+      const inLine = s.queue.length + (this.siteInbound[cd.site] ?? 0);
+      if (inLine >= maxQueue) continue; // no room left to stand: not a candidate, ever
+      open.push(cd);
+      openQueueMin.push((inLine * s.serviceMin) / s.bays);
       if (cd.minutes < nearest) nearest = cd.minutes;
     }
-    if (!Number.isFinite(nearest)) return null;
+    if (!open.length) return null;
     const window = nearest * (p.choiceRadius ?? 1.5) + 10;
 
-    let balking = false;
+    const balkMin = p.queueBalkMin ?? 240;
     for (let pass = 0; pass < 2; pass++) {
-    balking = pass === 1; // second pass: every option was over the balk threshold
-    weights.length = 0;
-    opts.length = 0;
-    for (const cd of cand) {
-      const s = this.sites[cd.site]!;
-      if (!s.open || !s.accepts[c]) continue;
-      if (this.portOutageActive(s) && s.isPort) continue;
-      let stockTotal = 0;
-      for (let k = 0; k < NC; k++) stockTotal += s.stock[k]!;
-      if (stockTotal >= s.capacityT * 0.995) continue; // full
-      if (cd.minutes > window && !s.isPort) continue; // out of realistic reach
-      const queueMin = ((s.queue.length + (this.siteInbound[cd.site] ?? 0)) * s.serviceMin) / s.bays;
-      // growers balk rather than join an unbounded queue: the worst turnaround ever
-      // reported on EP is ~4 h (Port Lincoln, Nov 2018 rail-outage congestion), so treat
-      // that as the tolerance. Without it a big season can pile an unphysical queue onto
-      // one site (2022/23 tripped the engine's own QUEUE INSANE guard at Lucky Bay).
-      if (queueMin > (p.queueBalkMin ?? 240) && !balking) continue;
-      let attract = 1.0;
-      if (s.isPort) attract *= p.portAttractBias;
-      if (s.isTports) attract *= p.luckyBayBias;
-      const cost = cd.minutes + queueMin + s.serviceMin;
-      weights.push(attract / Math.pow(cost, p.choiceBeta));
-      opts.push(cd);
-    }
-    if (opts.length) break;
+      // Pass 0 applies the ordinary tolerance: the worst turnaround ever reported on EP is
+      // ~4 h (Port Lincoln, Nov 2018 rail-outage congestion). Pass 1 runs only when that
+      // left nothing, and stretches to queueBalkMaxMin — a full receival day — rather than
+      // to infinity. A load that clears neither waits on farm, where the engine already
+      // tracks and prices it (onFarmTonneDays, A22); that is the third state, not a crash.
+      const tolerance = pass === 0 ? balkMin : Math.max(balkMin, p.queueBalkMaxMin ?? 720);
+      weights.length = 0;
+      opts.length = 0;
+      for (let i = 0; i < open.length; i++) {
+        const cd = open[i]!;
+        const s = this.sites[cd.site]!;
+        if (cd.minutes > window && !s.isPort) continue; // out of realistic reach
+        const queueMin = openQueueMin[i]!;
+        if (queueMin > tolerance) continue;
+        let attract = 1.0;
+        if (s.isPort) attract *= p.portAttractBias;
+        if (s.isTports) attract *= p.luckyBayBias;
+        const cost = cd.minutes + queueMin + s.serviceMin;
+        weights.push(attract / Math.pow(cost, p.choiceBeta));
+        opts.push(cd);
+      }
+      if (opts.length) break;
     }
     if (!opts.length) return null;
+    // the fitted Huff draw is kept on both passes: it is already a soft argmin over
+    // (travel + queue) minutes at the calibrated beta, so the stretched pass still sends
+    // most loads to the least-bad site without swapping in a second, unfitted rule.
     return opts[this.rng.weighted(weights)]!;
   }
 
@@ -725,7 +784,9 @@ export class Sim {
           s.bayBusyUntil[b] = tr.doneAt;
         }
       }
-      this.peakQueue = Math.max(this.peakQueue, s.queue.length);
+      if (s.queue.length > this.peakQueue) this.peakQueue = s.queue.length;
+      const waitMin = (s.queue.length * s.serviceMin) / s.bays;
+      if (waitMin > this.peakQueueMin) this.peakQueueMin = waitMin;
     }
 
     // vessels

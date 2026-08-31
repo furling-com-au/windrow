@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { Sim } from "../src/engine";
+import { DAY_TICKS, Sim } from "../src/engine";
 import { defaultParams } from "../src/params";
-import type { Bundle } from "../src/types";
+import type { Bundle, Params } from "../src/types";
 import { loadBundle } from "../scripts/load_bundle";
 import { tinyBundle } from "./tiny_bundle";
 
@@ -53,4 +53,102 @@ describe("sim core", () => {
     expect(res.seasonReceivedT).toBeGreaterThan(obs * 0.5);
     expect(res.seasonReceivedT).toBeLessThan(obs * 2.0);
   });
+});
+
+/**
+ * Regression cover for #26 / #27.
+ *
+ * The old two-pass site choice dropped the balk filter entirely on its fallback pass, so
+ * under load it admitted every over-threshold site instead of bounding anything: queues ran
+ * to 460-820 trucks (15-22 h waits, reported as fact — #27) and `checkInvariants` threw
+ * `QUEUE INSANE` out through `sim.step()` and into the worker, killing the app on lever
+ * combinations the UI itself offers — six of them, including both main sliders at maximum
+ * (#26). The suite could not see any of it because all three tests ran default parameters.
+ *
+ * These assert the three ceilings hold, in the order they bite:
+ *   queue LENGTH  <= siteQueueMaxTrucks           (physical, never relaxed)
+ *   queue TIME    <= queueBalkMaxMin + one slot   (behavioural; the slot is because the
+ *                                                  gate tests the line the joining truck
+ *                                                  has not yet joined)
+ *   and nothing throws, on any of them.
+ */
+function checkCeilings(sim: Sim, params: Params, label: string) {
+  const slotMin = Math.max(...sim.sites.map((s) => s.serviceMin / s.bays));
+  expect(sim.queueCapBreaches, `${label}: join gate leaked`).toBe(0);
+  expect(sim.peakQueue, `${label}: queue length ceiling`).toBeLessThanOrEqual(params.siteQueueMaxTrucks);
+  expect(sim.peakQueueMin, `${label}: queue wait ceiling`).toBeLessThanOrEqual(params.queueBalkMaxMin + slotMin);
+}
+
+describe("queue ceilings (#26/#27)", () => {
+  it("bounds queue length and wait however hard the tiny network is pushed", () => {
+    // Deliberately absurd: one upcountry site and one port, a crop 40x the fixture's, a
+    // fleet big enough to move it all at once, and a harvest rate that dumps it on farm in
+    // days. No balk policy can route its way out of this — the point is that the ceilings
+    // hold anyway and the engine keeps running, leaving the surplus on farm (where
+    // onFarmTonneDays already prices it) instead of throwing.
+    const p = defaultParams();
+    p.fleetTrucks = 600;
+    p.linehaulTrucks = 20;
+    p.productionScale = 40;
+    for (const c of Object.keys(p.harvestRatePerDay) as (keyof typeof p.harvestRatePerDay)[]) {
+      p.harvestRatePerDay[c] = 0.5;
+    }
+    const sim = new Sim(tinyBundle(), p, 7);
+    sim.step(120 * DAY_TICKS);
+    checkCeilings(sim, p, "tiny under absurd load");
+    // it did not just stop dispatching: the network still moved grain
+    expect(sim.receivedBungeT).toBeGreaterThan(0);
+    // and the grain it could not move is accounted for, not lost
+    expect(sim.onFarmTonneDays).toBeGreaterThan(0);
+  });
+
+  it("sweeps the UI presets and lever extremes on a real season without throwing", () => {
+    let bundle: Bundle;
+    try {
+      bundle = loadBundle("2025/26");
+    } catch {
+      console.warn("real bundle not present; skipping");
+      return;
+    }
+    // Every combination below is reachable from the app: the scenario presets, then each
+    // slider at an end of its published range, then the specific mixes that used to throw.
+    // The six pre-fix crashers are marked; each was verified to still crash on the parent
+    // commit before this test was written.
+    const combos: [string, Partial<Params>][] = [
+      ["preset baseline", {}],
+      ["preset bumper", { productionScale: 1.3 }],
+      ["preset drought", { productionScale: 0.6 }],
+      ["preset rail", { railReinstated: true, linehaulTrucks: 38 }],
+      ["preset lucky bay", { luckyBayBias: 2.5 }],
+      ["preset outage", { outage: { port: "Lincoln", fromDay: 70, days: 7 } }],
+      ["preset road closure", { roadClosure: { corridor: "tod", factor: 2.5 } }],
+      ["crop max", { productionScale: 1.4 }],
+      ["crop min", { productionScale: 0.5 }],
+      ["fleet max", { fleetTrucks: 890 }],
+      ["fleet min", { fleetTrucks: 280 }],
+      ["service max", { siteServiceMin: 25 }],
+      ["service min", { siteServiceMin: 6 }],
+      ["capacity min", { upcountryCapScale: 0.5 }],
+      ["payload min", { truckPayloadT: 28 }],
+      // --- the six that threw QUEUE INSANE on the parent commit ---
+      ["crash: crop max + fleet max", { productionScale: 1.4, fleetTrucks: 890 }], // 729 @ Port Lincoln
+      ["crash: crop max + capacity x0.1", { productionScale: 1.4, upcountryCapScale: 0.1 }], // 406 @ Lucky Bay
+      ["crash: crop max + service max + capacity min", { productionScale: 1.4, siteServiceMin: 25, upcountryCapScale: 0.5 }], // 406 @ Lucky Bay
+      ["crash: crop max + fleet max + service max", { productionScale: 1.4, fleetTrucks: 890, siteServiceMin: 25 }], // 677 @ Lucky Bay
+      ["crash: crop max + retention min + capacity min", { productionScale: 1.4, retentionShare: 0.05, upcountryCapScale: 0.5 }], // 412 @ Thevenard
+      [
+        "crash: every lever against the network",
+        { productionScale: 1.4, siteServiceMin: 25, upcountryCapScale: 0.5, fleetTrucks: 890, truckPayloadT: 28, carryInScale: 2, retentionShare: 0.05 },
+      ], // 764 @ Lucky Bay
+    ];
+    // 130 days covers the whole harvest peak, which is the only time queues form. Every
+    // pre-fix crash above fires inside it: measured on the parent commit they threw on
+    // season days 60, 72, 74, 74, 76 and 102, so this leaves ~4 weeks of margin.
+    for (const [label, patch] of combos) {
+      const params: Params = { ...defaultParams(), ...patch };
+      const sim = new Sim(bundle, params, 42);
+      sim.step(130 * DAY_TICKS); // throws on a violated invariant; that is the #26 assertion
+      checkCeilings(sim, params, label);
+    }
+  }, 300_000);
 });

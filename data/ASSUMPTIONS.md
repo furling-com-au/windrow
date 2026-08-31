@@ -77,6 +77,33 @@ presented as measured data.
   `QUEUE INSANE` invariant (>400 trucks at one site) bounded it. Fleet size is therefore
   **not identifiable from the weekly regional receivals alone** — it is pinned by site
   throughput and queue plausibility. See docs/calibration_report.md.
+- **Queue ceilings (2026-08-31, issues #26/#27).** Three thresholds now bound a queue,
+  and a grower who clears none of them leaves the load in the field bin for tomorrow —
+  where `onFarmTonneDays` already tracks and prices it (A22):
+  1. `queueBalkMin` **240 min** — the wait past which a grower drives to a different site.
+     Unchanged: the worst turnaround ever reported on EP is ~4 h (Port Lincoln, Nov 2018
+     rail-outage congestion).
+  2. `queueBalkMaxMin` **720 min** — the wait past which they stop carting altogether.
+     Reached only when *no* reachable site clears (1); one full receival day (07:00–19:00)
+     is the longest stretch the model is willing to call a delivery decision.
+  3. `siteQueueMaxTrucks` **250** — a physical stop, never relaxed: 250 waiting road trains
+     is ~5 km of stationary traffic on a site access road. Not a behavioural number (a
+     grower has already balked twice before it binds); it exists so that queue *length*
+     cannot grow without bound the way queue *time* is bounded by (2).
+  **What this replaced.** (1) was already here, but the site search's fallback pass — which
+  ran whenever nothing cleared it — dropped the queue filter *entirely* rather than
+  loosening it, so the balk rule bounded nothing precisely when it mattered (#27). Queues
+  ran to 460–822 trucks and 15–22 h on lever settings the UI offers, and the
+  `QUEUE INSANE` guard above then threw out of `sim.step()` and killed the app (#26).
+  Measured over 105 preset/lever/season combinations, the ceilings hold peak queues to
+  **≤ 226 trucks and ≤ 11 h**. At the calibrated defaults nothing changed at all: peak
+  queues stay 49–105 trucks (1.9–3.5 h, under (1)), and the event-log hash for every
+  calibration and held-out season is byte-identical to the pre-fix engine, so no refit
+  was needed.
+- **Sensitivity of the new ceilings**: none in the fitted seasons (they never bind);
+  large in the stress scenarios, where they convert an unphysical queue into on-farm
+  holding — which is the honest answer, but note it is the ceilings, not measurement,
+  that set how much grain waits at the extremes.
 - **Upgrade path**: operator site-cycle statistics (Viterra used to publish average site
   turnaround minutes in some harvest communications — none found archived).
 
