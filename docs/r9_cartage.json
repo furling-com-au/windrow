@@ -1,0 +1,1098 @@
+{
+  "generated": "2026-08-31",
+  "tier": "Tier 2 geometry x Tier 1 published rate. No simulation, no fitted parameter, no calibrated knob.",
+  "reproduce": "PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe pipeline/r9_cartage.py",
+  "rate": {
+    "citation": "ESCOSA, Inquiry into the South Australian bulk grain export supply chain costs - Final Report, 29 January 2019, Box 5.2, p. 91: \"Only the marginal freight cost has been used, $0.12 ($/tonne-km) for up to 50 kilometres and $0.11 ($/tonne-km) for 50 to 250 kilometres.\"",
+    "bands_aud_per_tonne_km": [
+      [
+        50.0,
+        0.12
+      ],
+      [
+        250.0,
+        0.11
+      ]
+    ],
+    "base_year": "2018-19 A$ (nominal, deliberately not indexed - A18)",
+    "application": "one-way loaded kilometres; band selected by the whole distance; no cumulative tiering; empty return not added",
+    "verify": ".venv/Scripts/python.exe pipeline/r9_escosa_rate_check.py   # VERDICT: PASS",
+    "marginal_floor": "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the additional cost of travelling further once the truck is on the road. Truck ownership, loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA says so. At EP's ~144 km average site-to-port haul the same rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t - the marginal rate is roughly half a delivered cartage price. A grower reading '$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, not the extra cost of running the extra trips.",
+    "ceiling_km": 250.0,
+    "provenance_is_not_uniform": "ESCOSA footnote 289 traces the <=50 km $0.12 to a public AEGIC document but the 50-250 km $0.11 to unpublished 'AEGIC advice'. Most EP hauls to an independent point fall in the second band, so the weaker-provenance rate carries most of the dollars on this page.",
+    "not_ep_specific": "The schedule is South Australia-wide and the case study behind it is the upper Central region (Gladstone catchment, 16-53 km hauls), not the Eyre Peninsula. No EP-specific $/t-km schedule was found. EP arguments cut both ways and neither is quantified."
+  },
+  "measure": {
+    "chosen": "PRIMARY: M2, the TOLL - cartage to the nearest independent receival point minus cartage to the nearest incumbent one, A$/t, tonne-weighted by district. Chosen for three reasons. (1) It is the only one of the four measures that is a grower DECISION variable: it converts directly into the price premium, per tonne, that the independent has to beat before a load is worth moving, which is the same unit a grower reads a basis quote in. (2) It is the quantity the network change actually moved. At state C the toll is not a large number, it is NOT A NUMBER - there is no non-Bunge receival point on the peninsula at any price. State A gives it a value; state B roughly halves it. (3) The obvious alternative, 'cartage to the nearest independent point', is not a cost anybody pays: it is a distance to a place most growers never go. REPORTED BESIDE IT, AND NOT OPTIONAL: M1, the bill actually paid (cartage to the cheapest point of any owner), because M1 is what moves growers' real costs and it BARELY MOVES between states - that is a finding, not an omission, and a reader given M2 alone would wrongly infer that every grower pays the toll. M3, the share of production for which the independent point genuinely is the cheapest or near-cheapest destination, because that share is what M1's movement is made of. M4, direct-to-port cartage, because that is the delivery pattern in which Lucky Bay's position does the most work and it is the task's 'nearest export-capable destination' measure made honest.",
+    "definitions": {
+      "M1_bill": "tonne-weighted mean cartage to the fewest-kilometre receival point of ANY owner, A$/t",
+      "M2_toll": "tonne-weighted mean of (cartage to the fewest-kilometre INDEPENDENT point minus cartage to the fewest-kilometre INCUMBENT point), A$/t. Signed: negative where the independent point is the closer of the two",
+      "M3_catchment": "tonne share whose toll is <= 0, <= $1, <= $2, <= $5/t",
+      "M4_port_run": "tonne-weighted mean cartage to the nearest EXPORT PORT of any owner, A$/t"
+    },
+    "rejected": [
+      {
+        "measure": "cartage to the nearest INDEPENDENT point, published bare",
+        "why": "Rejected as a headline. It is a distance to a place most EP growers have never delivered to, priced. It is reported here as an input to the toll and as a level (so a reader can see what using the gateway costs outright) but it is not 'what the gateway is worth', and quoting it alone would read as a cost growers bear."
+      },
+      {
+        "measure": "cartage to the nearest EXPORT-CAPABLE destination, over all points",
+        "why": "Rejected as it collapses onto M1 exactly. Every receival point on this roster feeds an export chain: a Bunge upcountry silo feeds Port Lincoln and Thevenard, a T-Ports bunker feeds Lucky Bay. Making the test 'export-capable' therefore excludes nothing and adds no information. What does not collapse is DIRECT-TO-PORT delivery, which is M4."
+      },
+      {
+        "measure": "the difference in cartage for the subset that uses the independent point",
+        "why": "Not rejected - it is M3, and it is published. But it cannot be the headline on its own: it is a saving conditional on a delivery choice this project cannot observe. There is no site-level receival series in this repo at any granularity (docs/gate_findings.md section 3), so who actually delivered where is not known and M3's catchment is a geometric catchment, not an observed one."
+      },
+      {
+        "measure": "total cartage dollars saved across the peninsula",
+        "why": "Rejected. Multiplying $/t by district tonnage produces a large headline number that implies a measured aggregate benefit. It would be a product of two modelled quantities (the cell weighting, A14 x CLUM, and a geometric delivery choice) priced at a marginal rate that is explicitly not a full cartage price, with no price data on the other side of the ledger. The per-tonne figure is what a grower can check against their own farm; the aggregate is what a press release would quote."
+      }
+    ],
+    "destination_choice": "ESCOSA's bands are FLAT and selected by the whole distance, so the priced cost is not monotone in distance across the 50 km edge: 49 km prices at $5.88 and 51 km at $5.61. The destination here is chosen by MINIMUM KILOMETRES and then priced, because that is what a truck does; choosing by minimum dollars would let a pricing convention pick a farther silo. The share of production where the two choices differ, and what it is worth, is measured below rather than assumed away.",
+    "structural_note_lucky_bay_is_a_port": "Lucky Bay is a PORT, not an upcountry silo. T-Ports' model had growers delivering either to the Lock and Kimba bunkers or direct to Lucky Bay, and in every case the grower's truck does one loaded one-way run from farm to a place where it tips and is paid, and stops. Whatever moves the grain onward - T-Ports shuttling bunker grain to Lucky Bay, Bunge line-hauling silo grain to Port Lincoln or Thevenard - is the OPERATOR's cost and is outside every number here. That is what makes it coherent to put a port and a silo in the same nearest-destination comparison. It does NOT make them commercially equivalent: a port and an upcountry silo differ in segregations, receival standards, opening hours, queueing and the contract on offer, none of which this page can see. And it is why state A's toll is as large as it is - with both bunkers shut, the only non-Bunge place to tip a load is a port on the far side of the peninsula."
+  },
+  "states": {
+    "A_lucky_bay_only": {
+      "letter": "A",
+      "label": "Lucky Bay only",
+      "attributed": "2025/26 as it stands (attribution UNSOURCED - see caveat)",
+      "desc": "the current Bunge network plus T-Ports Lucky Bay; both inland T-Ports bunkers absent",
+      "n_points": 23,
+      "n_independent_points": 1,
+      "n_ports": 3,
+      "sites": [
+        "Arno Bay",
+        "Buckleboo",
+        "Cummins",
+        "Darke Peak",
+        "Edillilie",
+        "Elliston",
+        "Kapinnie",
+        "Kimba",
+        "Lock",
+        "Lucky Bay (T-Ports port)",
+        "Penong",
+        "Poochera",
+        "Port Lincoln",
+        "Port Neill",
+        "Rudall",
+        "Streaky Bay",
+        "Thevenard",
+        "Tumby Bay",
+        "Warramboo",
+        "Wirrulla",
+        "Witera",
+        "Wudinna",
+        "Yeelanna"
+      ]
+    },
+    "B_bunkers_reopened": {
+      "letter": "B",
+      "label": "Lucky Bay + Lock + Kimba bunkers",
+      "attributed": "the 2023/24 network; equivalently, the bunkers reopened",
+      "desc": "the current Bunge network plus Lucky Bay plus both T-Ports inland bunkers",
+      "n_points": 25,
+      "n_independent_points": 3,
+      "n_ports": 3,
+      "sites": [
+        "Arno Bay",
+        "Buckleboo",
+        "Cummins",
+        "Darke Peak",
+        "Edillilie",
+        "Elliston",
+        "Kapinnie",
+        "Kimba",
+        "Kimba (T-Ports bunker)",
+        "Lock",
+        "Lock (T-Ports bunker)",
+        "Lucky Bay (T-Ports port)",
+        "Penong",
+        "Poochera",
+        "Port Lincoln",
+        "Port Neill",
+        "Rudall",
+        "Streaky Bay",
+        "Thevenard",
+        "Tumby Bay",
+        "Warramboo",
+        "Wirrulla",
+        "Witera",
+        "Wudinna",
+        "Yeelanna"
+      ]
+    },
+    "C_no_independent": {
+      "letter": "C",
+      "label": "no independent point at all",
+      "attributed": "counterfactual - Lucky Bay unavailable",
+      "desc": "the current Bunge network alone; every receival point on the peninsula is operated by the incumbent",
+      "n_points": 22,
+      "n_independent_points": 0,
+      "n_ports": 2,
+      "sites": [
+        "Arno Bay",
+        "Buckleboo",
+        "Cummins",
+        "Darke Peak",
+        "Edillilie",
+        "Elliston",
+        "Kapinnie",
+        "Kimba",
+        "Lock",
+        "Penong",
+        "Poochera",
+        "Port Lincoln",
+        "Port Neill",
+        "Rudall",
+        "Streaky Bay",
+        "Thevenard",
+        "Tumby Bay",
+        "Warramboo",
+        "Wirrulla",
+        "Witera",
+        "Wudinna",
+        "Yeelanna"
+      ]
+    },
+    "D_pre_2019": {
+      "letter": "D",
+      "label": "pre-2019",
+      "attributed": "before T-Ports existed and before the June 2019 closures",
+      "desc": "the current Bunge network plus the six sites closed in June 2019 plus the one still-dormant site (A12); no independent operator",
+      "n_points": 29,
+      "n_independent_points": 0,
+      "n_ports": 2,
+      "sites": [
+        "Arno Bay",
+        "Buckleboo",
+        "Cummins",
+        "Cungena (closed)",
+        "Darke Peak",
+        "Edillilie",
+        "Elliston",
+        "Kapinnie",
+        "Kielpa (closed)",
+        "Kimba",
+        "Kyancutta (closed)",
+        "Lock",
+        "Minnipa (closed)",
+        "Nunjikompita",
+        "Penong",
+        "Poochera",
+        "Port Lincoln",
+        "Port Neill",
+        "Rudall",
+        "Streaky Bay",
+        "Thevenard",
+        "Tumby Bay",
+        "Waddikee (closed)",
+        "Warramboo",
+        "Wharminda (closed)",
+        "Wirrulla",
+        "Witera",
+        "Wudinna",
+        "Yeelanna"
+      ]
+    }
+  },
+  "results_by_district": {
+    "A_lucky_bay_only": {
+      "EP": {
+        "tonnes_weight": 2883528.0,
+        "m1_bill_aud_per_t": 2.52,
+        "m1_km": 21.1,
+        "m1_p50_aud_per_t": 2.27,
+        "m1_p90_aud_per_t": 4.48,
+        "m4_port_aud_per_t": 10.16,
+        "m4_port_km": 91.8,
+        "incumbent_aud_per_t": 2.66,
+        "independent_level_aud_per_t": 19.14,
+        "independent_level_km": 173.8,
+        "m2_toll_aud_per_t": 16.48,
+        "m2_toll_p50_aud_per_t": 14.05,
+        "m2_toll_p90_aud_per_t": 34.43,
+        "m3_share_independent_is_cheapest": 0.0452,
+        "m3_share_within": {
+          "1": 0.0541,
+          "2": 0.0612,
+          "5": 0.0945
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 3.09,
+        "share_over_250km_ceiling": 0.1801,
+        "m2_toll_within_schedule_aud_per_t": 11.97
+      },
+      "WEP": {
+        "tonnes_weight": 826409.0,
+        "m1_bill_aud_per_t": 3.03,
+        "m1_km": 25.5,
+        "m1_p50_aud_per_t": 2.86,
+        "m1_p90_aud_per_t": 5.12,
+        "m4_port_aud_per_t": 13.47,
+        "m4_port_km": 121.9,
+        "incumbent_aud_per_t": 3.03,
+        "independent_level_aud_per_t": 32.93,
+        "independent_level_km": 299.3,
+        "m2_toll_aud_per_t": 29.89,
+        "m2_toll_p50_aud_per_t": 29.68,
+        "m2_toll_p90_aud_per_t": 45.03,
+        "m3_share_independent_is_cheapest": 0.0,
+        "m3_share_within": {
+          "1": 0.0,
+          "2": 0.0,
+          "5": 0.0
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 0.0,
+        "share_over_250km_ceiling": 0.6285,
+        "m2_toll_within_schedule_aud_per_t": 17.83
+      },
+      "EEP": {
+        "tonnes_weight": 945206.0,
+        "m1_bill_aud_per_t": 2.71,
+        "m1_km": 22.7,
+        "m1_p50_aud_per_t": 2.52,
+        "m1_p90_aud_per_t": 4.86,
+        "m4_port_aud_per_t": 9.97,
+        "m4_port_km": 90.1,
+        "incumbent_aud_per_t": 3.14,
+        "independent_level_aud_per_t": 9.98,
+        "independent_level_km": 90.2,
+        "m2_toll_aud_per_t": 6.84,
+        "m2_toll_p50_aud_per_t": 8.28,
+        "m2_toll_p90_aud_per_t": 12.32,
+        "m3_share_independent_is_cheapest": 0.1379,
+        "m3_share_within": {
+          "1": 0.165,
+          "2": 0.1866,
+          "5": 0.2883
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 3.09,
+        "share_over_250km_ceiling": 0.0,
+        "m2_toll_within_schedule_aud_per_t": 6.84
+      },
+      "LEP": {
+        "tonnes_weight": 1111912.0,
+        "m1_bill_aud_per_t": 1.96,
+        "m1_km": 16.4,
+        "m1_p50_aud_per_t": 1.9,
+        "m1_p90_aud_per_t": 3.41,
+        "m4_port_aud_per_t": 7.85,
+        "m4_port_km": 70.7,
+        "incumbent_aud_per_t": 1.96,
+        "independent_level_aud_per_t": 16.68,
+        "independent_level_km": 151.7,
+        "m2_toll_aud_per_t": 14.72,
+        "m2_toll_p50_aud_per_t": 15.43,
+        "m2_toll_p90_aud_per_t": 18.72,
+        "m3_share_independent_is_cheapest": 0.0,
+        "m3_share_within": {
+          "1": 0.0,
+          "2": 0.0,
+          "5": 0.0
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 0.0,
+        "share_over_250km_ceiling": 0.0,
+        "m2_toll_within_schedule_aud_per_t": 14.72
+      }
+    },
+    "B_bunkers_reopened": {
+      "EP": {
+        "tonnes_weight": 2883528.0,
+        "m1_bill_aud_per_t": 2.51,
+        "m1_km": 21.0,
+        "m1_p50_aud_per_t": 2.26,
+        "m1_p90_aud_per_t": 4.47,
+        "m4_port_aud_per_t": 10.16,
+        "m4_port_km": 91.8,
+        "incumbent_aud_per_t": 2.66,
+        "independent_level_aud_per_t": 11.01,
+        "independent_level_km": 99.4,
+        "m2_toll_aud_per_t": 8.36,
+        "m2_toll_p50_aud_per_t": 7.19,
+        "m2_toll_p90_aud_per_t": 19.99,
+        "m3_share_independent_is_cheapest": 0.1044,
+        "m3_share_within": {
+          "1": 0.1811,
+          "2": 0.2151,
+          "5": 0.3689
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 1.44,
+        "share_over_250km_ceiling": 0.0668,
+        "m2_toll_within_schedule_aud_per_t": 6.71
+      },
+      "WEP": {
+        "tonnes_weight": 826409.0,
+        "m1_bill_aud_per_t": 3.03,
+        "m1_km": 25.5,
+        "m1_p50_aud_per_t": 2.86,
+        "m1_p90_aud_per_t": 5.12,
+        "m4_port_aud_per_t": 13.47,
+        "m4_port_km": 121.9,
+        "incumbent_aud_per_t": 3.03,
+        "independent_level_aud_per_t": 18.78,
+        "independent_level_km": 170.4,
+        "m2_toll_aud_per_t": 15.75,
+        "m2_toll_p50_aud_per_t": 15.32,
+        "m2_toll_p90_aud_per_t": 30.59,
+        "m3_share_independent_is_cheapest": 0.0289,
+        "m3_share_within": {
+          "1": 0.097,
+          "2": 0.1064,
+          "5": 0.2027
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 0.06,
+        "share_over_250km_ceiling": 0.2332,
+        "m2_toll_within_schedule_aud_per_t": 11.0
+      },
+      "EEP": {
+        "tonnes_weight": 945206.0,
+        "m1_bill_aud_per_t": 2.68,
+        "m1_km": 22.4,
+        "m1_p50_aud_per_t": 2.51,
+        "m1_p90_aud_per_t": 4.84,
+        "m4_port_aud_per_t": 9.97,
+        "m4_port_km": 90.1,
+        "incumbent_aud_per_t": 3.14,
+        "independent_level_aud_per_t": 4.74,
+        "independent_level_km": 41.1,
+        "m2_toll_aud_per_t": 1.6,
+        "m2_toll_p50_aud_per_t": 1.28,
+        "m2_toll_p90_aud_per_t": 5.63,
+        "m3_share_independent_is_cheapest": 0.2931,
+        "m3_share_within": {
+          "1": 0.4676,
+          "2": 0.5631,
+          "5": 0.8644
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 1.56,
+        "share_over_250km_ceiling": 0.0,
+        "m2_toll_within_schedule_aud_per_t": 1.6
+      },
+      "LEP": {
+        "tonnes_weight": 1111912.0,
+        "m1_bill_aud_per_t": 1.96,
+        "m1_km": 16.4,
+        "m1_p50_aud_per_t": 1.9,
+        "m1_p90_aud_per_t": 3.41,
+        "m4_port_aud_per_t": 7.85,
+        "m4_port_km": 70.7,
+        "incumbent_aud_per_t": 1.96,
+        "independent_level_aud_per_t": 10.57,
+        "independent_level_km": 96.1,
+        "m2_toll_aud_per_t": 8.61,
+        "m2_toll_p50_aud_per_t": 8.56,
+        "m2_toll_p90_aud_per_t": 11.04,
+        "m3_share_independent_is_cheapest": 0.0,
+        "m3_share_within": {
+          "1": 0.0,
+          "2": 0.0,
+          "5": 0.0713
+        },
+        "m3_saving_where_independent_cheapest_aud_per_t": 0.0,
+        "share_over_250km_ceiling": 0.0,
+        "m2_toll_within_schedule_aud_per_t": 8.61
+      }
+    },
+    "C_no_independent": {
+      "EP": {
+        "tonnes_weight": 2883528.0,
+        "m1_bill_aud_per_t": 2.66,
+        "m1_km": 22.4,
+        "m1_p50_aud_per_t": 2.28,
+        "m1_p90_aud_per_t": 4.86,
+        "m4_port_aud_per_t": 13.54,
+        "m4_port_km": 122.6,
+        "incumbent_aud_per_t": 2.66,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      },
+      "WEP": {
+        "tonnes_weight": 826409.0,
+        "m1_bill_aud_per_t": 3.03,
+        "m1_km": 25.5,
+        "m1_p50_aud_per_t": 2.86,
+        "m1_p90_aud_per_t": 5.12,
+        "m4_port_aud_per_t": 13.93,
+        "m4_port_km": 126.1,
+        "incumbent_aud_per_t": 3.03,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      },
+      "EEP": {
+        "tonnes_weight": 945206.0,
+        "m1_bill_aud_per_t": 3.14,
+        "m1_km": 26.9,
+        "m1_p50_aud_per_t": 2.6,
+        "m1_p90_aud_per_t": 6.26,
+        "m4_port_aud_per_t": 19.83,
+        "m4_port_km": 180.2,
+        "incumbent_aud_per_t": 3.14,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      },
+      "LEP": {
+        "tonnes_weight": 1111912.0,
+        "m1_bill_aud_per_t": 1.96,
+        "m1_km": 16.4,
+        "m1_p50_aud_per_t": 1.9,
+        "m1_p90_aud_per_t": 3.41,
+        "m4_port_aud_per_t": 7.9,
+        "m4_port_km": 71.1,
+        "incumbent_aud_per_t": 1.96,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      }
+    },
+    "D_pre_2019": {
+      "EP": {
+        "tonnes_weight": 2883528.0,
+        "m1_bill_aud_per_t": 2.44,
+        "m1_km": 20.6,
+        "m1_p50_aud_per_t": 2.08,
+        "m1_p90_aud_per_t": 4.37,
+        "m4_port_aud_per_t": 13.54,
+        "m4_port_km": 122.6,
+        "incumbent_aud_per_t": 2.44,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      },
+      "WEP": {
+        "tonnes_weight": 826409.0,
+        "m1_bill_aud_per_t": 2.55,
+        "m1_km": 21.4,
+        "m1_p50_aud_per_t": 2.34,
+        "m1_p90_aud_per_t": 4.37,
+        "m4_port_aud_per_t": 13.93,
+        "m4_port_km": 126.1,
+        "incumbent_aud_per_t": 2.55,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      },
+      "EEP": {
+        "tonnes_weight": 945206.0,
+        "m1_bill_aud_per_t": 2.94,
+        "m1_km": 25.2,
+        "m1_p50_aud_per_t": 2.23,
+        "m1_p90_aud_per_t": 6.26,
+        "m4_port_aud_per_t": 19.83,
+        "m4_port_km": 180.2,
+        "incumbent_aud_per_t": 2.94,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      },
+      "LEP": {
+        "tonnes_weight": 1111912.0,
+        "m1_bill_aud_per_t": 1.93,
+        "m1_km": 16.1,
+        "m1_p50_aud_per_t": 1.87,
+        "m1_p90_aud_per_t": 3.34,
+        "m4_port_aud_per_t": 7.9,
+        "m4_port_km": 71.1,
+        "incumbent_aud_per_t": 1.93,
+        "independent_level_aud_per_t": null,
+        "m2_toll_aud_per_t": null,
+        "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
+      }
+    }
+  },
+  "deltas": [
+    {
+      "from": "D_pre_2019",
+      "to": "C_no_independent",
+      "why": "The cartage cost of losing the seven sites that went from the pre-2019 network to the current one - the six closed in June 2019 plus Nunjikompita, since gone dormant - holding OWNERSHIP constant, because both states are incumbent-only and no gateway effect is mixed in. READ IT AS AN UPPER BOUND. Only two of the six 2019 sites (Minnipa and Kyancutta) were operating the year before; the other four are in the group the operator described as 'not open the year prior' (Stock Journal, 6 June 2019). Treating all six as open overstates the pre-2019 network by four sites, understates state D's bill, and therefore overstates this delta. Pulling the other way, Cowell and Mangalo were receiving grain pre-2019 and are missing from sites.geojson entirely, which understates it",
+      "d_m1_bill_aud_per_t": {
+        "EP": 0.22,
+        "WEP": 0.48,
+        "EEP": 0.2,
+        "LEP": 0.03
+      },
+      "d_m4_port_aud_per_t": {
+        "EP": 0.0,
+        "WEP": 0.0,
+        "EEP": 0.0,
+        "LEP": 0.0
+      },
+      "d_m2_toll_aud_per_t": {
+        "EP": null,
+        "WEP": null,
+        "EEP": null,
+        "LEP": null
+      }
+    },
+    {
+      "from": "C_no_independent",
+      "to": "A_lucky_bay_only",
+      "why": "WHAT THE GATEWAY IS WORTH in cartage actually paid: the change in the bill when the peninsula's one independent point is added to the network. This is the delta the task asks for, and the honest answer is that it is small, concentrated in EEP, and zero in WEP and LEP - because outside EEP nobody's nearest place to tip a load changes",
+      "d_m1_bill_aud_per_t": {
+        "EP": -0.14,
+        "WEP": 0.0,
+        "EEP": -0.43,
+        "LEP": 0.0
+      },
+      "d_m4_port_aud_per_t": {
+        "EP": -3.38,
+        "WEP": -0.46,
+        "EEP": -9.86,
+        "LEP": -0.05
+      },
+      "d_m2_toll_aud_per_t": {
+        "EP": null,
+        "WEP": null,
+        "EEP": null,
+        "LEP": null
+      }
+    },
+    {
+      "from": "A_lucky_bay_only",
+      "to": "B_bunkers_reopened",
+      "why": "What reopening the two inland bunkers would be worth on top of Lucky Bay. Note the shape: the toll roughly halves while the bill does not move, because the bunkers sit beside Bunge's own Lock and Kimba sites (see the co-location table). They add a buyer, not a destination",
+      "d_m1_bill_aud_per_t": {
+        "EP": -0.01,
+        "WEP": 0.0,
+        "EEP": -0.03,
+        "LEP": 0.0
+      },
+      "d_m4_port_aud_per_t": {
+        "EP": 0.0,
+        "WEP": 0.0,
+        "EEP": 0.0,
+        "LEP": 0.0
+      },
+      "d_m2_toll_aud_per_t": {
+        "EP": -8.12,
+        "WEP": -14.14,
+        "EEP": -5.24,
+        "LEP": -6.11
+      }
+    },
+    {
+      "from": "D_pre_2019",
+      "to": "A_lucky_bay_only",
+      "why": "Pre-2019 to now, end to end. CONTAMINATED - it mixes the 2019 closures, the arrival of T-Ports and two different roster-defect sets. Decompose it with the two rows above rather than quoting it",
+      "d_m1_bill_aud_per_t": {
+        "EP": 0.08,
+        "WEP": 0.48,
+        "EEP": -0.23,
+        "LEP": 0.03
+      },
+      "d_m4_port_aud_per_t": {
+        "EP": -3.38,
+        "WEP": -0.46,
+        "EEP": -9.86,
+        "LEP": -0.05
+      },
+      "d_m2_toll_aud_per_t": {
+        "EP": null,
+        "WEP": null,
+        "EEP": null,
+        "LEP": null
+      }
+    }
+  ],
+  "colocation": {
+    "note": "THE TWO INLAND BUNKERS ARE NOT IN NEW COUNTRY; THEY ARE BESIDE BUNGE'S OWN SITES. The T-Ports Lock bunker is 0.91 km from Bunge's Lock silo and the T-Ports Kimba bunker is 2.31 km from Bunge's Kimba silo. That single fact explains the shape of every table below. Reopening them moves the BILL by about a cent a tonne, because no grower has to drive anywhere new; it roughly halves the TOLL, because for a large part of the peninsula the second buyer is standing in the yard the grower was already driving to. The bunkers were never a cartage improvement. They were a competition one, at locations that had already been chosen. Lucky Bay is the opposite case: 49.93 km from the nearest active Bunge site, a genuinely new place to tip a load, and a port.",
+    "measured": {
+      "Lock (T-Ports bunker)": {
+        "nearest_active_incumbent_site": "Lock",
+        "straight_line_km": 0.91
+      },
+      "Kimba (T-Ports bunker)": {
+        "nearest_active_incumbent_site": "Kimba",
+        "straight_line_km": 2.31
+      },
+      "Lucky Bay (T-Ports port)": {
+        "nearest_active_incumbent_site": "Arno Bay",
+        "straight_line_km": 49.93
+      }
+    }
+  },
+  "cross_check_vs_r0": {
+    "what": "R0 (pipeline/r8_choice_geometry.py) routes the same journeys on the same graph with the same weights and reports them in MINUTES. M1 is those journeys priced in KILOMETRES. The implied mean speed is printed so an inconsistency between the two scripts would be visible. This is a routing check, not a publication of R0's Ladder A, which is not quotable (docs/gate_findings.md).",
+    "by_state": {
+      "A_lucky_bay_only": {
+        "wmean_minutes_to_nearest_any_owner": 17.9,
+        "wmean_km_to_nearest_any_owner": 21.1,
+        "implied_mean_speed_kmh": 70.8
+      },
+      "B_bunkers_reopened": {
+        "wmean_minutes_to_nearest_any_owner": 17.8,
+        "wmean_km_to_nearest_any_owner": 21.0,
+        "implied_mean_speed_kmh": 70.8
+      },
+      "C_no_independent": {
+        "wmean_minutes_to_nearest_any_owner": 18.7,
+        "wmean_km_to_nearest_any_owner": 22.4,
+        "implied_mean_speed_kmh": 71.7
+      },
+      "D_pre_2019": {
+        "wmean_minutes_to_nearest_any_owner": 17.5,
+        "wmean_km_to_nearest_any_owner": 20.6,
+        "implied_mean_speed_kmh": 70.5
+      }
+    }
+  },
+  "nearest_independent_mix": {
+    "A_lucky_bay_only": {
+      "Lucky Bay (T-Ports port)": 1.0
+    },
+    "B_bunkers_reopened": {
+      "Kimba (T-Ports bunker)": 0.1693,
+      "Lock (T-Ports bunker)": 0.7067,
+      "Lucky Bay (T-Ports port)": 0.1241
+    },
+    "C_no_independent": null,
+    "D_pre_2019": null
+  },
+  "weighting": {
+    "method": "District TOTAL production averaged over every PIRSA season this repo holds (2022/23-2025/26), allocated to cells in proportion to CLUM cropping_ha within the district (A14). Held FIXED across all four states so a network change is not blended with a weather change. Identical to pipeline/r8_choice_geometry.parcel_weights.",
+    "district_mean_production_t": {
+      "EEP": 945206,
+      "LEP": 1111912,
+      "WEP": 826409
+    },
+    "total_t": 2883528,
+    "sensitivity": {
+      "A_lucky_bay_only": {
+        "fixed_mean_2022-26_tonnes": {
+          "m1_bill_aud_per_t": 2.52,
+          "m2_toll_aud_per_t": 16.48
+        },
+        "unweighted_cells": {
+          "m1_bill_aud_per_t": 2.9,
+          "m2_toll_aud_per_t": 20.78
+        }
+      },
+      "B_bunkers_reopened": {
+        "fixed_mean_2022-26_tonnes": {
+          "m1_bill_aud_per_t": 2.51,
+          "m2_toll_aud_per_t": 8.36
+        },
+        "unweighted_cells": {
+          "m1_bill_aud_per_t": 2.89,
+          "m2_toll_aud_per_t": 10.62
+        }
+      },
+      "C_no_independent": {
+        "fixed_mean_2022-26_tonnes": {
+          "m1_bill_aud_per_t": 2.66
+        },
+        "unweighted_cells": {
+          "m1_bill_aud_per_t": 3.05
+        }
+      },
+      "D_pre_2019": {
+        "fixed_mean_2022-26_tonnes": {
+          "m1_bill_aud_per_t": 2.44
+        },
+        "unweighted_cells": {
+          "m1_bill_aud_per_t": 2.75
+        }
+      }
+    }
+  },
+  "sensitivities": {
+    "least_distance_routing_A5_free": {
+      "what": "The primary figures route on least TIME (A5 class speeds) and then read the kilometres off that path, as p2_build_matrix.py does. This variant routes on least DISTANCE instead and so depends on NO assumed speed at all. It is a floor on the kilometres and therefore on the dollars.",
+      "EP": {
+        "A_lucky_bay_only": {
+          "m1_bill_aud_per_t": 2.46,
+          "m2_toll_aud_per_t": 15.88,
+          "m4_port_aud_per_t": 9.82
+        },
+        "B_bunkers_reopened": {
+          "m1_bill_aud_per_t": 2.45,
+          "m2_toll_aud_per_t": 8.18,
+          "m4_port_aud_per_t": 9.82
+        },
+        "C_no_independent": {
+          "m1_bill_aud_per_t": 2.61,
+          "m2_toll_aud_per_t": null,
+          "m4_port_aud_per_t": 13.19
+        },
+        "D_pre_2019": {
+          "m1_bill_aud_per_t": 2.41,
+          "m2_toll_aud_per_t": null,
+          "m4_port_aud_per_t": 13.19
+        }
+      }
+    },
+    "lucky_bay_coordinate": {
+      "what": "STATE A RESTS ENTIRELY ON ONE COORDINATE. With both bunkers shut, Lucky Bay is the only independent receival point on the peninsula, so the toll at state A is a pure function of the road distance to a single point. That point is registered in sites.geojson at a TOWN/HAMLET node ('Lucky Bay, South Australia' hamlet node, facility adjoins hamlet) - the same precision class A11 gives Lock and Kimba a <=5 km tolerance for, and it is registered in no assumption. It is swept here rather than asserted: the site is displaced 0 / 2.5 / 5 km on eight bearings, RE-SNAPPED to the road graph and RE-ROUTED with a fresh Dijkstra, and the envelope is published beside every state-A figure.",
+      "offsets_km": [
+        0.0,
+        2.5,
+        5.0
+      ],
+      "bearings_deg": [
+        0,
+        45,
+        90,
+        135,
+        180,
+        225,
+        270,
+        315
+      ],
+      "n_configurations": 17,
+      "state": "A_lucky_bay_only",
+      "envelope": {
+        "m2_toll_aud_per_t": [
+          15.75,
+          16.57
+        ],
+        "m1_bill_aud_per_t": [
+          2.47,
+          2.52
+        ],
+        "by_district_toll": {
+          "WEP": [
+            29.16,
+            29.98
+          ],
+          "EEP": [
+            6.11,
+            6.92
+          ],
+          "LEP": [
+            13.98,
+            14.81
+          ]
+        }
+      },
+      "rows": [
+        {
+          "offset_km": 0.0,
+          "bearing_deg": null,
+          "m2_toll_aud_per_t": 16.48,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.89,
+            "EEP": 6.84,
+            "LEP": 14.72
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 0,
+          "m2_toll_aud_per_t": 16.31,
+          "m1_bill_aud_per_t": 2.51,
+          "by_district_toll": {
+            "WEP": 29.72,
+            "EEP": 6.66,
+            "LEP": 14.54
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 45,
+          "m2_toll_aud_per_t": 16.57,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.98,
+            "EEP": 6.92,
+            "LEP": 14.81
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 90,
+          "m2_toll_aud_per_t": 16.57,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.98,
+            "EEP": 6.92,
+            "LEP": 14.81
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 135,
+          "m2_toll_aud_per_t": 16.57,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.98,
+            "EEP": 6.92,
+            "LEP": 14.81
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 180,
+          "m2_toll_aud_per_t": 16.45,
+          "m1_bill_aud_per_t": 2.51,
+          "by_district_toll": {
+            "WEP": 29.86,
+            "EEP": 6.8,
+            "LEP": 14.69
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 225,
+          "m2_toll_aud_per_t": 16.43,
+          "m1_bill_aud_per_t": 2.51,
+          "by_district_toll": {
+            "WEP": 29.84,
+            "EEP": 6.78,
+            "LEP": 14.66
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 270,
+          "m2_toll_aud_per_t": 16.38,
+          "m1_bill_aud_per_t": 2.51,
+          "by_district_toll": {
+            "WEP": 29.79,
+            "EEP": 6.73,
+            "LEP": 14.61
+          }
+        },
+        {
+          "offset_km": 2.5,
+          "bearing_deg": 315,
+          "m2_toll_aud_per_t": 16.19,
+          "m1_bill_aud_per_t": 2.5,
+          "by_district_toll": {
+            "WEP": 29.6,
+            "EEP": 6.54,
+            "LEP": 14.43
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 0,
+          "m2_toll_aud_per_t": 15.9,
+          "m1_bill_aud_per_t": 2.47,
+          "by_district_toll": {
+            "WEP": 29.33,
+            "EEP": 6.22,
+            "LEP": 14.16
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 45,
+          "m2_toll_aud_per_t": 16.57,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.98,
+            "EEP": 6.92,
+            "LEP": 14.81
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 90,
+          "m2_toll_aud_per_t": 16.57,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.98,
+            "EEP": 6.92,
+            "LEP": 14.81
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 135,
+          "m2_toll_aud_per_t": 16.57,
+          "m1_bill_aud_per_t": 2.52,
+          "by_district_toll": {
+            "WEP": 29.98,
+            "EEP": 6.92,
+            "LEP": 14.81
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 180,
+          "m2_toll_aud_per_t": 16.45,
+          "m1_bill_aud_per_t": 2.51,
+          "by_district_toll": {
+            "WEP": 29.86,
+            "EEP": 6.8,
+            "LEP": 14.69
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 225,
+          "m2_toll_aud_per_t": 16.43,
+          "m1_bill_aud_per_t": 2.51,
+          "by_district_toll": {
+            "WEP": 29.84,
+            "EEP": 6.78,
+            "LEP": 14.66
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 270,
+          "m2_toll_aud_per_t": 16.19,
+          "m1_bill_aud_per_t": 2.5,
+          "by_district_toll": {
+            "WEP": 29.6,
+            "EEP": 6.54,
+            "LEP": 14.43
+          }
+        },
+        {
+          "offset_km": 5.0,
+          "bearing_deg": 315,
+          "m2_toll_aud_per_t": 15.75,
+          "m1_bill_aud_per_t": 2.48,
+          "by_district_toll": {
+            "WEP": 29.16,
+            "EEP": 6.11,
+            "LEP": 13.98
+          }
+        }
+      ]
+    },
+    "a11_lock_kimba_coordinates": {
+      "what": "A11 gives the Lock and Kimba bunker coordinates a <=5 km tolerance (town centroids, exact pads unpublished). They set state B's independent side. Both sites are displaced, re-snapped and re-routed with a fresh Dijkstra. MAGNITUDES AND BEARINGS BOTH VARY INDEPENDENTLY here, so mixed configurations (Lock 5 km, Kimba 2.5 km) are evaluated; r8_choice_geometry.py's own A11 sweep locks the two magnitudes together and does not.",
+      "state": "B_bunkers_reopened",
+      "envelope": {
+        "n_configurations": 289,
+        "m2_toll_aud_per_t": [
+          8.34,
+          8.87
+        ],
+        "m1_bill_aud_per_t": [
+          2.48,
+          2.52
+        ],
+        "by_district_toll": {
+          "WEP": [
+            15.42,
+            16.63
+          ],
+          "EEP": [
+            1.54,
+            2.05
+          ],
+          "LEP": [
+            8.31,
+            9.49
+          ]
+        }
+      }
+    },
+    "band_inversion": {
+      "A_lucky_bay_only": {
+        "share_production_where_cheapest_is_not_nearest": 0.0016,
+        "wmean_aud_per_t_forgone": 0.0,
+        "max_aud_per_t_forgone": 0.26
+      },
+      "B_bunkers_reopened": {
+        "share_production_where_cheapest_is_not_nearest": 0.0025,
+        "wmean_aud_per_t_forgone": 0.001,
+        "max_aud_per_t_forgone": 0.34
+      },
+      "C_no_independent": {
+        "share_production_where_cheapest_is_not_nearest": 0.0022,
+        "wmean_aud_per_t_forgone": 0.001,
+        "max_aud_per_t_forgone": 0.37
+      },
+      "D_pre_2019": {
+        "share_production_where_cheapest_is_not_nearest": 0.0026,
+        "wmean_aud_per_t_forgone": 0.0,
+        "max_aud_per_t_forgone": 0.22
+      }
+    },
+    "250km_ceiling": {
+      "what": "The schedule stops at 250 km. Above it, applying $0.11 is an EXTRAPOLATION and not a citation (A18). Nothing is clipped; the affected share is reported so a reader can discount it.",
+      "by_state": {
+        "A_lucky_bay_only": {
+          "share_production_independent_haul_over_250km": 0.1801,
+          "share_production_nearest_haul_over_250km": 0.0,
+          "max_independent_haul_km": 622.1
+        },
+        "B_bunkers_reopened": {
+          "share_production_independent_haul_over_250km": 0.0668,
+          "share_production_nearest_haul_over_250km": 0.0,
+          "max_independent_haul_km": 490.9
+        },
+        "C_no_independent": {
+          "share_production_independent_haul_over_250km": null,
+          "share_production_nearest_haul_over_250km": 0.0,
+          "max_independent_haul_km": null
+        },
+        "D_pre_2019": {
+          "share_production_independent_haul_over_250km": null,
+          "share_production_nearest_haul_over_250km": 0.0,
+          "max_independent_haul_km": null
+        }
+      }
+    },
+    "road_snap": {
+      "wmean_cell_snap_km": 1.99,
+      "wshare_cells_snapped_over_2km": 0.443,
+      "worst_site_snap_km": 0.65,
+      "note": "A cell is routed from its nearest node on the OSM graph and the snap leg itself is not driven, so a large snap understates that cell's kilometres to EVERY destination equally. On the LEVELS (M1, M4, the bare independent level) it understates the dollars. On the TOLL it very largely cancels, because the toll is a difference of two hauls that share the same snap - it survives only through the band edge, where the two hauls can fall in different bands. Tonne-weighted mean snap and the share of production snapping more than 2 km are printed with it so the size of it is visible."
+    },
+    "return_leg_bound": {
+      "status": "OPEN QUESTION, NOT A PUBLISHED RESULT",
+      "note": "THE EMPTY RETURN LEG IS UNRESOLVED AND IS WORTH A FACTOR OF TWO. Established: ESCOSA APPLIES the rate to a one-way distance - all four of its own published results reproduce on that reading and on no other. Not established: whether AEGIC's underlying cost line was itself built on a round-trip cycle. The report is silent. The distance is NOT doubled here, because doubling would double-count if the cost line already embeds the return. The doubled figures are reported once, as a labelled UPPER BOUND on the open question, and are not a published result. Settling it needs AEGIC, Australia's grain supply chains, October 2018, Note 2c to Figure 4, p. 18, which is not cached in this repo.",
+      "published_one_way": {
+        "A_lucky_bay_only": 16.48,
+        "B_bunkers_reopened": 8.36,
+        "C_no_independent": null,
+        "D_pre_2019": null
+      },
+      "upper_bound_if_cost_line_is_one_way_and_return_is_real": {
+        "A_lucky_bay_only": 32.96,
+        "B_bunkers_reopened": 16.72,
+        "C_no_independent": null,
+        "D_pre_2019": null
+      },
+      "which_is_right": "Unknown from any document in this repo. The published figures everywhere else on this page are the one-way ones."
+    }
+  },
+  "caveats": {
+    "cartage_is_half_the_decision": "CARTAGE IS HALF OF A DELIVERY DECISION. Growers deliver where PRICE MINUS CARTAGE is best. This project has no price data - 13 days of off-season cash bids and nothing else (data/SOURCES.md, operator-cash-prices-api). Every figure on this page is one side of that ledger. A toll of $X/t says the independent must be worth $X/t more at the weighbridge before the load moves; it does NOT say whether it was, and nothing here is a total grower benefit or loss.",
+    "marginal_is_a_floor": "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the additional cost of travelling further once the truck is on the road. Truck ownership, loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA says so. At EP's ~144 km average site-to-port haul the same rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t - the marginal rate is roughly half a delivered cartage price. A grower reading '$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, not the extra cost of running the extra trips.",
+    "roster": "EVERY MEASURE ON THIS PAGE EXCEPT THE BARE INDEPENDENT LEVEL DEPENDS ON THE SITE ROSTER, AND THE ROSTER IS KNOWN INCOMPLETE. R0's threshold rows survive a roster defect because they are a function of the drive to the nearest INDEPENDENT point alone and every roster defect on record is incumbent-side. M1, M3 and M4 are not protected that way, and neither is the toll M2, because the toll is measured FROM the incumbent. docs/roster_audit_2026-08.md section 5: Tooligie (received 2022/23, 2023/24, 2024/25), Cowell (2017/18, 2018/19) and Mangalo (2018/19) are absent from sites.geojson altogether, and Cungena is tagged closed_2019 but received grain in 2022/23. THE DIRECTIONS ARE KNOWN AND ARE NOT SYMMETRIC. Missing incumbent sites raise the modelled cost to the nearest incumbent point, so: M1 levels are UPPER BOUNDS at every state; the toll M2 is a LOWER BOUND (a nearer real Bunge site would make the independent option relatively dearer); M3's catchment share is an UPPER BOUND. And the contamination is not even across states - Cowell and Mangalo bear on pre-2019 only, Tooligie on the 2023/24-attributed state and probably the current ones, Cungena on all three post-2019 states - so the state-to-state DELTAS carry it too. This is the single biggest defect in these numbers and it is not fixed here: fixing it means coordinates and capacities for three sites, and A4's capacity split entangles that with the calibration (roster_audit section 5).",
+    "lucky_bay_coordinate": "STATE A RESTS ENTIRELY ON ONE COORDINATE. With both bunkers shut, Lucky Bay is the only independent receival point on the peninsula, so the toll at state A is a pure function of the road distance to a single point. That point is registered in sites.geojson at a TOWN/HAMLET node ('Lucky Bay, South Australia' hamlet node, facility adjoins hamlet) - the same precision class A11 gives Lock and Kimba a <=5 km tolerance for, and it is registered in no assumption. It is swept here rather than asserted: the site is displaced 0 / 2.5 / 5 km on eight bearings, RE-SNAPPED to the road graph and RE-ROUTED with a fresh Dijkstra, and the envelope is published beside every state-A figure.",
+    "bunker_closure_unsourced": "THE SEASON LABELS ARE ATTRIBUTIONS AND ONE OF THEM IS UNSOURCED. The four states are defined by their CONTENT - which points exist - and every number here follows from that content alone. The attribution of state A to 2025/26 rests on the claim that both T-Ports bunkers were closed for that season, and that claim has no source in this repo: there is no tports.com/harvest entry in data/SOURCES.md, no cached page under data/raw/, no retrieval date, and for KIMBA no closure evidence at all (its status field is set with a notes field reading only 'Built for 2021 harvest'). The only record is a hand-typed note on LOCK in pipeline/manual_sites.json citing a live read of tports.com/harvest on 2026-08-19 - the same off-season live read that docs/roster_audit_2026-08.md section 1 identifies as the root cause of four wrongly closed Bunge sites. Read A and B as 'Lucky Bay alone' and 'Lucky Bay plus both bunkers'. Do not publish either season label until the page is archived and registered.",
+    "return_leg": "THE EMPTY RETURN LEG IS UNRESOLVED AND IS WORTH A FACTOR OF TWO. Established: ESCOSA APPLIES the rate to a one-way distance - all four of its own published results reproduce on that reading and on no other. Not established: whether AEGIC's underlying cost line was itself built on a round-trip cycle. The report is silent. The distance is NOT doubled here, because doubling would double-count if the cost line already embeds the return. The doubled figures are reported once, as a labelled UPPER BOUND on the open question, and are not a published result. Settling it needs AEGIC, Australia's grain supply chains, October 2018, Note 2c to Figure 4, p. 18, which is not cached in this repo.",
+    "base_year": "The rate is 2018-19 A$ and is published here unindexed, on A18's recorded decision. Seven years old. This must sit next to every figure, not in a footnote."
+  },
+  "carried_assumptions": [
+    {
+      "id": "A18",
+      "note": "the ESCOSA marginal cartage schedule, used as published. This is the ONLY place a dollar enters this page. The app's flat A$0.10/t-km working lever is NOT used and must not be confused with it."
+    },
+    {
+      "id": "A5",
+      "note": "road class speeds - used only to CHOOSE the path (least time), not to price it. The kilometres are then read off that path, never derived as minutes x speed. A least-DISTANCE routing variant is published as a standing sensitivity and it depends on no assumed speed at all."
+    },
+    {
+      "id": "A11",
+      "note": "the Lock and Kimba town-centroid coordinates, <=5 km tolerance. Bears on state B only. Swept, with magnitudes and bearings both varied independently."
+    },
+    {
+      "id": "A12",
+      "note": "season site sets. Load-bearing here in a way it is not for R0's threshold rows - see the roster caveat. This script inherits r8_choice_geometry's status-field state construction, including its known omission of Nunjikompita from the 2023/24-attributed state."
+    },
+    {
+      "id": "A14",
+      "note": "district boundaries approximated by LGA composition - used for the tonne weighting only, not for routing."
+    },
+    {
+      "id": "Lucky Bay coordinate",
+      "note": "a hamlet node, registered in no assumption. Swept here. It should be registered in ASSUMPTIONS.md."
+    },
+    {
+      "id": "A1/A2/A4/A9/A15/A24",
+      "note": "NOT USED. No payload, no bay count, no capacity, no fitted parameter enters any number on this page. A cart leg is priced per tonne, so the truck configuration cancels out of it entirely."
+    }
+  ]
+}

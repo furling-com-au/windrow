@@ -139,6 +139,30 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   **Licence**: operator public disclosure.
 - **Local cache**: `data/raw/press/tports_luckybay__20260831.html`
 
+## arowana-luckybay-freight-claim
+- **What**: Arowana's 2 September 2021 release on the early settlement of its secured
+  infrastructure debt facility for Lucky Bay Port. Source of two claims used in this
+  project, both verbatim from the cached page:
+  - "The Lucky Bay Port generates road freight savings for grain growers from the Eyre
+    Peninsula of **up to $15 per tonne** and 4,600 tonnes of CO2 emission savings annually."
+  - "This has enabled co-investors with Arowana to realise a return in excess of the
+    **target IRR of 15%**."
+- **URL**: `https://arowanaco.com/2021/09/02/arowanas-private-credit-investment-in-lucky-bay-port-yields-strong-returns/`
+  · **Retrieved**: 2026-08-31 · **Licence**: company media release, quoted with attribution.
+- **Local cache**: `data/raw/press/arowana_luckybay_returns_20210902__20260831.html`
+- **Status**: a **promotional claim by an investor in the asset**, not an independent study.
+  No working, no method, no rate and no base year are published for the $15/t figure, and
+  "up to" is a maximum. Tested in `pipeline/r10_arowana_claim.py`; the test is currently
+  NOT publishable for the reasons in `docs/r9_cartage_findings.md`.
+- ⚠ **Provenance failure worth recording.** This claim was used in a workflow prompt on
+  2026-08-31 before it was ever sourced into the repo — it came from a web-search summary
+  that was never fetched or cached. An adversarial pass caught it: the quoted words existed
+  nowhere in the repo except in the scripts written to test them. The claim turned out to be
+  real and is now registered here. The same channel had already produced two claims in this
+  project that were **false** (that T-Ports was hiring for Lock and Kimba in 2025/26, and
+  that Grain Producers SA opposed the 2024 Grainflow acquisition). A search summary is not
+  a source.
+
 ## bunge-surplus-site-tender-2026
 - **What**: Bunge's public tender of six surplus SA bulk-handling sites via Elders —
   Bordertown (36,200 t), Tintinara (13,000 t), Coomandook (23,000 t), Geranium (20,100 t),
@@ -221,6 +245,110 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   2025/26, ESCOSA bulk grain supply chain inquiry final report (2019).
 - **Licences**: publicly released regulatory/industry documents; cited.
 - **Local cache**: `data/raw/reference/` (7 PDFs)
+- ⚠ The ESCOSA report is **also registered separately below** as
+  `escosa-marginal-trucking-rate-2019`, because it carries a published $/t-km
+  freight schedule that A18 depends on and that needs its own basis and caveats.
+
+## escosa-marginal-trucking-rate-2019 — the published $/t-km schedule
+- **What**: the only public marginal road-cartage schedule for South Australian grain
+  found in this project — **A$0.12 per tonne-km up to 50 km, A$0.11 per tonne-km for
+  50–250 km**, in **2018–19 A$, nominal and undeflated**. Verbatim: "Only the marginal
+  freight cost has been used, $0.12 ($/tonne-km) for up to 50 kilometres and $0.11
+  ($/tonne-km) for 50 to 250 kilometres."
+- **Where**: Essential Services Commission of South Australia, *Inquiry into the South
+  Australian bulk grain export supply chain costs — Final Report*, **29 January 2019**,
+  Box 5.2 "Cost Shifting Case Study — Assumptions and detailed calculations", p. 91
+  (extracted-text lines 5405–5412 under `pdftotext -layout`).
+- **URL**: `https://www.escosa.sa.gov.au/ArticleDocuments/1076/20190129-Inquiry-BulkGrainExportSupplyChainCosts-FinalReport.pdf.aspx`
+  (linked from `https://www.escosa.sa.gov.au/projects-and-publications/projects/inquiries/inquiry-into-the-south-australian-bulk-grain-supply-chain-costs`).
+- **Retrieved**: PDF cached **2026-08-19**; schedule read, verified and registered
+  **2026-08-31**. · **Licence**: publicly released regulatory report; cited with
+  attribution.
+- **Local cache**: `data/raw/reference/escosa_grain_supply_chain_2019.pdf`
+  (sha256 `f901b52cba57cddac955a3448767c3ebe1e99656a11775ffd0bc348bf027354c`;
+  PDF ModDate 2019-01-29, matching the publication date. Not listed in
+  `data/raw/MANIFEST.sha256`.)
+- **Upstream provenance, and it is not uniform across the two bands**: ESCOSA states the
+  estimates "were based on data provided by AEGIC, verified against published Viterra
+  freight rates". Its footnote 289 attributes the **≤50 km** rate to AEGIC, *Australia's
+  grain supply chains: Costs, Risks and Opportunities*, October 2018, **Note 2c to Figure 4,
+  p. 18**, and the **50–250 km** rate to "**AEGIC advice**" — i.e. unpublished advice to the
+  Commission. Only the first of the two traces to a public document. The AEGIC report
+  itself is **not** cached in this repo.
+- **What it actually says — the basis, which matters more than the rates**:
+  - **Marginal, not average**: "once the grower's truck is on the road, then only the
+    additional (marginal) cost involved in travelling further to the next available site is
+    relevant." Truck ownership, loading and the trip that would have happened anyway are
+    outside it.
+  - **Applied to one-way loaded kilometres, band selected by the whole distance, no
+    cumulative tiering, empty return leg not added.** ESCOSA does not say this in prose; it
+    is recovered from the four case results it publishes against the four Google Maps
+    distances it used (Caltowie 16.3 km → $1.96/t, Yongala 53.0 km → $5.83/t, Gulnare
+    31.7 km → $3.80/t, Jamestown 28.5 km → $3.42/t). One-way flat-band reproduces all four;
+    round-trip reproduces none; cumulative tiering fails on Yongala, the only case crossing
+    the 50 km edge ($6.33 computed vs $5.83 published).
+  - **Time is excluded, and the report says so**: "This case study has not addressed all
+    potential costs, such as if the additional travel time resulted in the need for a
+    grower to employ an additional truck." Site turnaround is likewise set aside.
+  - **Nominal and deliberately not deflated**: "The marginal trucking cost rates have not
+    been deflated because it is not known how well the resulting deflated costs would
+    reflect the actual costs of the time."
+- **What it does NOT say**: it is **South Australia-wide, not Eyre Peninsula-specific** —
+  the case study behind it is the upper Central region (Gladstone catchment, 16–53 km
+  hauls). It publishes **no band above 250 km**. It is **silent on whether AEGIC's
+  underlying cost line embeds an empty return leg, loading or waiting**; the full report
+  text contains no "return leg", "backload", "round trip" or "empty run". That silence is
+  worth a factor of two and must be reported as silence, not resolved by assumption.
+  It is a **cost rate and not a distance threshold** — it does not designate any cart
+  range, and must not be used to justify one (see `docs/r0_choice_geometry.md:48`).
+- **Reproduce**:
+  `pdftotext -layout data/raw/reference/escosa_grain_supply_chain_2019.pdf - | sed -n '5405,5412p'`
+  and, for the application rule and the transcription check,
+  `.venv/Scripts/python.exe pipeline/r9_escosa_rate_check.py` (prints `VERDICT: PASS`).
+- **Used in**: `data/ASSUMPTIONS.md` A18; the Tier-2 cartage-dollars output. Never in the
+  simulation.
+- **No successor found.** Searched 2026-08-31 for any published $/t-km grain road-freight
+  schedule postdating January 2019: ESCOSA's inquiry page shows no successor inquiry or
+  update; AEGIC has published no edition of *Australia's grain supply chains* later than
+  October 2018 (the 2024 wp-content URLs are re-uploads of the 2018 report; aegic.org.au
+  refuses automated fetches, so this rests on search results rather than a document read);
+  ACCC bulk grain ports monitoring covers ports and capacity only and does not collect
+  overland grain movements; ABS road freight publishes no grain-specific $/t-km. The two
+  more recent published rate documents that do exist are registered below, and neither is a
+  replacement.
+
+## ach-recommended-cartage-rates-2026 (comparator — not a substitute)
+- **What**: Australian Custom Harvesters' "Recommended Cartage Rates" — "up to 10 km –
+  $16.50 per tonne (excl GST)/$18.15 (incl GST)", then "add $0.10 (excl GST) /$0.11 (incl
+  GST) per tonne" for each further kilometre. "These rates include demurrage." "These rates
+  are a guide only. Growers and contractors should negotiate rates based on individual
+  circumstances." Valid as at **1 February 2026**.
+- **URL**: `https://customharvesters.org.au/harvest-rates/` · **Retrieved**: 2026-08-31 ·
+  **Licence**: industry-association published guidance; cited with attribution.
+- **Why registered**: it is the most recent published *marginal* distance increment found,
+  and it bounds the inflation question — $0.10/t-km excl GST in 2026 sits **below** ESCOSA's
+  $0.11–0.12 in 2018–19 A$, which is why A18 publishes in base-year dollars rather than
+  indexing forward.
+- **Why it is not a substitute**: national rather than SA or EP; contractor guidance rather
+  than a regulator's finding; and a **full** charge with a large fixed component
+  ($16.50 for the first 10 km) rather than a pure marginal line. Not cached locally.
+
+## sagit-farm-gross-margin-guide-2026 (comparator — not a substitute)
+- **What**: SAGIT / Ag Excellence Alliance / GRDC, *2026 Farm Gross Margin and Enterprise
+  Planning Guide for South Australia*. "Freight Costs (as included in Gross Margins)":
+  cereal grains **$35.00/tonne**, canola $35.00, lentils $38.00, other legume grains
+  $35.00, triticale $28.00, fertiliser $35.00, oaten hay $35.00. Commodity prices in the
+  guide are "on delivered end-user basis e.g. Grain is delivered port basis".
+- **URL**: `https://sagit.com.au/wp-content/uploads/2026/02/ART-251201.07.01-SAGIT-Gross-Margins-Guide-2026_DIGITAL.pdf`
+  · **Retrieved**: 2026-08-31 · **Licence**: publicly released industry guide; cited.
+- **Why registered**: SA-specific and current, so it is the natural place a reader would
+  look for a 2026 SA cartage number.
+- **Why it is not a substitute**: it is a **flat $/tonne budgeting allowance with no
+  distance term at all**, so it cannot produce a per-district or per-kilometre figure. Used
+  only as an upper bracket: at EP's ~144 km average site→port haul the three sources read
+  ESCOSA $15.84/t (marginal, 2018–19 A$) < ACH $29.90/t (full, 2026) < SAGIT $35.00/t
+  (budgeted, 2026). The gap is the fixed and time cost the marginal rate excludes by design.
+  Not cached locally.
 
 ## published-claims — press and government reporting (verification pass 2026-08-31)
 
