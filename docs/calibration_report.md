@@ -9,10 +9,40 @@ radius, upcountry tipping bays, port tipping bays, Lucky Bay bias) fitted on
 **2023/24 + 2025/26** weekly Western-region receivals, season totals, and the Port
 Lincoln shipping program. **2024/25 (drought) is held out** entirely.
 
-Structural (non-fitted) model features added during calibration, all physically
-motivated and documented in ASSUMPTIONS.md/engine comments: spring-dryness maturity
-shift (dry Sep–Oct ⇒ earlier ripening), rain-hangover harvest suppression, rain-day
-delivery damping, T-Ports inland bunkers closed in 2024/25 (A15).
+Structural (non-fitted) model features, all physically motivated and documented in
+ASSUMPTIONS.md/engine comments: spring-dryness maturity shift (dry Sep–Oct ⇒ earlier
+ripening), rain-hangover harvest suppression, rain-day delivery damping, fire-danger
+harvest bans (McArthur grassland index against the SA Grain Harvesting Code of
+Practice's published GFDI 35 cease-harvest trigger — A7), T-Ports inland bunkers closed
+in 2024/25 (A15). The fire-danger rule replaced a flat "cut 25 % when tmax ≥ 38 °C" cut
+on 2026-08-31 (issue #24).
+
+**The #24 refit was run, and rejected — the knobs below are still #22's.** This needs
+saying plainly, because "we changed the engine and kept the old parameters" is normally a
+smell. Three things decided it:
+
+1. *The rule is fit-neutral at fixed knobs.* Swapping the temperature cut for the
+   fire-danger one at the #22 knob vector moved the objective 1.0800 → 1.0829 and every
+   season's weekly RMSE by ≤ 1 point; the held-out season did not move at all (−0.3 %,
+   64 %). It changes *which* days are lost, not how many, and a ~90-day harvest window
+   absorbs the difference. So this vector is not "fitted to a rule that no longer
+   exists" in any way the data can see — it remains an optimum-equivalent point.
+2. *Both refits bought calibration-season fit with held-out accuracy.* Independent
+   searches at 600 and 900 evaluations reached 1.0716 and 1.0639 — a real ~1.8 % gain,
+   not the four-decimal tie #22 documented — while the held-out season's total error went
+   −0.3 % → −1.2 % and −2.4 % and its weekly RMSE 64 % → 65 % and 69 %. Improving the
+   fitted seasons while degrading the held-out one is what the held-out season is *for*.
+3. *Both refits also broke external checks the objective cannot see.* The direct-to-port
+   share rose to 33–36 %, outside the **15–35 %** published prior in A9 (the incumbent
+   sits at 26.6 / 24.6 / 31.1 %); the 900-evaluation vector's 807-truck fleet trips the
+   engine's own queue guard on the 2022/23 replay; and the 600-evaluation vector left
+   `choiceBeta` clipped on its search floor, the exact defect #22 closed. All of it is
+   the objective wandering in the direction A2 already documents as unidentified —
+   weaker distance decay plus more trucks — not evidence about fire danger.
+
+Both refit vectors are reproducible: `calibrate.ts 400` and `calibrate.ts 600` off this
+commit. The 900-evaluation vector is recorded in docs/PROGRESS.md so the call can be
+reversed without re-running the search.
 
 ## Fitted parameters
 
@@ -44,17 +74,19 @@ but close enough that the next refit could be. No knob is clipped. Near a bound:
 
 | season | role | sim total (Mt) | obs total (Mt) | total err | weekly RMSE / mean weekly | PL vessels sim / AIS |
 |---|---|---|---|---|---|---|
-| 2022/23 | replay only* | 2.162 | 3.267 | -33.8 % | 93 % | 0 / – |
-| 2023/24 | calibration | 1.857 | 1.864 | -0.4 % | 40 % | 86 / 86 |
+| 2022/23 | replay only* | 2.151 | 3.267 | -34.2 % | 93 % | 0 / – |
+| 2023/24 | calibration | 1.858 | 1.864 | -0.3 % | 41 % | 86 / 86 |
 | 2024/25 | **held out** | 1.503 | 1.507 | -0.3 % | 64 % | 53 / 53 |
-| 2025/26 | calibration | 2.245 | 2.249 | -0.2 % | 66 % | 51 / 51 |
+| 2025/26 | calibration | 2.244 | 2.249 | -0.2 % | 65 % | 51 / 51 |
 
 \* 2022/23 predates the AIS coverage and its bundle carries **no vessel program at all**,
 so the ports never outload. Once upcountry storage fills, the network jams and receivals
 stop short — the total error on that row measures the jam, not the fit, and the season is
-a land-side replay only. (Under the pre-#22 parameter set the same jam tripped the
-engine's QUEUE INSANE guard and 2022/23 could not be run at all; it now completes, which
-is why a row appears here where earlier revisions printed a validity-envelope note.)
+a land-side replay only. Whether the jam merely truncates the season or trips the engine's
+own QUEUE INSANE guard turns on the fitted **fleet size**, not on anything about 2022/23:
+it tripped under the pre-#22 (691-truck) set, completes under this one, and would trip
+again under the 807-truck vector #24's refit proposed. Another reading of how weakly the
+objective identifies the fleet — see A2.
 
 ## Held-out season (2024/25) vs acceptance criteria
 

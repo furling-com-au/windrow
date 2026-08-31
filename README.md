@@ -52,7 +52,7 @@ npm --workspace packages/sim run test
 npx tsx packages/sim/scripts/run_headless.ts 2025/26 42
 
 # calibration search (writes packages/sim/src/calibrated.json)
-npx tsx packages/sim/scripts/calibrate.ts 400
+npx tsx packages/sim/scripts/calibrate.ts 600
 
 # scenarios sweep
 npx tsx packages/sim/scripts/scenarios.ts 2025/26
@@ -115,8 +115,10 @@ when published.
 
 Harvest demand comes from PIRSA district production disaggregated onto ABARES CLUM
 cropping pixels (2.5 km parcels, 324 logistics clusters). Each day, weather (ERA5)
-gates how much of each ripened crop can be harvested; grain accumulates on-farm, and a
-fleet of farm trucks chooses receival sites Huff-style (attractiveness ÷ (travel +
+gates how much of each ripened crop can be harvested — rain stops the header, and so
+does fire danger, via the McArthur grassland index against the GFDI 35 cease-harvest
+trigger the SA Grain Harvesting Code of Practice sets (A7). Grain accumulates on-farm,
+and a fleet of farm trucks chooses receival sites Huff-style (attractiveness ÷ (travel +
 queue time)^β, seeded-random tie-breaks) over a precomputed OSM travel-time matrix,
 with queue feedback. Sites have tipping bays, service times, and storage caps;
 line-haul trucks keep port stocks ahead of the vessel program; vessels (from AIS-derived

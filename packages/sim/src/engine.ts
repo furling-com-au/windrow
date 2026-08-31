@@ -112,6 +112,46 @@ const FALLBACK_SPEED_KMH = 75;
  *  as the trucks it replaces, at this speed instead of the road speed for that route. */
 const RAIL_SPEED_KMH = 40;
 
+/** Degree of curing (%) assumed for a paddock being harvested. A ripe cereal or pulse
+ *  crop standing ready for the header is fully cured by definition — this is not a free
+ *  parameter, and the published cease-harvest tables that A7 is validated against assume
+ *  the same thing (see below). */
+const CURING_PCT = 100;
+/** Constant term of the Mark 4 grassland meter with the curing term folded in at
+ *  CURING_PCT: -23.6 + 5.01 ln(100) = -0.53. Hoisted because the season loop evaluates
+ *  the index 1,110 times per Sim and the calibrator builds thousands of Sims. */
+const GFDI_C0 = -23.6 + 5.01 * Math.log(CURING_PCT);
+
+/**
+ * McArthur **Mark 4 grassland fire-danger index** (GFDI) for a fully cured paddock, in
+ * the equation form of Purton (1982), *Equations for the McArthur Mark 4 grassland fire
+ * danger meter*, BoM Meteorological Note 147 (the meters were first put into equations by
+ * Noble, Bary & Gill 1980):
+ *
+ *     GFDI = 2.0 exp(-23.6 + 5.01 ln C + 0.0281 T - 0.226 sqrt(RH) + 0.633 sqrt(U))
+ *
+ * C = degree of curing (%), T = air temperature (°C), RH = relative humidity (%),
+ * U = 10 m wind speed (km/h).
+ *
+ * This is the index the **CFS/PIRSA/Grain Producers SA Grain Harvesting Code of Practice**
+ * (Sept 2023) is written against: Required Practice 1 is "suspend grain harvesting
+ * operations when the local actual GFDI exceeds 35". District harvesting codes publish
+ * that threshold as a lookup table of the wind speed at which to stop for a given
+ * temperature and humidity; this implementation reproduces two published entries of that
+ * table to within ~3 index points (35 °C / 14 % RH / 26 km/h -> 34; 40 °C / 15 % RH /
+ * 26 km/h -> 38, against a stated threshold of 35). See ASSUMPTIONS.md A7.
+ *
+ * Note this is temperature AND wind AND humidity together. A 41 °C day with a 20 km/h
+ * breeze scores ~24 and is a perfectly good harvest day; a 22 °C day with a 47 km/h wind
+ * over cured stubble scores ~36 and is not. That is the whole point of using it.
+ */
+export function gfdiFullyCured(tempC: number, rhPct: number, windKmh: number): number {
+  return (
+    2.0 *
+    Math.exp(GFDI_C0 + 0.0281 * tempC - 0.226 * Math.sqrt(Math.max(0, rhPct)) + 0.633 * Math.sqrt(Math.max(0, windKmh)))
+  );
+}
+
 interface Vessel {
   id: number;
   port: number; // site index
@@ -178,6 +218,11 @@ export class Sim {
   tonneKm = 0; // loaded ROAD tonne-km (economics layer; the only tonne-km A18 prices)
   railTravelMin = 0; // trainset loaded+empty travel minutes (rail scenario)
   railTonneKm = 0; // loaded RAIL tonne-km — moved by trainsets, so NOT a road freight cost
+  /** trainset dispatches, and the distinct days on which any happened (rail scenario).
+   *  docs/scenarios.md quotes the cycles-per-trainset-per-active-day these give; before
+   *  #24 that figure could not be reproduced from the code at all. */
+  railTrips = 0;
+  railActiveDays = new Set<number>();
   /** farm trucks currently en route to each site: growers can see site status/wait
    *  before committing, so the choice model must not ignore committed traffic. */
   private siteInbound: Int32Array = new Int32Array(0);
@@ -247,7 +292,6 @@ export class Sim {
         const i = day + offsetDays;
         const rain = w.rain_mm[i] ?? 0;
         const rain2 = (w.rain_mm[i - 1] ?? 0) + rain;
-        const tmax = w.tmax_c[i] ?? 25;
         const rs = params.rainStopMm ?? 5; // A7 threshold (assumption lever)
         let f = 1.0;
         if (rain >= rs || rain2 >= 2 * rs) f = 0;
@@ -255,7 +299,29 @@ export class Sim {
         // hangover: paddocks stay wet after a heavy fall (A7)
         if ((w.rain_mm[i - 1] ?? 0) >= 1.6 * rs) f *= 0.3;
         else if ((w.rain_mm[i - 2] ?? 0) >= 1.6 * rs) f *= 0.5;
-        if (tmax >= 38) f *= 0.75;
+
+        // ---- fire-danger harvest ban (A7) ----
+        // Peak-of-day GFDI from the day's worst combination: hottest temperature, driest
+        // hour, windiest hour. Those three do broadly coincide in the mid-late afternoon
+        // of a hot north-westerly, which is exactly when bans get called; on other days
+        // this overstates the peak, which is the main known bias in this rule.
+        // Fallbacks outside the weather array are a benign day (GFDI ~10, no ban).
+        const g = gfdiFullyCured(w.tmax_c[i] ?? 25, w.rh_min_pct[i] ?? 40, w.wind_max_kmh[i] ?? 20);
+        const gb = params.harvestBanGfdi ?? 35; // published cease-harvest trigger (lever)
+        if (g > gb) {
+          // The code of practice SUSPENDS harvesting while the index is over the
+          // threshold — it does not write off the day — so what matters is how long the
+          // day spends above it. GFDI traces a diurnal arc, near zero overnight (cool,
+          // humid, calm) and peaking mid-late afternoon. Approximating that arc as a
+          // cosine of peak height g, the share of it lying above gb is
+          //     (2/pi) acos(gb/g)
+          // which is 0 for a day that only just touches the trigger, 1/3 at g = 40,
+          // 1/2 at g = 50, 2/3 at g = 70, and tends to 1 for a catastrophic day. The
+          // remainder is the early morning and the evening after the wind drops, which
+          // is when growers actually get a ban day's grain off. No free constant here
+          // beyond the published trigger itself.
+          f *= 1 - (2 / Math.PI) * Math.acos(Math.min(1, gb / g));
+        }
         this.weatherFactor[di * 370 + day] = f;
       }
       // spring-dryness maturity shift (A7 extension): dry Sep-Oct => crops ripen earlier.
@@ -946,6 +1012,8 @@ export class Sim {
         if (isTrain) {
           this.railTravelMin += minutes * 2;
           this.railTonneKm += legKm * load;
+          this.railTrips++;
+          this.railActiveDays.add(this.day);
         } else {
           this.truckTravelMin += minutes * 2;
           this.truckKm += legKm * 2; // loaded out, empty back

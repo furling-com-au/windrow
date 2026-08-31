@@ -42,6 +42,8 @@ export function defaultParams(): Params {
     siteServiceMin: 12, // A2 (assumed)
     travelTimeScale: 1.0, // A5 speeds as built into the matrix
     rainStopMm: 5, // A7 (assumed threshold)
+    harvestBanGfdi: 35, // A7 cease-harvest trigger — PUBLISHED, not fitted: CFS/PIRSA/GPSA
+    //   Grain Harvesting Code of Practice (Sept 2023), Required Practice 1.
     carryInScale: 1.0, // A17 as measured from Oct-Nov shipments
     upcountryCapScale: 1.0, // A4 estimated capacities as allocated (see sites.geojson)
     choiceBeta: 2.806, // * Huff travel-time decay

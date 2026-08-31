@@ -72,6 +72,13 @@ presented as measured data.
   is **10,160 t**, and the bay count still barely touches it — 10,109 t at 5 bays, 10,160
   at 6, 10,180 at 7. A 2 % spread across the whole physical band is as clean a statement
   as this model can make that tipping capacity is not what caps that port.
+  **Re-measured again after #24's fire-danger harvest rule** (A7; same fitted knobs):
+  **10,710 t** at the fitted 6 bays — 10,282 t at 5, 10,239 t at 7. The peak day moved 5 %
+  because the rule changes which days are lost, and the sweep is now not even monotone in
+  bays (7 sits *below* 6, inside a 4 % band) — which if anything sharpens the point: adding
+  tipping capacity does not reliably buy throughput here, so it is not the constraint. The
+  finding now survives a change of weather mechanism as well as a change of parameter
+  vector.
 - **Related finding**: with bays under-provisioned the calibration objective is monotone
   in fleet size (more trucks always scored better, to 900+), and only the engine's own
   `QUEUE INSANE` invariant (>400 trucks at one site) bounded it. Fleet size is therefore
@@ -158,7 +165,8 @@ presented as measured data.
   took the 2025/26 baseline from **33.1 % direct-to-port and a 139-truck peak queue to
   30.7 % and 135** (at #22's refit the same baseline reads **30.9 % and 105**, and
   `upcountryCapScale` 1.5 still moves it to 24.3 % and 42 — the lever's direction and
-  rough size survive a complete change of parameter vector), and right-sizes the far
+  rough size survive a complete change of parameter vector, and re-measured under #24's
+  fire-danger harvest rule the same lever again lands on **24.3 % and 42**), and right-sizes the far
   west: Witera, Streaky Bay, Wirrulla and
   Poochera go from 30–56 % peak fill to 64–98 %. It also costs the model Port Lincoln's
   published peak receival day — see A2.
@@ -198,13 +206,136 @@ presented as measured data.
 - **Upgrade path**: swap in SILO patched-point (same schema) when an operator email is
   provided — single fetch script change (`pipeline/r5_fetch_climate.py`).
 
-## A7 — harvestable-day rule (to be calibrated in Phase 3)
-- **Value** (initial): a day is non-harvestable if rain_mm ≥ 5 on the day, or ≥ 10 over
-  the prior 2 days; daily harvestable fraction reduced 25 % when tmax ≥ 38 °C (harvest
-  bans / grower behaviour); commodity-specific ramp per calibration.
-- **Reasoning**: standard industry heuristics (GRDC harvest-management guidance
-  discusses rain/humidity delays qualitatively); exact thresholds are free parameters
-  fitted to the weekly receivals dips.
+## A7 — harvestable-day rule
+Until 2026-08-31 this entry described a rain threshold and a flat hot-day cut, which was
+roughly half of what the engine ran, and named a temperature mechanism the engine should
+never have used (issue #24). It is now written against the code. Everything below is in
+the `weatherFactor` block of `packages/sim/src/engine.ts`, except the maturity shift,
+which is flagged as such.
+
+**What the daily harvestable fraction actually is.** One number per district per day,
+`0 … 1`, from the ERA5 district series of A6. It scales *two* things, not one: the
+tonnes a parcel gives up that day, and — separately, at ~0.75 weight — the probability a
+grower attempts a delivery at all. EP harvest is largely header-direct to site with
+little on-farm buffering, so receivals track the weather with barely a lag; that second
+use is why a wet week shows up in the published weekly receivals and not just in the
+harvest curve.
+
+- **Rain — stop (`rainStopMm`, default 5 mm; app lever)**: factor `0` if the day's rain
+  ≥ 5 mm, or if the day plus the day before ≥ 10 mm.
+- **Rain — half-rate band**: otherwise, factor `0.5` for a day of 2 mm to 5 mm
+  (`0.4 × rainStopMm` up to the stop threshold). A shower costs a morning, not a day.
+  *This band was never in the published entry.*
+- **Rain — hangover**: then `× 0.3` if *yesterday* had ≥ 8 mm, else `× 0.5` if the day
+  before that did (`1.6 × rainStopMm`). Paddocks stay too wet to carry a header after a
+  real fall, and this is the rule that produces the multi-day dips in the weekly curve
+  rather than single-day notches. *Also never in the published entry.* Every rain
+  threshold scales off `rainStopMm`, so the app's one slider moves the whole rain rule
+  coherently.
+- **Fire danger — harvest ban** (replaced the flat tmax rule 2026-08-31): see below.
+- **Spring-dryness maturity shift** — **not part of the harvestable fraction at all.**
+  Total Sep–Oct district rain shifts every parcel's ripening date by
+  `clamp((springRain − 45 mm) × 0.25 d/mm, −12, +10)` days: a dry spring ripens the crop
+  early, a wet one holds it back. It is applied once, to `parcelMaturity`, and so moves
+  *when* the season starts rather than what any given day yields. It has always been in
+  the engine and has never appeared in this register; it is listed in
+  docs/calibration_report.md's structural-features paragraph.
+
+### The fire-danger harvest ban (replaces "cut 25 % when tmax ≥ 38 °C")
+- **Value**: harvesting is suspended while the **McArthur Mark 4 Grassland Fire Danger
+  Index exceeds 35** (`harvestBanGfdi`), evaluated at full curing from the day's
+  temperature, humidity and wind.
+- **Source of the threshold — published, not fitted**: CFS / PIRSA / Grain Producers SA
+  **Grain Harvesting Code of Practice** (Sept 2023), *Required Practice 1*: "Suspend
+  grain harvesting operations when the local actual GFDI exceeds 35." That code is the
+  basis for the district harvesting codes EP growers actually operate under, and SA
+  retained the 35 threshold at its most recent review. `harvestBanGfdi` is therefore an
+  **assumption lever, deliberately not a calibration knob** — fitting it would throw away
+  the one hard number in this entry.
+- **Source of the index**: McArthur Mark 4 grassland meter in the equation form of
+  Purton (1982), *Equations for the McArthur Mark 4 grassland fire danger meter*, BoM
+  Meteorological Note 147 (the meters were first reduced to equations by Noble, Bary &
+  Gill 1980, *Aust. J. Ecol.* 5:201–203):
+
+  `GFDI = 2.0 exp(−23.6 + 5.01 ln C + 0.0281 T − 0.226 √RH + 0.633 √U)`
+
+  with C = curing %, T = °C, RH = %, U = 10 m wind km/h. **C = 100 %** — a ripe crop
+  standing ready for the header is fully cured by definition, and it is what the
+  published cease-harvest tables assume.
+- **Validation**: the district codes publish the threshold as a table of the wind speed
+  at which to stop for a given temperature and humidity. This implementation reproduces
+  the entries reported from it to within ~3 index points — 35 °C / 14 % RH / 26 km/h
+  → **34**, and 40 °C / 15 % RH / 26 km/h → **38**, against the code's own **35**. The
+  match is what confirms both the coefficients and the C = 100 choice; at any lower
+  curing the index would fall far short of the published table.
+- **Why the old rule was wrong, not merely coarse**: temperature alone is the weakest of
+  the three inputs. Over the four modelled seasons the two rules disagree on **77 of the
+  1,260 district-days** in the Oct 26 – Feb 7 window: **24 days at or above 38 °C carry no ban**
+  (up to 41 °C with a 20 km/h breeze scores ~24 — a good harvest day, and growers treat
+  it as one), and **53 ban days never reach 38 °C** (one is 22 °C with a 47 km/h wind
+  over cured stubble, GFDI 36 — grassland fire danger is wind-driven). The old rule was
+  taxing the wrong days.
+- **How much of a day a ban costs**: the code *suspends* harvesting while the index is
+  over the line; it does not write the day off, and growers get grain off early in the
+  morning and again in the evening once the wind drops. GFDI traces a diurnal arc, near
+  zero overnight and peaking mid-late afternoon. Approximating that arc as a cosine of
+  peak height `g`, the share of it above the trigger `gb` is `(2/π)·acos(gb/g)`, and the
+  factor is cut by that share. It is 0 for a day that only just touches the trigger,
+  ⅓ at GFDI 40, ½ at 50, ⅔ at 70, → 1 for a catastrophic day. **This introduces no free
+  constant beyond the published trigger.** It is, however, the one modelled shape in the
+  rule rather than a measured one.
+- **Inputs that were dead payload until now**: `rh_min_pct` and `wind_max_kmh` have
+  shipped in `weather_*.json` since the bundle was first built and were read by nothing.
+  They are now both load-bearing. The same wind series is what a Lucky Bay
+  transshipment-downtime rule would need (backlog item, T-Ports' published >21 kn limit);
+  it remains unused there.
+- **Known biases, in the order they matter**:
+  1. **Daily extremes, not simultaneous readings.** The code of practice means the
+     *local actual* GFDI, from concurrent temperature, humidity and wind. The bundle carries daily tmax,
+     daily minimum RH and daily maximum 10 m wind, so this computes the day's
+     worst-case combination. Those three do broadly coincide in the afternoon of a hot
+     north-westerly — which is when bans are called — but on other days the peak is
+     overstated.
+  2. **ERA5 wind is smooth.** A ~25 km reanalysis cell averaged again over the A6
+     district points under-represents point wind speeds, and wind enters the index under
+     a square root with the largest coefficient. This biases the index **low**, i.e.
+     towards too few ban days, and pulls against bias 1.
+  3. **Declared Total Fire Bans are not modelled.** On a TFB day harvesting is
+     prohibited outright under the *Fire and Emergency Services Act 2005*, whatever the
+     realised weather; here an extreme day is only ever a large partial loss. A TFB is a
+     forecast decision over a whole fire-ban district and is not recoverable from
+     reanalysis, so it is left out rather than guessed at.
+  4. **GFDI itself is superseded.** AFDRS replaced it with the Grassland Fire Behaviour
+     Index in 2022. The *harvesting* code still runs on GFDI 35, so GFDI is the correct
+     index for this particular rule, but it will not match a modern fire-danger rating.
+- **Realised in the model (measured 2026-08-31 over Nov 1 – Jan 31, all four seasons)**:
+  **91 ban days in 1,104 district-days (8.2 %)**, 2–13 per district-season — the right
+  order for EP, where growers report a handful to a dozen stopped days a year. Mean
+  harvestable fraction over that window moves **0.863 → 0.846**, i.e. about **two extra
+  lost days per district-season**.
+- **The rule is fit-neutral, and that is the honest headline.** At an unchanged parameter
+  set, swapping the temperature cut for this one moves the calibration objective
+  1.0800 → 1.0829, season totals by ≤ 0.1 pt, and weekly RMSE by ≤ 1 point on every
+  season (40 → 41 %, held-out 64 → 64 %, 66 → 66 %). It fixes *which* days are lost, and a
+  ~90-day harvest window absorbs the redistribution of ~2 days. It was adopted because
+  the mechanism is right, not because it fits better — and the refit it triggered was run
+  and then **rejected** on held-out and A9 evidence. That whole decision is written up in
+  docs/calibration_report.md and docs/PROGRESS.md; the fitted knobs are still #22's.
+- **Sensitivity**: `rainStopMm` (2–10 mm) is the dominant lever — rain zeroes days
+  outright while a ban costs part of one. `harvestBanGfdi` is exposed for sensitivity
+  but is not in the app UI; lowering it towards 25 is the way to probe bias 2.
+- **Upgrade path**: BoM station observations (Port Lincoln, Cleve, Minnipa, Ceduna AWS)
+  at 3-hourly resolution would remove bias 1 and most of bias 2 and allow a true
+  hours-above-threshold count instead of the cosine approximation; CFS Total Fire Ban
+  declarations by fire-ban district — the EP districts map cleanly onto WEP/LEP/EEP —
+  would close bias 3 with recorded fact instead of a formula.
+- **Calibration status**: fitted, repeatedly — not "to be calibrated in Phase 3", which
+  is what this entry's heading said until 2026-08-31 and had not been true since Phase 3
+  closed; the model has since been refitted for #20 and #22 as well. Neither of this
+  entry's own values is fitted: `rainStopMm` is a registered assumption and
+  `harvestBanGfdi` is a published threshold. The knobs that absorb this rule
+  (harvest-rate scale, maturity shift, ramp days) were re-searched for #24 and left at
+  their #22 values — see the rejection above.
 
 ## A8 — AIS berth-visit derivation parameters
 - **Value**: berth geofence = 400 m around the empirically-clustered berth point
@@ -231,8 +362,16 @@ presented as measured data.
   the two non-drought seasons sit above the 25 % central figure, in the direction this
   entry's own reasoning predicts. The numbers are stable across refits: they read
   26.2 / 24.4 / 30.7 % at the pre-#22 parameter set, i.e. they barely moved while eleven
-  of twelve knobs did. The binding constraint is A4 upcountry storage, not the
+  of twelve knobs did — and **26.6 / 24.4 / 30.9 %**, unchanged to the last digit, after
+  #24 replaced the harvest-day weather rule at those same knobs. The binding constraint is
+  A4 upcountry storage, not the
   attractiveness knob — `upcountryCapScale` 1.5 takes 2025/26 to 24.3 %.
+- **This band did the work of rejecting #24's refit.** Both of that issue's candidate
+  parameter vectors pushed the realised share to **33–36 %**, i.e. 2025/26 out the top of
+  this entry's 15–35 % range, while improving the calibration objective. Nothing in the
+  objective function watches this share; this register entry is the only thing that does,
+  which is the argument for recording priors on *outputs* and not only on knobs. See
+  docs/calibration_report.md.
 
 ## A10 — Thevenard vessel calls: grain share
 - **Value**: grain vessels at Thevenard identified by month-weighting AIS calls with
@@ -329,7 +468,11 @@ presented as measured data.
   'received')" — was false: carry-in is indeed never received, but it displaces what
   can be. (#21 first measured this at the post-#20 knobs, where the same A/B read
   +0.2 % → +2.4 % on 2023/24 and −0.6 % → +0.4 % on 2025/26; the effect survives a
-  complete change of parameter vector, which is the point.)
+  complete change of parameter vector, which is the point.) **Re-run under #24's
+  fire-danger harvest rule** at the same knobs: 2023/24 −0.3 % → **+1.6 %**, direct-to-port
+  26.6 → 24.5 %, peak queue 57 → 36; 2025/26 −0.1 % → **+0.9 %**, 30.9 → 29.0 %, 98 → 84;
+  held-out 2024/25 still barely moves. Every digit within rounding of the line above — the
+  effect now also survives a change of weather mechanism.
 
 ## A18 — road grain freight rate (economics layer, indicative)
 - **Value**: A$0.10 per tonne-km (range 0.07–0.13).
