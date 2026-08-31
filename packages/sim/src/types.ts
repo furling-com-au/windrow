@@ -187,6 +187,21 @@ export interface Params {
   railReinstated: boolean; // adds high-capacity Cummins->PL + Wudinna->PL line-haul
   outage: { port: string; fromDay: number; days: number } | null;
   roadClosure: { corridor: "lincoln" | "tod" | "flinders" | "birdseye"; factor: number } | null;
+  /** Which sites operate, overriding the engine's own open/closed rule (R5/R0/R3).
+   *
+   *  Without this the network state is not a parameter at all: `Sim.init()` decides
+   *  "open" per site from the bundle's static `status` string plus a HARDCODED match on
+   *  the season string (`season === "2025/26" || "2024/25"` closes the two T-Ports
+   *  bunkers, A15). That conflates two different things wearing one label — which
+   *  demand/weather/observed bundle to load, and which sites exist — so a run cannot ask
+   *  "this season's crop against a different network" without editing the engine.
+   *
+   *  Names are matched against `BundleSite.name` exactly, and an unmatched name THROWS:
+   *  a typo that silently did nothing would produce a plausible-looking number for a
+   *  network state that was never actually applied. `forceClosed` wins over `forceOpen`
+   *  for a site named in both. `null` (the default, and every calibrated run) leaves the
+   *  engine's own rule untouched. */
+  networkState: { forceOpen?: string[]; forceClosed?: string[] } | null;
 }
 
 export interface SimEvent {

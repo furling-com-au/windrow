@@ -369,6 +369,23 @@ export class Sim {
 
     // ---- sites ----
     const season = bundle.season;
+    // Network-state override (R5/R0/R3). Validated against the bundle BEFORE the loop:
+    // a name that matches no site is a typo, and a typo that silently changed nothing
+    // would hand back a normal-looking season total for a network state that was never
+    // applied — the same class of silent-wrong-number defect as #20 and #29.
+    const ns = params.networkState ?? null;
+    if (ns) {
+      const known = new Set(bundle.matrix.sites.map((s) => s.name));
+      const unknown = [...(ns.forceOpen ?? []), ...(ns.forceClosed ?? [])].filter((n) => !known.has(n));
+      if (unknown.length) {
+        throw new Error(
+          `networkState names no site in this bundle: ${unknown.join(", ")}. ` +
+            `Sites present: ${[...known].join(", ")}`,
+        );
+      }
+    }
+    const forceOpen = new Set(ns?.forceOpen ?? []);
+    const forceClosed = new Set(ns?.forceClosed ?? []);
     for (const s of bundle.matrix.sites) {
       const isTports = s.operator.includes("T-Ports");
       const isPort = s.role === "port";
@@ -377,6 +394,10 @@ export class Sim {
       // T-Ports Lock & Kimba bunkers: closed 2025/26 (documented) and assumed not
       // operated in drought 2024/25 (A15 - unverified, crop too small to fill them)
       if (isTports && !isPort && (season === "2025/26" || season === "2024/25")) open = false;
+      // ...and the network-state override wins over both of the rules above. forceClosed
+      // beats forceOpen for a site named in both, so the result never depends on order.
+      if (forceOpen.has(s.name)) open = true;
+      if (forceClosed.has(s.name)) open = false;
       const accepts = new Array(NC).fill(false) as boolean[];
       if (isPort) accepts.fill(true);
       else {
@@ -386,6 +407,21 @@ export class Sim {
         }
         // sites with 3+ segregations act as general receivers for minor "other" crops
         if (s.commodities.length >= 3) accepts[COMMODITIES.indexOf("other")] = true;
+      }
+      // A forced-open site with no segregation list accepts NOTHING (`chooseSite` skips
+      // any site where `accepts[c]` is false), so it would sit in the network looking
+      // open and receive zero tonnes for the whole season — a counterfactual that
+      // silently did not happen. The five dormant Bunge sites and the six closed-2019
+      // ex-Viterra sites all carry `commodities: []` in the bundle, so this is the
+      // normal case, not an edge one: reopening any of them needs an assumed
+      // segregation list in the DATA first (A12-style), which is why this throws rather
+      // than guessing one here.
+      if (forceOpen.has(s.name) && !accepts.some(Boolean)) {
+        throw new Error(
+          `networkState.forceOpen names "${s.name}", which carries no commodities in this ` +
+            `bundle and would therefore accept nothing. Give it a segregation list in the ` +
+            `bundle (see A12) before reopening it.`,
+        );
       }
       const name = s.name;
       // A4: every site now carries a capacity from the bundle - published where one
