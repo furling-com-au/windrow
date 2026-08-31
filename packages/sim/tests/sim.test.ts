@@ -71,12 +71,18 @@ describe("sim core", () => {
  *                                                  gate tests the line the joining truck
  *                                                  has not yet joined)
  *   and nothing throws, on any of them.
+ *
+ * The STORAGE ceiling (#29) rides along on the same sweep: every combination below is a
+ * real season already being run, so asserting it costs nothing and covers the lever
+ * extremes (crop max, capacity min, carry-over x2) where storage is most likely to be
+ * the binding constraint. Its own targeted cases are in "storage ceiling (#29)" below.
  */
 function checkCeilings(sim: Sim, params: Params, label: string) {
   const slotMin = Math.max(...sim.sites.map((s) => s.serviceMin / s.bays));
   expect(sim.queueCapBreaches, `${label}: join gate leaked`).toBe(0);
   expect(sim.peakQueue, `${label}: queue length ceiling`).toBeLessThanOrEqual(params.siteQueueMaxTrucks);
   expect(sim.peakQueueMin, `${label}: queue wait ceiling`).toBeLessThanOrEqual(params.queueBalkMaxMin + slotMin);
+  expect(sim.capacityBreaches, `${label}: storage ceiling`).toBe(0);
 }
 
 describe("queue ceilings (#26/#27)", () => {
@@ -151,6 +157,116 @@ describe("queue ceilings (#26/#27)", () => {
       checkCeilings(sim, params, label);
     }
   }, 300_000);
+});
+
+/**
+ * Regression cover for #29.
+ *
+ * A site cannot hold more grain than it holds — the capacities are published (both ports,
+ * all three T-Ports sites) or estimated per A4, and reporting them as exceeded undercuts
+ * the whole claim that storage is a real constraint. Two separate paths did it:
+ *
+ *   1. carry-in (A17) was seeded with no capacity check at all, so `carryInScale` 2 put
+ *      2023/24's Port Lincoln at 162 % of its published 395,600 t on day ONE;
+ *   2. `chooseSite`'s storage gate tested on-site stock only, so any number of trucks
+ *      could read the same nearly-full site as "room for me" in one tick and all tip —
+ *      6 sites over at the calibrated baseline, 11 at +30 % crop (0.2–2.2 % over).
+ *
+ * Neither was visible to the suite: every pre-#29 test either ran the tiny fixture (whose
+ * one site never fills) or asserted on queues and totals, never on fill.
+ */
+describe("storage ceiling (#29)", () => {
+  /** worst stock/capacity ratio over every site, and the site that hit it */
+  function worstFill(sim: Sim): { pct: number; name: string } {
+    let pct = 0;
+    let name = "";
+    for (const s of sim.sites) {
+      let st = 0;
+      for (let c = 0; c < s.stock.length; c++) st += s.stock[c]!;
+      const f = st / s.capacityT;
+      if (f > pct) {
+        pct = f;
+        name = s.name;
+      }
+    }
+    return { pct: pct * 100, name };
+  }
+
+  it("clamps carry-in that will not fit, and reports how much it dropped", () => {
+    const b = tinyBundle();
+    // Testville holds 50,000 t and Port Lincoln 395,600 t; both are seeded well past it.
+    b.observed.carry_in = {
+      port_lincoln_t: 500_000,
+      thevenard_t: 0,
+      upcountry_t: 200_000,
+      provenance: "test fixture",
+    };
+    const p = defaultParams();
+    p.fleetTrucks = 2;
+    p.linehaulTrucks = 1;
+    const sim = new Sim(b, p, 7);
+    const stock = (i: number) => sim.sites[i]!.stock.reduce((a, v) => a + v, 0);
+    expect(stock(0)).toBeCloseTo(50_000, 3); // filled exactly, not 400 % full
+    expect(stock(1)).toBeCloseTo(395_600, 3);
+    // the overflow is dropped, counted and disclosed — not spilled onto a neighbour, which
+    // would invent a location A17's provenance (port-held old crop) says nothing about
+    expect(sim.carryInClampedT).toBeCloseTo(150_000 + 104_400, 3);
+    // ...and only the tonnes actually placed enter the mass balance, so the daily
+    // invariant check inside run() proves the clamp did not quietly lose or create grain
+    expect(sim.carryInT).toBeCloseTo(445_600, 3);
+    sim.run(200);
+    expect(sim.capacityBreaches).toBe(0);
+  });
+
+  it("never lets converging trucks tip a site past capacity, tick by tick", () => {
+    // the #26 absurd-load fixture: far more grain and trucks than the two sites can take,
+    // so the storage gate is under continuous pressure from many trucks at once. Sampled
+    // every tick rather than daily — an intra-day overshoot drawn back down overnight
+    // would be invisible to the engine's own once-a-day invariant check.
+    const p = defaultParams();
+    p.fleetTrucks = 600;
+    p.linehaulTrucks = 20;
+    p.productionScale = 40;
+    for (const c of Object.keys(p.harvestRatePerDay) as (keyof typeof p.harvestRatePerDay)[]) {
+      p.harvestRatePerDay[c] = 0.5;
+    }
+    const sim = new Sim(tinyBundle(), p, 7);
+    let worst = 0;
+    for (let t = 0; t < 60 * DAY_TICKS; t++) {
+      sim.step(1);
+      const w = worstFill(sim);
+      if (w.pct > worst) worst = w.pct;
+    }
+    expect(worst).toBeLessThanOrEqual(100);
+    expect(sim.capacityBreaches).toBe(0);
+    // and it is a real ceiling being tested, not an empty network: the sites do fill
+    expect(worst).toBeGreaterThan(99);
+  });
+
+  it("holds every EP site inside its capacity across a bumper season", () => {
+    let bundle: Bundle;
+    try {
+      bundle = loadBundle("2025/26");
+    } catch {
+      console.warn("real bundle not present; skipping");
+      return;
+    }
+    // +30 % crop is the app's own bumper preset, and the case reported in #29: eleven
+    // sites peaked at 100.2–102.2 % of capacity on the parent commit, ports included.
+    const params: Params = { ...defaultParams(), productionScale: 1.3 };
+    const sim = new Sim(bundle, params, 42);
+    let worst = { pct: 0, name: "" };
+    for (let d = 0; d < 365; d++) {
+      sim.step(DAY_TICKS);
+      const w = worstFill(sim);
+      if (w.pct > worst.pct) worst = w;
+    }
+    expect(worst.pct, `worst fill was ${worst.name} at ${worst.pct.toFixed(1)}%`).toBeLessThanOrEqual(100);
+    expect(sim.capacityBreaches).toBe(0);
+    // storage really is the binding constraint in this scenario — if this ever stops
+    // being true the assertion above has gone quiet rather than passed
+    expect(worst.pct).toBeGreaterThan(99);
+  }, 60_000);
 });
 
 describe("harvest-ban fire danger (A7)", () => {

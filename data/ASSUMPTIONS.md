@@ -156,7 +156,8 @@ presented as measured data.
   storage exists whether or not it is opened in a given season (A12).
 - **Sensitivity**: **binding at the calibrated baseline, not only in bumper years.**
   Under the flat 120 kt guess this entry used to describe, 8 of the 16 operated sites
-  peaked at 100–102 % of capacity in 2025/26 while Kapinnie and Yeelanna peaked under
+  peaked at 100–102 % of capacity in 2025/26 (a *reading*, not a target: over-100 %
+  fills were possible until #29 — see the ceiling note below) while Kapinnie and Yeelanna peaked under
   10 %, and lifting `upcountryCapScale` to 1.5 on that baseline moved direct-to-port
   share 33.3 % → 24.2 % and peak queue 141 → 75. Direct-to-port share (A9) and T-Ports
   intake are both downstream of where this capacity sits, so the district allocation
@@ -166,10 +167,29 @@ presented as measured data.
   30.7 % and 135** (at #22's refit the same baseline reads **30.9 % and 105**, and
   `upcountryCapScale` 1.5 still moves it to 24.3 % and 42 — the lever's direction and
   rough size survive a complete change of parameter vector, and re-measured under #24's
-  fire-danger harvest rule the same lever again lands on **24.3 % and 42**), and right-sizes the far
+  fire-danger harvest rule the same lever again lands on **24.3 % and 42**, and under
+  #29's capacity ceiling on **24.4 % and 42** from a 31.0 % / 102 baseline), and right-sizes the far
   west: Witera, Streaky Bay, Wirrulla and
   Poochera go from 30–56 % peak fill to 64–98 %. It also costs the model Port Lincoln's
   published peak receival day — see A2.
+- **These numbers are now a hard ceiling, not a target.** Whichever way a capacity is
+  arrived at — published or allocated — the engine holds `stock <= capacityT` at every
+  site at every tick (issue #29). It did not before: the storage gate in `chooseSite`
+  tested on-site stock only, so any number of trucks could read the same nearly-full site
+  as "room for me" in a single tick, all get dispatched, and all tip on arrival — nothing
+  stops a truck once it has left the farm. Measured on 2025/26 seed 42: **six of the
+  sixteen operated sites peaked at 100.1–100.9 % of capacity at the calibrated baseline,
+  and eleven at 100.1–102.2 % under the +30 % bumper preset, ports included** (Thevenard
+  102.2 %, Port Lincoln 101.8 %, Lucky Bay 101.0 %). Small overshoots, but published
+  tonnages reported as exceeded, and the site panel showed them as such —
+  "343,207 t of 335,925 t" — while the map's fill ring clamped at 100 % and hid it. A
+  farm truck now reserves its load against the destination's storage when it is
+  dispatched and releases the reservation when it tips, and line-haul checks that
+  reservation before unloading at a port, so committed-but-undelivered tonnage counts
+  against capacity exactly as tonnage on the ground does. Sites still fill to within one
+  truckload of capacity — the constraint binds as hard as it did — they just no longer
+  pass it. `Sim.capacityBreaches` counts any site-day above capacity and is asserted zero
+  across the whole preset/lever regression sweep.
 - **History**: until 2026-08-31 this entry described the allocation above but the engine
   implemented a flat 120,000 t for every Bunge site and 145,000 t for T-Ports
   (`engine.ts`), i.e. only the 2.5 Mt total was real — 21 × 120 kt = 2.52 Mt — and none
@@ -363,9 +383,13 @@ harvest curve.
   entry's own reasoning predicts. The numbers are stable across refits: they read
   26.2 / 24.4 / 30.7 % at the pre-#22 parameter set, i.e. they barely moved while eleven
   of twelve knobs did — and **26.6 / 24.4 / 30.9 %**, unchanged to the last digit, after
-  #24 replaced the harvest-day weather rule at those same knobs. The binding constraint is
+  #24 replaced the harvest-day weather rule at those same knobs. Under **#29's capacity
+  ceiling** (again the same knobs) they read **26.6 / 24.5 / 31.0 %** — one tenth of a
+  point on two of three, comfortably inside the band, which is the useful surprise given
+  that #29 is a change to the storage constraint this entry names as the binding one.
+  That binding constraint is
   A4 upcountry storage, not the
-  attractiveness knob — `upcountryCapScale` 1.5 takes 2025/26 to 24.3 %.
+  attractiveness knob — `upcountryCapScale` 1.5 takes 2025/26 to 24.3 % (24.4 % under #29).
 - **This band did the work of rejecting #24's refit.** Both of that issue's candidate
   parameter vectors pushed the realised share to **33–36 %**, i.e. 2025/26 out the top of
   this entry's 15–35 % range, while improving the calibration objective. Nothing in the
@@ -445,6 +469,22 @@ harvest curve.
   backwards at the top end: 2023/24's 320,504 t is 81 % of Port Lincoln's published
   395,600 t storage on day one, whereas a real port is drawn *down* before harvest.
   Treat the lever (`carryInScale`) as the honest range, not the point estimate.
+- **The seed is CLAMPED at each site's capacity, and the shortfall is reported.** 81 % of
+  Port Lincoln on day one at ×1 becomes **162 %** at the lever's top of ×2 — 641,008 t of
+  old crop in a shed holding 395,600 t. Until 2026-08-31 the engine seeded it anyway: the
+  `seed()` closure had no capacity test of any kind, so a physically impossible opening
+  stock went onto the map, into the fill rings and into every capacity-derived reading
+  (issue #29). It is now capped at what the site can hold; the surplus (245,408 t in that
+  example) is **dropped**, counted in `Sim.carryInClampedT`, and logged as a
+  `carry_in_clamped` event naming the site and both tonnages. Only the tonnes actually
+  placed enter `carryInT` and the mass balance, so nothing is created or silently lost.
+  The overflow is deliberately **not** spilled to a neighbouring site: this figure's
+  provenance is specifically *port-held* old crop shipped out of Port Lincoln and
+  Thevenard, so relocating it upcountry would invent a location the source says nothing
+  about. What a clamp actually reports is that the scaled figure is not physically
+  realisable where A17 puts it — which is a finding about the lever's top end, and worth
+  surfacing rather than absorbing. It cannot bind at the calibrated ×1 on any built
+  season: the largest seed is 81 % of its site.
 - **Source coverage**: a Flinders monthly workbook is one sheet covering every Flinders
   port, and the parser keeps only nonzero rows, so "port has no grain row" and "no
   workbook for that month" both arrive as a silent 0. `p2_build_observed.py` therefore
@@ -472,7 +512,13 @@ harvest curve.
   fire-danger harvest rule** at the same knobs: 2023/24 −0.3 % → **+1.6 %**, direct-to-port
   26.6 → 24.5 %, peak queue 57 → 36; 2025/26 −0.1 % → **+0.9 %**, 30.9 → 29.0 %, 98 → 84;
   held-out 2024/25 still barely moves. Every digit within rounding of the line above — the
-  effect now also survives a change of weather mechanism.
+  effect now also survives a change of weather mechanism. **Re-run again under #29's
+  capacity gates** (same knobs): 2023/24 −0.3 % → **+1.7 %**, direct-to-port 26.6 → 24.5 %,
+  peak queue 59 → 38; 2025/26 −0.2 % → **+0.8 %**, 31.0 → 28.9 %, 102 → 86; held-out
+  2024/25 1.504 → 1.503 Mt. Within rounding of both lines above, on a third change of
+  mechanism — and the mechanism this time is the very one the sentence describes
+  ("carry-in occupies storage the engine's capacity gates then police"), now that those
+  gates actually hold.
 
 ## A18 — road grain freight rate (economics layer, indicative)
 - **Value**: A$0.10 per tonne-km (range 0.07–0.13).
