@@ -419,16 +419,58 @@ harvest curve.
 ## A11 — T-Ports inland site coordinates
 - **Value**: town coordinates (Lock, Kimba); exact pads unpublished (Kimba pad is "east
   of the township").
-- **Sensitivity**: ≤ 5 km error on two closed-in-2025/26 sites; negligible for v1.
+- **Sensitivity**: ≤ 5 km error on two closed-in-2025/26 sites; negligible **for the
+  simulation**, where these are two of 25 sites and the error is small against a cart leg.
+- **NOT negligible for the ownership-gap geometry (`pipeline/r8_choice_geometry.py`).**
+  Lock and Kimba are the only independent *inland* receival points that have ever existed
+  on EP, so in the 2023/24 network state they alone set the "nearest independent point"
+  distance for much of the peninsula. A displacement of 5 km — inside this assumption's own
+  stated tolerance — moves the 2023/24 headline from 20.3 % to 24.6 % and cuts the
+  2023/24 → 2025/26 multiple from 3.3× to 2.72×. The error is asymmetric in **size**, not
+  in sign: the swept envelope runs 19.94–24.58 % against a published 20.3 %, so roughly
+  +4.3 pp of upside against −0.3 pp of downside, about 13:1. (An earlier version of this
+  entry claimed the error "can only ever make the baseline worse, never better"; the sweep
+  finds a 19.9 % configuration, so that was too strong.)
+- **Upgrade path**: the actual bunker pad coordinates, or an explicit sweep published
+  alongside the headline. Until one exists, any figure quoting the 2023/24 level or the
+  multiple must carry this range. The 2025/26 level (66.8 %) does not depend on it —
+  both bunkers are closed in that state.
 
 ## A12 — season site sets
-- **Value**: baseline network = the 18 active 2025/26 Bunge sites + 3 T-Ports sites;
-  earlier seasons re-enable dormant sites (Penong, Nunjikompita, Darke Peak, Buckleboo,
-  Elliston) when named in that season's reports (site-mention extraction from report
-  narratives), else keep 2025/26 set.
+- **Value**: baseline network = the **22** active 2025/26 Bunge sites + 3 T-Ports sites.
+  Every site carries `operating_seasons`, the set of seasons in which the operator's own
+  weekly report names it receiving grain (`pipeline/r1_build_sites.py`,
+  `annotate_operating_seasons`, from `data/processed/receivals_notes.jsonl`).
 - **Reasoning**: per-season official site lists aren't archived in machine-readable
   form; ACCC records 21 EP upcountry sites in 2020-21, 25 in 2019-20.
-- **Sensitivity**: small re-routing effects in early seasons.
+- **Positive evidence only.** A mention establishes that a site OPERATED that season. The
+  absence of a mention establishes nothing: reports name a site at its first receival and
+  when it is notable, not every week. `operating_seasons` is a lower bound and must never
+  be read as a roster. Sentences are required to carry a receival verb, and a name behind
+  a locational preposition is rejected — "east of Kyancutta" locates a grower's paddock,
+  it is not a receival at Kyancutta.
+- **Corrected 2026-08-31 (was wrong in both directions).** This entry previously described
+  per-season re-enabling that *no code implemented* — nothing in the pipeline or the engine
+  varied the site set by season — and it listed Penong, Darke Peak, Buckleboo and Elliston
+  as dormant. They are not: `segregations_2025_26` was read from the live Bunge table on
+  2026-08-19, **off-season**, and a site between harvests correctly lists no segregations.
+  `r1_build_sites.py` read that emptiness as "dormant" and closed four sites that Bunge's
+  own reports name taking 2025/26 deliveries ("Harvest kicked off at our Buckleboo,
+  Elliston, Penong, Poochera and Warramboo sites", week ending 2025-11-16; Darke Peak,
+  week ending 2025-11-23). This is the same off-season trap already recorded for the cash-
+  price board, which lists zero EP sites outside harvest. Only Nunjikompita remains
+  dormant, on weak evidence: last named 2023/24, no mention since.
+- **Sensitivity**: measured, not asserted. Re-running the v1 scenario set on the corrected
+  roster moves every headline by <1 % except two queue figures (road closure +5.3 %, Lucky
+  Bay −2.4 %); every ranking and direction of effect is unchanged, so the fitted parameter
+  vector was NOT refitted. Operable 2025/26 storage rises ~0.48 Mt (1.99 → 2.46 Mt),
+  which the network barely notices at baseline because it is not storage-constrained
+  there. Site capacities themselves are unchanged: the A4 pool always included the
+  dormant sites.
+- **Known open**: `pipeline/r8_choice_geometry.py` still builds its historical network
+  states from the single `status` field rather than from `operating_seasons`, so its
+  2023/24 column omits Nunjikompita, which was named that season. See
+  `docs/roster_audit_2026-08.md`.
 
 ## A14 — PIRSA district boundaries approximated by LGA composition
 - **Value**: WEP = Ceduna + Streaky Bay + Elliston + Wudinna (+ unincorporated far-west

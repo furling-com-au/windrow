@@ -4,16 +4,16 @@
     {
       "id": "baseline",
       "label": "Baseline replay",
-      "receivedMt": 2.245,
-      "receivedLbMt": 0.417,
+      "receivedMt": 2.248,
+      "receivedLbMt": 0.413,
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
       "peakQueue": 102,
-      "truckKm": 18902129,
-      "roadTonneKmM": 318.2,
+      "truckKm": 18839786,
+      "roadTonneKmM": 317,
       "railTonneKmM": 0,
-      "peakWeekKt": 358
+      "peakWeekKt": 360
     },
     {
       "id": "bumper",
@@ -23,22 +23,22 @@
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
-      "peakQueue": 217,
-      "truckKm": 21406206,
-      "roadTonneKmM": 370.4,
+      "peakQueue": 218,
+      "truckKm": 21404977,
+      "roadTonneKmM": 370.8,
       "railTonneKmM": 0,
-      "peakWeekKt": 377
+      "peakWeekKt": 376
     },
     {
       "id": "drought",
       "label": "Drought (-40%)",
-      "receivedMt": 1.387,
-      "receivedLbMt": 0.209,
+      "receivedMt": 1.388,
+      "receivedLbMt": 0.208,
       "shippedPlMt": 1.15,
       "vesselCount": 51,
       "meanVesselWaitH": 84.4,
       "peakQueue": 40,
-      "truckKm": 14757965,
+      "truckKm": 14755572,
       "roadTonneKmM": 245.2,
       "railTonneKmM": 0,
       "peakWeekKt": 217
@@ -46,15 +46,15 @@
     {
       "id": "rail",
       "label": "Rail reinstated",
-      "receivedMt": 2.249,
-      "receivedLbMt": 0.413,
+      "receivedMt": 2.251,
+      "receivedLbMt": 0.411,
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
-      "peakQueue": 98,
-      "truckKm": 16670220,
-      "roadTonneKmM": 268.1,
-      "railTonneKmM": 48.9,
+      "peakQueue": 97,
+      "truckKm": 16614495,
+      "roadTonneKmM": 267.1,
+      "railTonneKmM": 48.8,
       "peakWeekKt": 358
     },
     {
@@ -65,25 +65,25 @@
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
-      "peakQueue": 85,
-      "truckKm": 18993515,
-      "roadTonneKmM": 320,
+      "peakQueue": 83,
+      "truckKm": 19034938,
+      "roadTonneKmM": 320.6,
       "railTonneKmM": 0,
       "peakWeekKt": 348
     },
     {
       "id": "outage",
       "label": "Port Lincoln outage (7 d @ day 70)",
-      "receivedMt": 2.229,
-      "receivedLbMt": 0.433,
+      "receivedMt": 2.23,
+      "receivedLbMt": 0.431,
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 28.1,
-      "peakQueue": 120,
-      "truckKm": 19358377,
-      "roadTonneKmM": 328.3,
+      "peakQueue": 123,
+      "truckKm": 19380861,
+      "roadTonneKmM": 328.6,
       "railTonneKmM": 0,
-      "peakWeekKt": 358
+      "peakWeekKt": 360
     },
     {
       "id": "roadclosure",
@@ -93,11 +93,11 @@
       "shippedPlMt": 1.202,
       "vesselCount": 51,
       "meanVesselWaitH": 27.7,
-      "peakQueue": 94,
-      "truckKm": 23417416,
-      "roadTonneKmM": 410.4,
+      "peakQueue": 99,
+      "truckKm": 23404186,
+      "roadTonneKmM": 410.2,
       "railTonneKmM": 0,
-      "peakWeekKt": 352
+      "peakWeekKt": 353
     }
   ]
 }
