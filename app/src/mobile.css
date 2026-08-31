@@ -1,0 +1,59 @@
+/*
+ * Mobile touch-target floors (#30).
+ *
+ * These live outside the Svelte components on purpose: the 44px floor and the
+ * range-slider thumb have to reach controls in App.svelte, LeversPanel.svelte,
+ * SiteDetail.svelte, Tour.svelte, Intro.svelte and AboutModal.svelte, and Svelte's
+ * per-component style scoping would mean six copies of the same rules.
+ *
+ * EVERYTHING in this file is inside the mobile breakpoint. Desktop rendering is
+ * untouched by design — if you add a rule here, keep it inside the media query.
+ */
+@media (max-width: 800px) {
+  /* Before this, every one of the ~23 controls was under 44px: mode buttons 20px,
+     slider tracks 16px, the About link 14px, the help "?" 24px. */
+  button,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* The visual track stays thin; the input's own box is what grows to 44px, and the
+     thumb becomes a 26px disc that a finger can actually land on. Setting
+     appearance:none drops the accent-color styling, so track and thumb are painted
+     here in the same palette. */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 44px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 3px;
+    background: #2f4359;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    margin-top: -10px;
+    border-radius: 50%;
+    background: #3e73b3;
+    border: 2px solid #cfe0f2;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    background: #2f4359;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #3e73b3;
+    border: 2px solid #cfe0f2;
+  }
+}

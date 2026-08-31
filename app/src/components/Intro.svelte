@@ -108,4 +108,24 @@
     color: #64788c;
     font-size: 10.5px;
   }
+
+  /* mobile (#30): 12px text floor and 4.5:1 on #64788c (3.76:1 before) */
+  @media (max-width: 800px) {
+    .card {
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 22px 20px;
+    }
+    .kicker {
+      font-size: 12px;
+    }
+    .fine {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+    .btns .go,
+    .btns .alt {
+      flex: 1 1 100%;
+    }
+  }
 </style>

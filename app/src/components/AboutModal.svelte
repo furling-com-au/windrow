@@ -165,4 +165,17 @@
     padding: 7px 14px;
     cursor: pointer;
   }
+
+  /* mobile (#30): tighter gutters so the long-form copy isn't squeezed */
+  @media (max-width: 800px) {
+    .modal {
+      box-sizing: border-box;
+      width: 94vw;
+      max-height: 88vh;
+      padding: 16px 14px;
+    }
+    .fine {
+      font-size: 12px;
+    }
+  }
 </style>

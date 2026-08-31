@@ -114,4 +114,25 @@
     color: #708396;
     margin-left: 0;
   }
+
+  /* mobile (#30): the bottom sheet now occupies the lower third, so the tour card
+     centres instead of hugging the bottom edge. 12px text floor. */
+  @media (max-width: 800px) {
+    .wrap {
+      align-items: center;
+      padding: 0 10px;
+    }
+    .card {
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .step {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+    p {
+      font-size: 13px;
+    }
+  }
 </style>

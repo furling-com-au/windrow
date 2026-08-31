@@ -21,6 +21,109 @@
   let map: DeckMap | null = null;
   let worker: Worker | null = null;
 
+  // ─── mobile bottom sheet (#30) ────────────────────────────────────────────
+  // On phones the side panel doesn't fit beside a map — it used to sit over it at
+  // 55vh with an unindicated inner scroll. It now becomes a bottom sheet with two
+  // heights: PEEK (date + play/speed + KPIs, so the map keeps ~two thirds of the
+  // screen) and EXPANDED. Everything below is inert above 800px: `.grip` is
+  // display:none, `.peek-group` is display:contents, and the two `isMobile`
+  // snippets render exactly where they always did.
+  const MOBILE_Q = "(max-width: 800px)";
+  let isMobile = $state(typeof window !== "undefined" && window.matchMedia(MOBILE_Q).matches);
+  let sheetExpanded = $state(false);
+  /** measured height of the peek region, published to CSS as --peek-h */
+  let peekH = $state(260);
+  /** live drag offset in px while a pointer is down on the grip (null = settled) */
+  let dragY: number | null = $state(null);
+  let sheetEl: HTMLDivElement | null = $state(null);
+  let peekEl: HTMLDivElement | null = $state(null);
+
+  let dragFromY = 0;
+  let dragFromOffset = 0;
+  let dragMoved = false;
+  let suppressClick = false;
+  let maxShift = 0;
+
+  let sheetStyle = $derived(
+    (isMobile ? `--peek-h:${peekH}px;` : "") + (dragY === null ? "" : `--sheet-y:${dragY}px;`),
+  );
+
+  /** the peek height is whatever the peek group actually needs — the KPI grid grows
+   *  from two cards to four between Simple and Advanced, so it can't be a constant.
+   *  Deliberately doesn't read peekH, so the effects below don't depend on their own output. */
+  function measurePeek() {
+    if (!isMobile || !sheetEl || !peekEl) return;
+    const h = peekEl.getBoundingClientRect().bottom - sheetEl.getBoundingClientRect().top;
+    peekH = Math.min(Math.max(140, Math.round(h)), Math.round(window.innerHeight * 0.62));
+  }
+
+  $effect(() => {
+    if (!isMobile || !sheetEl || !peekEl) return;
+    measurePeek();
+    const ro = new ResizeObserver(() => measurePeek());
+    ro.observe(sheetEl);
+    ro.observe(peekEl);
+    window.addEventListener("resize", measurePeek);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measurePeek);
+    };
+  });
+
+  /** the peek group changes shape twice: when the first snapshot lands (the KPI grid
+   *  appears) and when Simple/Advanced swaps two KPI cards for four. Both are worth
+   *  measuring on the spot rather than a frame late. hasSnap is derived so this doesn't
+   *  re-run on every tick's snapshot. */
+  let hasSnap = $derived(app.snap !== null);
+  $effect(() => {
+    void isMobile;
+    void hasSnap;
+    void app.viewMode;
+    measurePeek();
+  });
+
+  // a collapsed sheet always shows its top — otherwise re-expanding lands mid-content
+  $effect(() => {
+    if (!sheetExpanded && sheetEl) sheetEl.scrollTop = 0;
+  });
+
+  // pointer events cover mouse and touch with one code path
+  function gripDown(e: PointerEvent) {
+    if (!isMobile || !sheetEl) return;
+    maxShift = Math.max(0, sheetEl.offsetHeight - peekH);
+    dragFromOffset = sheetExpanded ? 0 : maxShift;
+    dragFromY = e.clientY;
+    dragMoved = false;
+    dragY = dragFromOffset;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // no capture available (synthetic event, or the pointer already went away) —
+      // the drag still tracks while the pointer stays over the grip
+    }
+  }
+  function gripMove(e: PointerEvent) {
+    if (dragY === null) return;
+    const dy = e.clientY - dragFromY;
+    if (Math.abs(dy) > 5) dragMoved = true;
+    dragY = Math.min(maxShift, Math.max(0, dragFromOffset + dy));
+  }
+  function gripUp() {
+    if (dragY === null) return;
+    const settled = dragY;
+    dragY = null;
+    suppressClick = dragMoved; // a drag must not also fire the tap-to-toggle below
+    if (dragMoved) sheetExpanded = settled < maxShift / 2;
+  }
+  /** tap (or Enter/Space) on the grip toggles — the fallback when dragging isn't practical */
+  function toggleSheet() {
+    if (suppressClick) {
+      suppressClick = false;
+      return;
+    }
+    sheetExpanded = !sheetExpanded;
+  }
+
   // main-thread histories for chart, CSV, drill-downs
   let dailyReceived: number[] = $state([]);
   let dailyShipped: number[] = [];
@@ -221,6 +324,10 @@
 
   onMount(() => {
     let heatTimer: ReturnType<typeof setInterval> | null = null;
+    const mq = window.matchMedia(MOBILE_Q);
+    const onMq = () => (isMobile = mq.matches);
+    onMq();
+    mq.addEventListener("change", onMq);
     (async () => {
       const j = (u: string) => fetch("./data/" + u).then((r) => r.json());
       const [basemap, roads, paths, parcels, matrix] = await Promise.all([
@@ -291,6 +398,7 @@
     })();
     return () => {
       if (heatTimer) clearInterval(heatTimer);
+      mq.removeEventListener("change", onMq);
       worker?.terminate();
       map?.destroy();
     };
@@ -326,7 +434,57 @@
 
 <div class="map" bind:this={mapEl}></div>
 
-<div class="panel">
+<!-- Rendered once, in one of two places: floating over the map on desktop, or inside
+     the bottom sheet on mobile, where free-floating overlays would cover the map (#30) -->
+{#snippet portsBlock()}
+  <PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} live={app.observed?.live ?? false} />
+{/snippet}
+
+{#snippet mapKey()}
+  {#if legendOpen}
+    <div class="legend">
+      <div class="lg-head">
+        <b>Map key</b>
+        <button class="lg-x" onclick={() => (legendOpen = false)}>×</button>
+      </div>
+      <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: green = crop standing, gold = harvested</div>
+      <div class="lg-sub">moving dots are trucks, coloured by their load:</div>
+      <div class="chips">
+        <span><i style="background:#ebc85a"></i>wheat</span>
+        <span><i style="background:#d6a864"></i>barley</span>
+        <span><i style="background:#fadc28"></i>canola</span>
+        <span><i style="background:#c85a50"></i>lentils</span>
+        <span><i style="background:#96b45a"></i>beans</span>
+        <span><i style="background:#5ac8eb"></i>silo→port shuttle</span>
+      </div>
+      <div><span class="sw ring"></span> silo/site: turns bright blue as storage fills · red ring = trucks queued · click it for detail</div>
+      <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
+      <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
+    </div>
+  {:else}
+    <button class="legend-btn" onclick={() => (legendOpen = true)}>🗺 map key</button>
+  {/if}
+{/snippet}
+
+<div
+  class="panel"
+  class:peek={!sheetExpanded}
+  class:dragging={dragY !== null}
+  style={sheetStyle}
+  bind:this={sheetEl}
+>
+  <button
+    class="grip"
+    onpointerdown={gripDown}
+    onpointermove={gripMove}
+    onpointerup={gripUp}
+    onpointercancel={gripUp}
+    onclick={toggleSheet}
+  >
+    <span class="grip-bar"></span>
+    <span class="grip-label">{sheetExpanded ? "Hide details" : "Scenario, chart & what-ifs"}</span>
+  </button>
+
   <header>
     <div>
       <h1>Windrow</h1>
@@ -356,71 +514,78 @@
     </label>
   </div>
 
-  <div class="row controls">
-    {#if app.done}
-      <button class="play" onclick={replay}>↺ Replay season</button>
-    {:else}
-      <button class="play" onclick={togglePlay} disabled={app.loading || app.seeking}>
-        {app.playing ? "⏸ Pause" : "▶ Play"}
-      </button>
-    {/if}
-    {#each SPEEDS as sp}
-      <button class:active={app.speed === sp.v} onclick={() => setSpeed(sp.v)} title="simulation speed">{sp.label}</button>
-    {/each}
-  </div>
-
-  <div class="row date-row">
-    <span class="date">{prettyDate}</span>
-    <div class="scrub">
-      <input
-        type="range"
-        min="0"
-        max="364"
-        value={scrubDay}
-        oninput={(e) => {
-          dragging = true;
-          scrubDay = parseInt(e.currentTarget.value);
-        }}
-        onchange={(e) => {
-          dragging = false;
-          seek(parseInt(e.currentTarget.value));
-        }}
-      />
-      <div class="phases"><span class="ph h">harvest</span><span class="ph s">shipping</span></div>
+  <!-- The sheet's peek content on mobile: play/speed, the date scrubber and the KPIs.
+       display:contents above 800px, so on desktop this wrapper doesn't exist. -->
+  <div class="peek-group" bind:this={peekEl}>
+    <div class="row controls">
+      {#if app.done}
+        <button class="play" onclick={replay}>↺ Replay season</button>
+      {:else}
+        <button class="play" onclick={togglePlay} disabled={app.loading || app.seeking}>
+          {app.playing ? "⏸ Pause" : "▶ Play"}
+        </button>
+      {/if}
+      {#each SPEEDS as sp}
+        <button class:active={app.speed === sp.v} onclick={() => setSpeed(sp.v)} title="simulation speed">{sp.label}</button>
+      {/each}
     </div>
+
+    <div class="row date-row">
+      <span class="date">{prettyDate}</span>
+      <div class="scrub">
+        <input
+          type="range"
+          min="0"
+          max="364"
+          value={scrubDay}
+          oninput={(e) => {
+            dragging = true;
+            scrubDay = parseInt(e.currentTarget.value);
+          }}
+          onchange={(e) => {
+            dragging = false;
+            seek(parseInt(e.currentTarget.value));
+          }}
+        />
+        <div class="phases"><span class="ph h">harvest</span><span class="ph s">shipping</span></div>
+      </div>
+    </div>
+
+    {#if app.snap}
+      <div class="kpis">
+        <div class="kpi" title="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published weekly figure, shown only on the week-ending date it was reported — the observed total doesn't move between Sundays. Deliveries to T-Ports Lucky Bay are counted separately.">
+          <span class="v">{(app.snap.kpi.receivedT / 1e6).toFixed(2)}</span>
+          <span class="l">million t delivered (sim)</span>
+          {#if obsCumAtDay}<span class="o">actual {(obsCumAtDay.value / 1e6).toFixed(2)} (w/e {fmtWeekEnding(obsCumAtDay.weekEnding)})</span>{/if}
+        </div>
+        {#if app.viewMode === "simple"}
+          <div class="kpi" title="Trucks currently loading, driving or queued in the simulation">
+            <span class="v">{app.snap.trucks.length}</span>
+            <span class="l">trucks on the road now</span>
+          </div>
+        {:else}
+          <div
+            class="kpi"
+            title="Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay). Ships also load stock carried over from last season, so this can exceed this season's deliveries."
+          >
+            <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
+            <span class="l">million t shipped out</span>
+            {#if app.snap.kpi.carryInT > 10000}<span class="o">incl. {(app.snap.kpi.carryInT / 1e6).toFixed(2)} carry-over</span>{/if}
+          </div>
+          <div class="kpi" title="Trucks waiting to unload across all sites right now">
+            <span class="v">{app.snap.kpi.queueTrucks}</span>
+            <span class="l">trucks queued</span>
+          </div>
+          <div class="kpi" title="Ships at anchor waiting for a berth or for grain">
+            <span class="v">{app.snap.kpi.vesselsWaiting}</span>
+            <span class="l">ships waiting</span>
+          </div>
+        {/if}
+      </div>
+    {/if}
   </div>
 
   {#if app.snap}
-    <div class="kpis">
-      <div class="kpi" title="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published weekly figure, shown only on the week-ending date it was reported — the observed total doesn't move between Sundays. Deliveries to T-Ports Lucky Bay are counted separately.">
-        <span class="v">{(app.snap.kpi.receivedT / 1e6).toFixed(2)}</span>
-        <span class="l">million t delivered (sim)</span>
-        {#if obsCumAtDay}<span class="o">actual {(obsCumAtDay.value / 1e6).toFixed(2)} (w/e {fmtWeekEnding(obsCumAtDay.weekEnding)})</span>{/if}
-      </div>
-      {#if app.viewMode === "simple"}
-        <div class="kpi" title="Trucks currently loading, driving or queued in the simulation">
-          <span class="v">{app.snap.trucks.length}</span>
-          <span class="l">trucks on the road now</span>
-        </div>
-      {:else}
-        <div
-          class="kpi"
-          title="Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay). Ships also load stock carried over from last season, so this can exceed this season's deliveries."
-        >
-          <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
-          <span class="l">million t shipped out</span>
-          {#if app.snap.kpi.carryInT > 10000}<span class="o">incl. {(app.snap.kpi.carryInT / 1e6).toFixed(2)} carry-over</span>{/if}
-        </div>
-        <div class="kpi" title="Trucks waiting to unload across all sites right now">
-          <span class="v">{app.snap.kpi.queueTrucks}</span>
-          <span class="l">trucks queued</span>
-        </div>
-        <div class="kpi" title="Ships at anchor waiting for a berth or for grain">
-          <span class="v">{app.snap.kpi.vesselsWaiting}</span>
-          <span class="l">ships waiting</span>
-        </div>
-      {/if}
-    </div>
     <MoneyChart {dailyReceived} observed={app.observed} season={app.season} day={scrubDay} />
   {/if}
 
@@ -431,6 +596,11 @@
       <button class:active={app.heatmapOn} onclick={toggleHeatmap} title="Cumulative loaded tonnes per route">🚚 truck-flow heatmap</button>
       <button onclick={downloadCsv} title="Daily sim series + actual weekly deliveries (CSV)">⬇ CSV</button>
     </div>
+  {/if}
+
+  {#if isMobile}
+    {@render portsBlock()}
+    {@render mapKey()}
   {/if}
 
   {#if app.error}
@@ -450,37 +620,23 @@
 </div>
 
 {#if narratorText}
-  <div class="narrator" class:shift={app.viewMode === "advanced"}>{narratorText}</div>
+  <!-- m-hide is mobile-only CSS: the narrator is pinned to the top of the screen, where
+       an expanded sheet or an open site card would otherwise collide with it (#30) -->
+  <div
+    class="narrator"
+    class:shift={app.viewMode === "advanced"}
+    class:m-hide={sheetExpanded || app.selectedSite != null}
+  >
+    {narratorText}
+  </div>
 {/if}
 
-<PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} live={app.observed?.live ?? false} />
+{#if !isMobile}{@render portsBlock()}{/if}
 <SiteDetail {siteHistory} />
 <Tour />
 {#if showIntro}<Intro onwatch={dismissIntro} />{/if}
 
-{#if legendOpen}
-  <div class="legend">
-    <div class="lg-head">
-      <b>Map key</b>
-      <button class="lg-x" onclick={() => (legendOpen = false)}>×</button>
-    </div>
-    <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: green = crop standing, gold = harvested</div>
-    <div class="lg-sub">moving dots are trucks, coloured by their load:</div>
-    <div class="chips">
-      <span><i style="background:#ebc85a"></i>wheat</span>
-      <span><i style="background:#d6a864"></i>barley</span>
-      <span><i style="background:#fadc28"></i>canola</span>
-      <span><i style="background:#c85a50"></i>lentils</span>
-      <span><i style="background:#96b45a"></i>beans</span>
-      <span><i style="background:#5ac8eb"></i>silo→port shuttle</span>
-    </div>
-    <div><span class="sw ring"></span> silo/site: turns bright blue as storage fills · red ring = trucks queued · click it for detail</div>
-    <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
-    <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
-  </div>
-{:else}
-  <button class="legend-btn" onclick={() => (legendOpen = true)}>🗺 map key</button>
-{/if}
+{#if !isMobile}{@render mapKey()}{/if}
 
 {#if app.showAbout}<AboutModal onclose={() => (app.showAbout = false)} />{/if}
 
@@ -503,6 +659,14 @@
     color: #dfe7ef;
     font-size: 13px;
     backdrop-filter: blur(4px);
+  }
+  /* Both are inert above the mobile breakpoint: the sheet's drag handle doesn't
+     render at all, and the peek wrapper leaves no box behind (#30). */
+  .grip {
+    display: none;
+  }
+  .peek-group {
+    display: contents;
   }
   header {
     display: flex;
@@ -800,15 +964,185 @@
     margin-left: 5px;
     margin-right: 11px;
   }
+  /* ─── mobile: the panel is a draggable bottom sheet (#30) ──────────────────
+     Nothing below applies above 800px. The old rule sized the panel with
+     calc(100vw - 24px) on top of left:12px, which came out 18px wider than the
+     viewport, then clipped it at 55vh over an unindicated inner scroll. It now
+     spans the viewport by anchoring left:0/right:0 (no width arithmetic to get
+     wrong) and sits at one of two heights: peek — the date, transport controls
+     and KPIs — or expanded. */
   @media (max-width: 800px) {
     .panel {
-      width: calc(100vw - 24px);
-      max-height: 55vh;
+      position: fixed;
+      top: auto;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto;
+      height: 86vh;
+      height: 86dvh;
+      max-height: none;
+      display: flex;
+      flex-direction: column;
+      padding: 0 14px 16px;
+      border-width: 1px 0 0;
+      border-radius: 14px 14px 0 0;
+      box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+      overscroll-behavior: contain;
+      z-index: 8;
+      transform: translateY(var(--sheet-y, 0px));
+      transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
     }
+    /* --peek-h is measured from the peek group and set inline, because the KPI
+       grid is two cards in Simple mode and four in Advanced */
+    .panel.peek {
+      --sheet-y: calc(100% - var(--peek-h, 260px));
+      overflow: hidden;
+    }
+    .panel.dragging {
+      transition: none;
+    }
+    /* the sheet is a fixed-height flex column whose content overflows it, so without
+       this every block (and every component root inside it) gets squashed by
+       flex-shrink — the Simple/Advanced toggle collapsed to a 2px line */
+    .panel > :global(*) {
+      flex-shrink: 0;
+    }
+    /* the inner scroll is real on mobile — give it a visible thumb */
+    .panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .panel::-webkit-scrollbar-thumb {
+      background: #3c5573;
+      border-radius: 3px;
+    }
+    .grip {
+      display: flex;
+      order: -2;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      margin: 0 -14px 2px;
+      padding: 9px 14px 7px;
+      min-height: 44px;
+      background: #0e1a28; /* opaque: content scrolls underneath it */
+      border: none;
+      border-radius: 14px 14px 0 0;
+      color: #9db1c5;
+      font-size: 12px;
+      touch-action: none;
+      cursor: grab;
+    }
+    .grip:active {
+      cursor: grabbing;
+    }
+    .grip-bar {
+      width: 42px;
+      height: 4px;
+      border-radius: 2px;
+      background: #4a668a;
+    }
+    /* hoisted above the title/mode/scenario block so the peek shows what matters
+       while the sheet is down */
+    .peek-group {
+      display: flex;
+      flex-direction: column;
+      order: -1;
+      /* the fold sits on this padding, so nothing below it half-shows at peek */
+      padding-bottom: 12px;
+    }
+    header h1 {
+      font-size: 22px;
+    }
+    .sub {
+      font-size: 12px;
+    }
+    .modes button {
+      font-size: 13px;
+      padding: 4px 18px;
+    }
+    label {
+      font-size: 12px;
+    }
+    select {
+      max-width: none;
+      font-size: 14px; /* iOS zooms the page in on focus below 16px; 14 is the practical floor here */
+    }
+    .row {
+      margin-top: 12px;
+    }
+    .date {
+      font-size: 14px;
+      min-width: 96px;
+    }
+    .phases {
+      font-size: 12px;
+      color: #7d90a4; /* was #64788c — 3.99:1, under AA for small text */
+      margin-top: -2px;
+    }
+    .kpi .l,
+    .kpi .o {
+      font-size: 12px;
+    }
+    /* kept compact on purpose: in Advanced mode four of these sit in the peek, and
+       every pixel here is a pixel of map */
+    .kpi {
+      padding: 6px 9px;
+    }
+    .kpi .v {
+      font-size: 18px;
+    }
+    .tools button {
+      font-size: 12px;
+    }
+    .err .detail {
+      font-size: 12px;
+    }
+    .disclaimer {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+    footer {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    /* the narrator is fixed to the top of the screen; hide it rather than let an
+       expanded sheet or a site card sit underneath it */
+    .narrator {
+      left: 10px;
+      right: 10px;
+      max-width: none;
+      transform: none;
+      text-align: left;
+    }
+    .narrator.m-hide {
+      display: none;
+    }
+    /* on mobile the map key rides inside the sheet instead of floating over the map */
     .legend,
     .legend-btn {
-      left: 12px;
-      bottom: 58vh;
+      position: static;
+      left: auto;
+      bottom: auto;
+      max-width: none;
+      width: 100%;
+      margin-top: 12px;
+      font-size: 12px;
+      text-align: left;
+    }
+    .legend {
+      gap: 5px;
+      color: #c3d0de;
+    }
+    .lg-sub {
+      color: #9db1c5;
+    }
+    .lg-x {
+      font-size: 20px;
+      min-width: 44px;
     }
   }
 </style>
