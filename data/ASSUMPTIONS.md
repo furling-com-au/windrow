@@ -38,11 +38,17 @@ presented as measured data.
 - **Value**: sample + weigh + tip cycle 12 min/truck/bay; **4 tipping bays at an upcountry
   site, 5 at a port terminal** (`countryBays`, `portBays`; both fitted, port bays sit on
   the floor of the physical band derived below).
-- **Reasoning**: not published anywhere in minutes. Bounded by physics against the one
+- **Reasoning**: not published anywhere in minutes, so bounded empirically against the one
   published throughput anchor — the Port Lincoln site record of **13,148/13,512 t/day
-  (Nov 2020) and 13,675 t/day (2022/23)**: at ~40 t average load that is ~340 truck
-  visits/day, ~24/h across a 14 h receival day, and a 12-min cycle serves 5 trucks/bay/h,
-  so **at least 5 bays** are required to reach the record at all.
+  (Nov 2020) and 13,675 t/day (2022/23)** — by measuring what bay count reproduces it (see
+  below), not by a back-of-envelope rate calculation. A rate calculation doesn't hold here:
+  the engine gates farm trucks *dispatching* to a 12 h window (07:00–19:00, `engine.ts`
+  `sitesOpenNow`), but bays servicing an already-queued truck are gated only by whether the
+  site is open for the season, not by that daily window — they keep tipping past 19:00
+  until the queue clears, so there is no single "receival day" length to divide the
+  ~340 daily visits by. (An earlier version of this entry assumed a flat 14 h window and
+  derived "≥5 bays" from it; that number happened to match measurement, but the arithmetic
+  it came from didn't correspond to anything the code does.)
 - **CORRECTED 2026-08-19 (was 2 bays upcountry / 4 at ports)**: the earlier values were
   never checked against that record. Measured, the 2/4 configuration peaks at
   **10,285 t/day** at Port Lincoln — 24 % below the published record, i.e. the model

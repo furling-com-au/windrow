@@ -78,7 +78,6 @@ interface SiteState {
   serviceMin: number;
   accepts: boolean[]; // per commodity
   cumReceivedT: number;
-  intakeTph: number;
   shiploaderTph: number;
   berthsFree: number;
   cumShippedT: number;
@@ -312,7 +311,6 @@ export class Sim {
         serviceMin: params.siteServiceMin ?? 12, // A2 (assumption lever)
         accepts,
         cumReceivedT: 0,
-        intakeTph: isPort ? (name.includes("Lincoln") ? 4000 : name.includes("Thevenard") ? 1400 : 1000) : 600,
         shiploaderTph: name.includes("Lincoln") ? 3000 : name.includes("Thevenard") ? 1000 : 417, // LB = 10 kt/day transshipment
         berthsFree: name.includes("Lincoln") ? 2 : 1,
         cumShippedT: 0,
