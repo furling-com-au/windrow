@@ -23,16 +23,20 @@ This file is the canonical record of where the project is. Updated as work proce
 
 ## Validation headline (see docs/calibration_report.md)
 
-- Held-out 2024/25: season total **−0.4 %** (spec ±5 % ✓); weekly RMSE 63 % of mean weekly
+- Held-out 2024/25: season total **−0.4 %** (spec ±5 % ✓); weekly RMSE 61 % of mean weekly
   (timing-dominated; the late-Nov 2024 rain collapse is missing from ERA5 at the A6
   points — documented). Vessel counts = AIS schedule by construction.
-- 2023/24 **−1.6 %**, 2025/26 **−1.0 %** (calibration seasons; 2026-08-19 recalibration —
-  all three seasons now inside ±2 %, against −2.5 %…+0.7 % before).
-- Port Lincoln peak day 14,458 t vs published record 13,148–13,675 t — now reproducible
-  (the pre-2026-08-19 bay settings topped out at 10,285 t, 24 % below the record).
-- Mean vessel wait 28.3 h vs 26.8 h AIS-observed; peak network queue 139 trucks.
-- 2022/23 bumper now exceeds the validity envelope entirely (A4 capacities fill; queue
-  guard fires). Already excluded from the UI; recorded as skipped in the report.
+- 2023/24 **+0.2 %**, 2025/26 **−0.6 %** (calibration seasons; 2026-08-31 refit on the A4
+  district capacities — all three seasons inside ±1 % for the first time).
+- Port Lincoln peak grower-receival day **9,950 t** against the published record of
+  13,148–13,675 t — **no longer reproduced**. It was (13,694 t) while upcountry capacity
+  was a flat 120 kt everywhere: the lower-EP sites filled and pushed carting past them to
+  the port. Under A4's district allocation they hold 162,900 t and stop saturating. Bays
+  are not the constraint any more (10,502 t at 6 port bays, 11,302 t at 7) — see A2.
+- Mean vessel wait 30.7 h vs 26.8 h AIS-observed; peak network queue 135 trucks.
+- 2022/23 bumper still exceeds the validity envelope entirely (upcountry capacity fills;
+  the queue guard fires at Lucky Bay, 542 trucks). Excluded from the UI; recorded as
+  skipped in the report.
 
 ## Phase 1 acceptance criteria — status
 
@@ -184,6 +188,42 @@ This file is the canonical record of where the project is. Updated as work proce
 - `docs/calibration_report.md` regenerated in passing — it was stale from before the `#6`
   vessel give-up fix and still showed 2024/25 at 45/53 vessel calls (a **FAIL** on the
   ±10 % check); the current engine gives 53/53, **PASS**. Unrelated to this fix.
+
+### 2026-08-31 (#20: A4's per-site capacity method was never implemented)
+
+- **A4 described an allocation the code did not do.** The register said "per-site capacity
+  allocated proportional to long-run district receivals"; `engine.ts` used a flat
+  `120000` for every Bunge site and `145000` for T-Ports. Only the *total* was real
+  (21 × 120 kt = 2.52 Mt ≈ A4's 2.5 Mt); none of the proportionality was.
+- **Implemented rather than documented away.** `pipeline/r1_build_sites.py` now assigns
+  every site a PIRSA district by LGA point-in-polygon — the same A14 mapping and far-west
+  fallback `r4_build_demand.py` uses on CLUM cells — and splits the 2.54 Mt upcountry
+  total (max Western season receivals 3.267 Mt − published port storage 0.732 Mt, both
+  re-derived from the data at build time) between districts by long-run receivals share,
+  then evenly within a district: **WEP 72,700 t, LEP 162,900 t, EEP 166,200 t**.
+  `sites.geojson` gains real `capacity_t`, a `capacity_estimated` flag and `district`;
+  the engine reads them and `upcountryCapScale` now moves the estimated capacities only,
+  never a published tonnage. The flat constants survive as a pre-#20-bundle fallback.
+- **It right-sizes the far west.** Witera, Streaky Bay, Wirrulla and Poochera went from
+  30–56 % peak fill to 64–98 %; the four sites still running near-empty (Yeelanna,
+  Kapinnie, Port Neill, Edillilie) are single-segregation niche sites limited by what they
+  accept, not by storage. 2025/26 baseline: direct-to-port **33.1 → 30.7 %** (A9's prior
+  is ~25 %), peak queue **139 → 135**.
+- **Refitted** (11 knobs, 200+100 evals): fleet 731 → **691**, line-haul 60 → **64**,
+  port bays 6 → **5**, portAttractBias 0.8 → **1.475**, choiceRadius 2.11 → **2.64**.
+  Score 1.133 → **1.115**; season totals 2023/24 **+0.2 %**, 2025/26 **−0.6 %**, holdout
+  2024/25 **−0.4 %** — all three inside ±1 % for the first time. Weekly RMSE improved on
+  2023/24 (63 → 46 %) and the holdout (63 → 61 %), worsened on 2025/26 (50 → 63 %).
+- **Cost: Port Lincoln's published peak receival day is no longer reproduced** (13,694 →
+  9,950 t against a 13,148–13,675 t record). The old agreement depended on the six
+  lower-EP sites saturating at 120 kt and pushing carting past them to the port; at
+  162,900 t they do not. Adding port bays does not recover it (10,502 t at 6, 11,302 t at
+  7), so this is an upcountry-capacity result, not a tipping-capacity one. Recorded in
+  A2 rather than tuned away.
+- `docs/scenarios.md` / `scenarios_data.json` / `calibration_report.md` regenerated;
+  A2, A4, A14, README and the app's capacity lever/site panel copy updated. The site
+  panel now reads the capacity the run enforces (new `SiteView.capacityT`) instead of the
+  raw bundle figure, so it no longer contradicts the capacity lever.
 
 ## Key decisions
 

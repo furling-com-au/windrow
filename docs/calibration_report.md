@@ -18,28 +18,28 @@ delivery damping, T-Ports inland bunkers closed in 2024/25 (A15).
 
 | knob | value |
 |---|---|
-| fleetTrucks | 731.426 |
-| linehaulTrucks | 59.772 |
-| rateScale | 0.7 |
+| fleetTrucks | 690.76 |
+| linehaulTrucks | 63.918 |
+| rateScale | 0.881 |
 | matShift | -4 |
-| harvestRampDays | 8.475 |
+| harvestRampDays | 5 |
 | retentionShare | 0.1 |
-| portAttractBias | 0.8 |
-| choiceBeta | 2.199 |
-| choiceRadius | 2.105 |
-| countryBays | 4.404 |
-| portBays | 5.699 |
-| luckyBayBias | 0.4 |
+| portAttractBias | 1.475 |
+| choiceBeta | 2.06 |
+| choiceRadius | 2.64 |
+| countryBays | 3.573 |
+| portBays | 5.035 |
+| luckyBayBias | 0.469 |
 
-> **Outside the model's validity envelope (not run):** 2022/23 — QUEUE INSANE at Lucky Bay (T-Ports port): 431
+> **Outside the model's validity envelope (not run):** 2022/23 — QUEUE INSANE at Lucky Bay (T-Ports port): 542
 
 ## Fit quality (all seasons, seed 42)
 
 | season | role | sim total (Mt) | obs total (Mt) | total err | weekly RMSE / mean weekly | PL vessels sim / AIS |
 |---|---|---|---|---|---|---|
-| 2023/24 | calibration | 1.835 | 1.864 | -1.6 % | 63 % | 86 / 86 |
-| 2024/25 | **held out** | 1.501 | 1.507 | -0.4 % | 63 % | 53 / 53 |
-| 2025/26 | calibration | 2.227 | 2.249 | -1.0 % | 50 % | 51 / 51 |
+| 2023/24 | calibration | 1.868 | 1.864 | +0.2 % | 46 % | 86 / 86 |
+| 2024/25 | **held out** | 1.501 | 1.507 | -0.4 % | 61 % | 53 / 53 |
+| 2025/26 | calibration | 2.236 | 2.249 | -0.6 % | 63 % | 51 / 51 |
 
 \* 2022/23 has no AIS vessel schedule (pre-coverage); its vessel program is synthetic,
 so only the receivals side is meaningful.
@@ -49,7 +49,7 @@ so only the receivals side is meaningful.
 | criterion (spec §5) | value | threshold | verdict |
 |---|---|---|---|
 | season total error | -0.4 % | ±5 % | **PASS** |
-| weekly RMSE / mean weekly | 63 % | ≤15 % band (see note) | see note |
+| weekly RMSE / mean weekly | 61 % | ≤15 % band (see note) | see note |
 | vessel call count | +0.0 % | ±10 % | **PASS** |
 
 **Note on the weekly band.** The spec's "±15 % weekly RMSE band" is ambiguous for weeks

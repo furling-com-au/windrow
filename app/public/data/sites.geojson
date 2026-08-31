@@ -3,7 +3,7 @@
  "name": "windrow_sites",
  "metadata": {
   "generated": "pipeline/r1_build_sites.py",
-  "notes": "EP + far west grain receival sites. Coordinates: operator API (facility) or OSM town nodes (town). Capacities only where published; upcountry Bunge capacities are NOT published (see ASSUMPTIONS.md).",
+  "notes": "EP + far west grain receival sites. Coordinates: operator API (facility) or OSM town nodes (town). Bunge upcountry capacities are NOT published: those carry capacity_estimated=true and an estimate allocated by PIRSA district (ASSUMPTIONS.md A4). capacity_estimated=false marks the five published figures.",
   "attribution": [
    "Site data (c) Bunge/Viterra operator API",
    "OpenStreetMap contributors (ODbL) for town coordinates"
@@ -31,10 +31,12 @@
      "BA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 143
+    "nearest_osm_silo_m": 143,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -57,10 +59,12 @@
      "WH"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 101
+    "nearest_osm_silo_m": 101,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -81,10 +85,12 @@
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/1436f217-8ded-4bc6-989e-a91301835864 (retrieved 2026-08-19)",
     "commodities_2025_26": [],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 131
+    "nearest_osm_silo_m": 131,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -111,10 +117,12 @@
      "LE"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 162900,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 821
+    "nearest_osm_silo_m": 821,
+    "district": "LEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -137,10 +145,12 @@
      "FB"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 162900,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 186
+    "nearest_osm_silo_m": 186,
+    "district": "LEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -163,10 +173,12 @@
      "FB"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 162900,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 199
+    "nearest_osm_silo_m": 199,
+    "district": "LEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -187,10 +199,12 @@
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/3a5f0288-fe75-42f1-bc2b-a91301835864 (retrieved 2026-08-19)",
     "commodities_2025_26": [],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 108
+    "nearest_osm_silo_m": 108,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -215,10 +229,12 @@
      "BA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 166200,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 1906
+    "nearest_osm_silo_m": 1906,
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -239,10 +255,12 @@
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/4a6f63f5-00d4-46e4-9fc8-a9130183585f (retrieved 2026-08-19)",
     "commodities_2025_26": [],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 166200,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 166
+    "nearest_osm_silo_m": 166,
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -268,10 +286,12 @@
      "LE"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 162900,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 345
+    "nearest_osm_silo_m": 345,
+    "district": "LEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -294,10 +314,12 @@
      "CA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 162900,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 153
+    "nearest_osm_silo_m": 153,
+    "district": "LEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -321,10 +343,12 @@
      "BA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 219
+    "nearest_osm_silo_m": 219,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -349,10 +373,12 @@
      "BA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 611
+    "nearest_osm_silo_m": 611,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -377,10 +403,12 @@
      "LE"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 166200,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 470
+    "nearest_osm_silo_m": 470,
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -404,10 +432,12 @@
      "BA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 47
+    "nearest_osm_silo_m": 47,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -430,10 +460,12 @@
      "CA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 162900,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 108
+    "nearest_osm_silo_m": 108,
+    "district": "LEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -454,10 +486,12 @@
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/b89e1868-2309-47b6-b26b-a9130183585f (retrieved 2026-08-19)",
     "commodities_2025_26": [],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 166200,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 129
+    "nearest_osm_silo_m": 129,
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -478,10 +512,12 @@
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/c90de8a9-a1c7-4c0a-91ad-a9130183585f (retrieved 2026-08-19)",
     "commodities_2025_26": [],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 50
+    "nearest_osm_silo_m": 50,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -506,10 +542,12 @@
      "LE"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 210
+    "nearest_osm_silo_m": 210,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -537,7 +575,9 @@
     "capacity_t": 335925,
     "capacity_provenance": "ACCC Final Determinations Port Lincoln & Thevenard, 20 Jul 2021, Table 3.1 (https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf); T-Ports: https://tports.com/lucky-bay/ + ACCC ibid.",
     "region": "western",
-    "nearest_osm_silo_m": 289
+    "nearest_osm_silo_m": 289,
+    "district": "WEP",
+    "capacity_estimated": false
    }
   },
   {
@@ -562,10 +602,12 @@
      "CA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 166200,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 1586
+    "nearest_osm_silo_m": 1586,
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -593,7 +635,9 @@
     "capacity_t": 395600,
     "capacity_provenance": "ACCC Final Determinations Port Lincoln & Thevenard, 20 Jul 2021, Table 3.1 (https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf); T-Ports: https://tports.com/lucky-bay/ + ACCC ibid.",
     "region": "western",
-    "nearest_osm_silo_m": 121
+    "nearest_osm_silo_m": 121,
+    "district": "LEP",
+    "capacity_estimated": false
    }
   },
   {
@@ -617,10 +661,12 @@
      "BA"
     ],
     "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
-    "capacity_t": null,
-    "capacity_provenance": null,
+    "capacity_t": 72700,
+    "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
-    "nearest_osm_silo_m": 140
+    "nearest_osm_silo_m": 140,
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -654,7 +700,9 @@
      "https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf"
     ],
     "notes": "Transshipment port opened 2019; no berth for ocean vessels - TSV MV Lucky Eyre shuttles to anchorage",
-    "nearest_osm_silo_m": 11581
+    "nearest_osm_silo_m": 11581,
+    "district": "EEP",
+    "capacity_estimated": false
    }
   },
   {
@@ -686,7 +734,9 @@
      "https://tports.com/harvest/"
     ],
     "notes": "'Site closed for 25/26 season' per tports.com/harvest (2026-08-19); operated prior seasons from 2019",
-    "nearest_osm_silo_m": 220
+    "nearest_osm_silo_m": 220,
+    "district": "WEP",
+    "capacity_estimated": false
    }
   },
   {
@@ -719,7 +769,9 @@
      "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/"
     ],
     "notes": "Built for 2021 harvest",
-    "nearest_osm_silo_m": 440
+    "nearest_osm_silo_m": 440,
+    "district": "EEP",
+    "capacity_estimated": false
    }
   },
   {
@@ -747,7 +799,9 @@
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/",
      "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/"
     ],
-    "notes": "Closed in Viterra's 2019 network rationalisation after EP rail shutdown"
+    "notes": "Closed in Viterra's 2019 network rationalisation after EP rail shutdown",
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -774,7 +828,9 @@
     "sources": [
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed 2019"
+    "notes": "Closed 2019",
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -801,7 +857,9 @@
     "sources": [
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019 (dormant before)"
+    "notes": "Closed permanently 2019 (dormant before)",
+    "district": "WEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -828,7 +886,9 @@
     "sources": [
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019; rail-served until May 2019"
+    "notes": "Closed permanently 2019; rail-served until May 2019",
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -855,7 +915,9 @@
     "sources": [
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019"
+    "notes": "Closed permanently 2019",
+    "district": "EEP",
+    "capacity_estimated": true
    }
   },
   {
@@ -882,7 +944,9 @@
     "sources": [
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019"
+    "notes": "Closed permanently 2019",
+    "district": "EEP",
+    "capacity_estimated": true
    }
   }
  ]

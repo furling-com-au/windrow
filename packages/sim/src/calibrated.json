@@ -1,66 +1,67 @@
 {
   "knobs": {
-    "fleetTrucks": 731.4261843189597,
-    "linehaulTrucks": 59.7716456927359,
-    "rateScale": 0.7,
+    "fleetTrucks": 690.7601983956993,
+    "linehaulTrucks": 63.917607271019364,
+    "rateScale": 0.8810744783189147,
     "matShift": -4,
-    "harvestRampDays": 8.474589382279664,
+    "harvestRampDays": 5,
     "retentionShare": 0.1,
-    "portAttractBias": 0.8,
-    "choiceBeta": 2.1988918587714443,
-    "choiceRadius": 2.105491730625741,
-    "countryBays": 4.404088321160525,
-    "portBays": 5.698792750816793,
-    "luckyBayBias": 0.4
+    "portAttractBias": 1.4745477937534455,
+    "choiceBeta": 2.05991799197346,
+    "choiceRadius": 2.639763329409062,
+    "countryBays": 3.573412701878696,
+    "portBays": 5.0345851624943325,
+    "luckyBayBias": 0.4694349017292262
   },
   "params": {
-    "fleetTrucks": 731,
-    "linehaulTrucks": 60,
+    "fleetTrucks": 691,
+    "linehaulTrucks": 64,
     "truckPayloadT": 38,
     "linehaulPayloadT": 45,
     "harvestRatePerDay": {
-      "wheat": 0.037939999999999995,
-      "barley": 0.04557,
-      "canola": 0.037939999999999995,
-      "lentils": 0.05061,
-      "beans": 0.040459999999999996,
-      "other": 0.040459999999999996
+      "wheat": 0.03342796570741963,
+      "barley": 0.040150563976992945,
+      "canola": 0.03342796570741963,
+      "lentils": 0.04459117934772028,
+      "beans": 0.03564827339278329,
+      "other": 0.03564827339278329
     },
     "maturityDayOffset": {
-      "lentils": 14,
-      "barley": 18,
-      "other": 26,
-      "beans": 32,
-      "canola": 38,
-      "wheat": 40
+      "lentils": 10,
+      "barley": 14,
+      "other": 22,
+      "beans": 28,
+      "canola": 34,
+      "wheat": 36
     },
     "districtStartOffset": {
       "WEP": -8,
       "EEP": 0,
       "LEP": 8
     },
-    "harvestRampDays": 8.474589382279664,
+    "harvestRampDays": 5,
     "siteServiceMin": 12,
     "travelTimeScale": 1,
     "rainStopMm": 5,
     "carryInScale": 1,
     "upcountryCapScale": 1,
-    "choiceBeta": 2.1988918587714443,
-    "choiceRadius": 2.105491730625741,
+    "choiceBeta": 2.05991799197346,
+    "choiceRadius": 2.639763329409062,
     "countryBays": 4,
-    "portBays": 6,
-    "portAttractBias": 0.8,
+    "portBays": 5,
+    "queueBalkMin": 240,
+    "portAttractBias": 1.4745477937534455,
     "retentionShare": 0.1,
-    "luckyBayBias": 0.4,
+    "luckyBayBias": 0.4694349017292262,
     "productionScale": 1,
     "railReinstated": false,
     "outage": null,
     "roadClosure": null
   },
-  "score": 1.1332627961153459,
+  "score": 1.1147980345564297,
   "parts": {
-    "2023/24": 0.6115751229316829,
-    "2025/26": 0.521687673183663
+    "2023/24": 0.46154536550938313,
+    "2025/26": 0.6532526690470466
   },
   "nEvaluations": 300
 }

@@ -223,7 +223,8 @@ export class DeckMap {
         const sv = snap.sites[s.id];
         const stock = sv?.stockT ?? 0;
         const queue = sv?.queue ?? 0;
-        const cap = s.capacity_t ?? 120000;
+        // the capacity the run enforces, so the fill ring tracks the A4 capacity lever
+        const cap = sv?.capacityT ?? s.capacity_t ?? 120000;
         return {
           ...s,
           stock,

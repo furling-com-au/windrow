@@ -56,18 +56,18 @@
   },
   "evaluations": 300,
   "best": {
-    "fleetTrucks": 731.4261843189597,
-    "linehaulTrucks": 59.7716456927359,
-    "rateScale": 0.7,
+    "fleetTrucks": 690.7601983956993,
+    "linehaulTrucks": 63.917607271019364,
+    "rateScale": 0.8810744783189147,
     "matShift": -4,
-    "harvestRampDays": 8.474589382279664,
+    "harvestRampDays": 5,
     "retentionShare": 0.1,
-    "portAttractBias": 0.8,
-    "choiceBeta": 2.1988918587714443,
-    "choiceRadius": 2.105491730625741,
-    "countryBays": 4.404088321160525,
-    "portBays": 5.698792750816793,
-    "luckyBayBias": 0.4
+    "portAttractBias": 1.4745477937534455,
+    "choiceBeta": 2.05991799197346,
+    "choiceRadius": 2.639763329409062,
+    "countryBays": 3.573412701878696,
+    "portBays": 5.0345851624943325,
+    "luckyBayBias": 0.4694349017292262
   },
-  "bestScore": 1.1332627961153459
+  "bestScore": 1.1147980345564297
 }

@@ -557,8 +557,8 @@
           <span>Last season's carry-over <b>×{app.assump.carryInScale.toFixed(1)}</b></span>
           <input type="range" min="0" max="2" step="0.1" value={app.assump.carryInScale} oninput={(e) => setA("carryInScale", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A4: country silo capacities are unpublished (assumed ~120,000 t each). Published port and T-Ports capacities are NOT scaled.">
-          <span>Assumed silo capacities <b>×{app.assump.capScale.toFixed(1)}</b></span>
+        <label title="A4: country silo capacities are unpublished. Each is estimated from its PIRSA district's share of long-run receivals (73 kt far west, 163 kt lower EP, 166 kt eastern EP). Published port and T-Ports capacities are NOT scaled.">
+          <span>Estimated silo capacities <b>×{app.assump.capScale.toFixed(1)}</b></span>
           <input type="range" min="0.5" max="1.5" step="0.1" value={app.assump.capScale} oninput={(e) => setA("capScale", parseFloat(e.currentTarget.value))} />
         </label>
         <div class="econ-head">Dollar rates (display only — the sim doesn't use money)</div>

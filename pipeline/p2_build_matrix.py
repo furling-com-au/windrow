@@ -150,6 +150,9 @@ def main():
                 "lon": lon,
                 "lat": lat,
                 "capacity_t": p.get("capacity_t"),
+                # True where capacity_t is the A4 district allocation rather than a
+                # published figure: the engine's capacity lever moves only those.
+                "capacity_estimated": bool(p.get("capacity_estimated")),
                 "commodities": p.get("commodities_2025_26") or [],
             }
         )

@@ -36,7 +36,8 @@ presented as measured data.
 
 ## A2 — receival site service times and bay counts
 - **Value**: sample + weigh + tip cycle 12 min/truck/bay; **4 tipping bays at an upcountry
-  site, 6 at a port terminal** (`countryBays`, `portBays`).
+  site, 5 at a port terminal** (`countryBays`, `portBays`; both fitted, port bays sit on
+  the floor of the physical band derived below).
 - **Reasoning**: not published anywhere in minutes. Bounded by physics against the one
   published throughput anchor — the Port Lincoln site record of **13,148/13,512 t/day
   (Nov 2020) and 13,675 t/day (2022/23)**: at ~40 t average load that is ~340 truck
@@ -50,8 +51,16 @@ presented as measured data.
   peak 189 trucks), which in turn inflated truck cycle times and therefore the fitted
   fleet size: the calibrator was buying missing site throughput with imaginary trucks.
 - **Sensitivity**: drives queue lengths at peak — a headline output — and, indirectly,
-  the fitted fleet. Bay counts are now calibrated within a band that keeps the modelled
-  Port Lincoln peak day inside the published record; must stay marked assumed in the UI.
+  the fitted fleet. Must stay marked assumed in the UI.
+- **Bays are no longer what caps Port Lincoln (2026-08-31, issue #20).** They were, under
+  the flat 120 kt upcountry capacities: the model's peak grower-receival day at Port
+  Lincoln was 13,694 t, at the top of the published band, because Cummins and Tumby Bay
+  saturated at 120,000 t and pushed carting past them to the port. Under A4's district
+  allocation the lower-EP sites hold 162,900 t, stop being the binding constraint, and the
+  peak day falls to **9,950 t** — and adding bays barely moves it (10,502 t at 6 port
+  bays, 11,302 t at 7). So the model no longer reproduces the published daily record, and
+  the reason is upcountry storage near the port, not tipping capacity at it. Recorded
+  rather than tuned away: the earlier agreement rested on a capacity we now think wrong.
 - **Related finding**: with bays under-provisioned the calibration objective is monotone
   in fleet size (more trucks always scored better, to 900+), and only the engine's own
   `QUEUE INSANE` invariant (>400 trucks at one site) bounded it. Fleet size is therefore
@@ -69,15 +78,56 @@ presented as measured data.
 - **Sensitivity**: affects truck-km, not tonnage balances.
 
 ## A4 — upcountry site storage capacities (Bunge, EP)
-- **Value**: per-site capacity allocated proportional to long-run district receivals,
-  scaled so Western upcountry total ≈ 2.5 Mt (network Western max harvest 3.27 Mt minus
-  port storage 0.73 Mt, rounded).
+- **Value**: the unpublished Bunge upcountry storage total — **2.54 Mt** (max Western
+  season receivals 3.267 Mt, 2022/23, minus published Western port storage 0.732 Mt) —
+  split between PIRSA districts in proportion to their long-run receivals share, then
+  evenly between that district's Bunge upcountry sites:
+  **WEP 72,700 t** each (10 sites), **LEP 162,900 t** (6), **EEP 166,200 t** (5).
+  Of those 21 sites, the 16 operated in 2025/26 hold 1.985 Mt.
+  Published capacities are used as published and are never scaled: Port Lincoln
+  395,600 t, Thevenard 335,925 t, T-Ports Lucky Bay 384,000 / Lock 140,000 /
+  Kimba 150,000 t.
+- **Computed in**: `pipeline/r1_build_sites.py` (`allocate_capacities`), which writes
+  `capacity_t`, `capacity_estimated` and `district` onto every feature of
+  `sites.geojson`. Long-run share = mean PIRSA district production 2022/23–2025/26 —
+  the same window A20 uses — and the district of a site is the LGA polygon containing
+  its coordinate (A14, the same mapping and far-west fallback `r4_build_demand.py`
+  applies to CLUM cropping cells). The engine reads `capacity_t` directly; the app
+  labels every `capacity_estimated` site "(capacity estimated)".
 - **Reasoning**: individual EP site capacities are not published; even ACCC redacted
-  Viterra's EP storage total ("[c-i-c]"). Published anchors: Port Lincoln 395,600 t,
-  Thevenard 335,925 t, T-Ports Lucky Bay 384,000 t / Lock 140,000 t / Kimba 150,000 t.
-- **Sensitivity**: matters only when sites fill (bumper scenarios); mark clearly.
+  Viterra's EP storage total ("[c-i-c]"). What district shares add over a flat per-site
+  figure is the *density* of the network: WEP grows 29 % of EP production across 10
+  sites, EEP 33 % across 5 and LEP 39 % across 6, so a far-west siding is modelled at
+  44 % of an eastern silo — which is the direction the ground truth runs (Wirrulla,
+  Witera and Poochera against Kimba, Cummins and Rudall).
+- **Known limit — within a district every site gets the same number.** Three PIRSA
+  districts is the finest geography this repo has: Bunge's receivals reports are
+  network-region only (western / central / eastern, where "western" is the whole
+  peninsula), so there is nothing to allocate on below district level. Cummins and
+  Kapinnie therefore carry the same modelled capacity, which they certainly do not in
+  reality. 2025/26 segregation counts hint at the spread (Tumby Bay runs 5, Cummins 4,
+  Kapinnie and Yeelanna 1 each) but count grades, not tonnes, so they are not used.
+  Dormant sites are given their district's figure and included in the 2.54 Mt: the
+  storage exists whether or not it is opened in a given season (A12).
+- **Sensitivity**: **binding at the calibrated baseline, not only in bumper years.**
+  Under the flat 120 kt guess this entry used to describe, 8 of the 16 operated sites
+  peaked at 100–102 % of capacity in 2025/26 while Kapinnie and Yeelanna peaked under
+  10 %, and lifting `upcountryCapScale` to 1.5 on that baseline moved direct-to-port
+  share 33.3 % → 24.2 % and peak queue 141 → 75. Direct-to-port share (A9) and T-Ports
+  intake are both downstream of where this capacity sits, so the district allocation
+  is a structural input and the knobs were refitted with it
+  (docs/calibration_report.md). Moving the same 2.5 Mt from flat to district-allocated
+  takes the 2025/26 baseline from **33.1 % direct-to-port and a 139-truck peak queue to
+  30.7 % and 135**, and right-sizes the far west: Witera, Streaky Bay, Wirrulla and
+  Poochera go from 30–56 % peak fill to 64–98 %. It also costs the model Port Lincoln's
+  published peak receival day — see A2.
+- **History**: until 2026-08-31 this entry described the allocation above but the engine
+  implemented a flat 120,000 t for every Bunge site and 145,000 t for T-Ports
+  (`engine.ts`), i.e. only the 2.5 Mt total was real — 21 × 120 kt = 2.52 Mt — and none
+  of the district proportionality (issue #20). The flat constants survive only as a
+  fallback for a bundle built before that fix.
 - **Upgrade path**: operator data; or per-site bunker/silo footprint digitisation from
-  aerial imagery.
+  aerial imagery — the one route to a genuine within-district spread.
 
 ## A5 — road speeds by class (loaded grain truck)
 - **Value**: trunk/primary 90 km/h, secondary 80, tertiary 70, unclassified 60,
@@ -155,7 +205,11 @@ presented as measured data.
 - **Value**: WEP = Ceduna + Streaky Bay + Elliston + Wudinna (+ unincorporated far-west
   cropping strip); EEP = Kimba + Cleve + Franklin Harbour; LEP = Lower Eyre Peninsula +
   Tumby Bay + City of Port Lincoln. LGA polygons: data.sa.gov.au (CC-BY).
-- **Used in**: `pipeline/r4_build_demand.py` (district assignment of demand cells).
+- **Used in**: `pipeline/r4_build_demand.py` (district assignment of demand cells) and
+  `pipeline/r1_build_sites.py` (district of each receival site, for the A4 capacity
+  allocation). Both carry the same LGA→district map and the same far-west fallback;
+  change one and change the other. All 31 EP sites resolve inside an LGA polygon except
+  Penong, which the far-west fallback picks up.
 - **Reasoning**: PIRSA does not publish machine-readable district boundaries. Validation
   against PIRSA sown areas: LEP ratio 1.04 (excellent), EEP 1.29, WEP 2.14 — WEP's CLUM
   cropping mask includes large opportunistically-sown marginal country, consistent with

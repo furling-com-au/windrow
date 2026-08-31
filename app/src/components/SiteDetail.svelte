@@ -8,8 +8,12 @@
 
   let site = $derived(app.selectedSite != null ? app.sites[app.selectedSite] : null);
   let view = $derived(app.selectedSite != null && app.snap ? app.snap.sites[app.selectedSite] : null);
-  let capT = $derived(site?.capacity_t ?? 120000);
-  let capAssumed = $derived(site?.capacity_t == null);
+  // the capacity the run enforces (upcountryCapScale already applied where estimated),
+  // not the raw bundle figure — otherwise the panel contradicts the capacity lever
+  let capT = $derived(view?.capacityT ?? site?.capacity_t ?? 120000);
+  // A4: the two ports and the three T-Ports sites have published capacities; every
+  // Bunge upcountry figure is an estimate allocated by PIRSA district
+  let capAssumed = $derived(site?.capacity_estimated ?? site?.capacity_t == null);
   let hist = $derived(app.selectedSite != null ? (siteHistory[app.selectedSite] ?? []) : []);
 
   let spark = $derived.by(() => {
@@ -35,7 +39,12 @@
     </div>
 
     <div class="row">
-      <span title="grain in storage / storage capacity">{(Math.round(view.stockT / 100) * 100).toLocaleString()} t of {capT.toLocaleString()} t {capAssumed ? "(capacity assumed)" : ""}</span>
+      <span
+        title={capAssumed
+          ? "grain in storage / storage capacity. This site's capacity is not published: it is an estimate — the unpublished upcountry storage total split between PIRSA districts by long-run receivals, then evenly within the district (ASSUMPTIONS A4)."
+          : "grain in storage / published storage capacity"}
+        >{(Math.round(view.stockT / 100) * 100).toLocaleString()} t of {capT.toLocaleString()} t {capAssumed ? "(capacity estimated)" : ""}</span
+      >
       <span class="q" class:hot={view.queue > 15}>{view.queue} trucks queued</span>
     </div>
     <div class="stack">

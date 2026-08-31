@@ -128,7 +128,8 @@ receivals; 2024/25 (the drought year) is held out for validation.
 
 - AMSA CTS positions are anonymised and thinned to ≥60 min — berth timings ±1 h; the
   Feb–Apr 2024 extracts cover only ~half of each day (visits merged across gaps).
-- Upcountry site storage capacities are not published — assumed (A4).
+- Upcountry site storage capacities are not published — each is estimated from its PIRSA
+  district's share of long-run receivals, so sites within a district share one figure (A4).
 - District-level demand (not paddock-level) in v1; Sentinel-2 segmentation is a stretch goal.
 - Vessel names are heuristic date-window joins from ~monthly archived stem snapshots.
 - Site service times and truck cycle details are assumptions calibrated in aggregate.

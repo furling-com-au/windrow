@@ -7,6 +7,13 @@ Merges:
 
 Every feature carries provenance fields. Bunge sites active in 2025/26 = those with
 segregations listed; the 5 strategic/dormant sites are kept with status "dormant".
+
+Also assigns each site a PIRSA district (LGA point-in-polygon, ASSUMPTIONS A14 - the
+same mapping r4_build_demand.py uses for CLUM cropping cells) and, for the Bunge
+upcountry sites whose capacity is NOT published, an estimated capacity_t following the
+A4 method: the unpublished upcountry storage total is split between districts in
+proportion to their long-run receivals, then evenly between that district's sites.
+See ASSUMPTIONS.md A4 for the derivation and its limits.
 """
 from __future__ import annotations
 
@@ -15,10 +22,31 @@ import math
 import sys
 from pathlib import Path
 
+import polars as pl
+from shapely.geometry import Point, shape
+from shapely.prepared import prep
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from wlib import PROCESSED, RAW, ROOT
 
 PORT_ROLES = {"PORT LINCOLN": "port", "THEVENARD": "port"}
+
+# ASSUMPTIONS A14: PIRSA EP district composition by LGA. Kept identical to
+# r4_build_demand.py's LGA_DISTRICT - if one changes, change both.
+LGA_DISTRICT = {
+    "CITY OF PORT LINCOLN": "LEP",
+    "LOWER EYRE PENINSULA": "LEP",
+    "TUMBY BAY": "LEP",
+    "CLEVE": "EEP",
+    "FRANKLIN HARBOUR": "EEP",
+    "KIMBA": "EEP",
+    "WUDINNA": "WEP",
+    "ELLISTON": "WEP",
+    "STREAKY BAY": "WEP",
+    "CEDUNA": "WEP",
+}
+# A20's "long-run" window: the four seasons PIRSA district estimates cover.
+LONGRUN_SEASONS = ["2022/23", "2023/24", "2024/25", "2025/26"]
 
 
 def dist_m(lat1, lon1, lat2, lon2):
@@ -38,6 +66,95 @@ def load_osm_silos() -> list[tuple[float, float]]:
         elif "center" in el:
             pts.append((el["center"]["lat"], el["center"]["lon"]))
     return pts
+
+
+def load_district_polygons():
+    """Prepared LGA polygons tagged with their PIRSA district (A14)."""
+    lga_dir = RAW / "sa_lga"
+    gj_files = [f for f in list(lga_dir.glob("*.geojson")) + list(lga_dir.glob("*.json")) if not f.name.endswith(".zip")]
+    j = json.loads(sorted(gj_files)[0].read_text(encoding="utf-8"))
+    feats = j["features"]
+    name_key = next(k for k in feats[0]["properties"] if "name" in k.lower())
+    out = []
+    for f in feats:
+        nm = str(f["properties"].get(name_key, "")).upper()
+        for lga, dist in LGA_DISTRICT.items():
+            if lga in nm or nm in lga:
+                out.append((prep(shape(f["geometry"])), dist))
+                break
+    print(f"LGA polygons matched: {len(out)}/{len(LGA_DISTRICT)} (name key: {name_key})")
+    return out
+
+
+def district_of(lon: float, lat: float, polys) -> str | None:
+    for pp, dist in polys:
+        if pp.contains(Point(lon, lat)):
+            return dist
+    # unincorporated far-west cropping strip (Penong / Nullarbor fringe): same fallback
+    # r4_build_demand.py applies to CLUM cells that land outside every LGA polygon
+    if lon < 134.7 and lat > -33.2:
+        return "WEP"
+    return None
+
+
+def longrun_district_shares() -> dict[str, float]:
+    """Each PIRSA district's share of long-run EP production (A20 window)."""
+    prod = pl.read_parquet(PROCESSED / "production_districts.parquet").filter(
+        (pl.col("crop") == "TOTAL") & pl.col("season").is_in(LONGRUN_SEASONS)
+    )
+    means = prod.group_by("district").agg(pl.col("production_t").mean().alias("t"))
+    total = float(means["t"].sum())
+    return {r["district"]: float(r["t"]) / total for r in means.to_dicts()}
+
+
+def upcountry_storage_target(port_caps: dict) -> tuple[int, int, int]:
+    """A4: max Western season receivals - published Western port storage."""
+    rec = pl.read_parquet(PROCESSED / "receivals_weekly.parquet").filter(pl.col("region") == "western")
+    max_harvest = int(rec.group_by("season").agg(pl.col("cum_t").max().alias("t"))["t"].max())
+    port_total = int(sum(v for k, v in port_caps.items() if not k.startswith("_")))
+    return max_harvest - port_total, max_harvest, port_total
+
+
+def allocate_capacities(features: list[dict], polys, port_caps: dict) -> None:
+    """Write district + estimated capacity_t onto the Bunge upcountry features (A4)."""
+    for f in features:
+        p = f["properties"]
+        lon, lat = f["geometry"]["coordinates"]
+        p["district"] = district_of(lon, lat, polys)
+        p["capacity_estimated"] = p.get("capacity_t") is None
+
+    target, max_harvest, port_total = upcountry_storage_target(port_caps)
+    shares = longrun_district_shares()
+
+    # every Bunge upcountry site holds grain when it is operated, dormant ones included
+    # (A12 re-enables them in earlier seasons), so all of them share the storage total
+    pool = [f for f in features if f["properties"]["operator"].startswith("Bunge") and f["properties"]["role"] == "upcountry"]
+    missing = [f["properties"]["name"] for f in pool if f["properties"]["district"] is None]
+    if missing:
+        raise SystemExit(f"no PIRSA district for upcountry site(s): {missing}")
+    n_by_district: dict[str, int] = {}
+    for f in pool:
+        d = f["properties"]["district"]
+        n_by_district[d] = n_by_district.get(d, 0) + 1
+
+    prov = (
+        "estimated (not published): A4 method - long-run district receivals share "
+        f"(mean PIRSA district production {LONGRUN_SEASONS[0]}-{LONGRUN_SEASONS[-1]}) allocated across that "
+        f"district's Bunge upcountry sites, scaled so all {len(pool)} of them total "
+        f"{target/1e6:.2f} Mt (max Western season receivals {max_harvest/1e6:.2f} Mt "
+        f"- published Western port storage {port_total/1e6:.2f} Mt)"
+    )
+    print(f"\nA4 upcountry storage target: {max_harvest:,} - {port_total:,} = {target:,} t over {len(pool)} sites")
+    per_site = {d: int(round(target * shares[d] / n, -2)) for d, n in n_by_district.items()}
+    for f in pool:
+        f["properties"]["capacity_t"] = per_site[f["properties"]["district"]]
+        f["properties"]["capacity_provenance"] = prov
+        f["properties"]["capacity_estimated"] = True
+    for d in sorted(n_by_district):
+        print(f"  {d}: share {shares[d]:.3f} over {n_by_district[d]} sites -> {per_site[d]:,} t each")
+    allocated = sum(f["properties"]["capacity_t"] for f in pool)
+    opened = sum(f["properties"]["capacity_t"] for f in pool if f["properties"]["status"] == "active_2025_26")
+    print(f"  allocated {allocated:,.0f} t ({allocated/1e6:.3f} Mt); operated in 2025/26: {opened/1e6:.3f} Mt")
 
 
 def main():
@@ -101,12 +218,14 @@ def main():
             {"type": "Feature", "geometry": {"type": "Point", "coordinates": [s["lon"], s["lat"]]}, "properties": props}
         )
 
+    allocate_capacities(features, load_district_polygons(), caps)
+
     gj = {
         "type": "FeatureCollection",
         "name": "windrow_sites",
         "metadata": {
             "generated": "pipeline/r1_build_sites.py",
-            "notes": "EP + far west grain receival sites. Coordinates: operator API (facility) or OSM town nodes (town). Capacities only where published; upcountry Bunge capacities are NOT published (see ASSUMPTIONS.md).",
+            "notes": "EP + far west grain receival sites. Coordinates: operator API (facility) or OSM town nodes (town). Bunge upcountry capacities are NOT published: those carry capacity_estimated=true and an estimate allocated by PIRSA district (ASSUMPTIONS.md A4). capacity_estimated=false marks the five published figures.",
             "attribution": ["Site data (c) Bunge/Viterra operator API", "OpenStreetMap contributors (ODbL) for town coordinates"],
         },
         "features": features,
@@ -118,7 +237,9 @@ def main():
     for f in features:
         p = f["properties"]
         extra = f" silo@{p.get('nearest_osm_silo_m','?')}m" if "nearest_osm_silo_m" in p else ""
-        print(f"  {p['name']:28s} {p['operator']:18s} {p['role']:9s} {p['status']:22s} {p['coord_precision']}{extra}")
+        cap = f"{p['capacity_t']:>7,.0f} t{'*' if p['capacity_estimated'] else ' '}" if p["capacity_t"] else "      - "
+        print(f"  {p['name']:28s} {p['operator']:18s} {p['role']:9s} {p['status']:22s} {str(p['district']):4s} {cap} {p['coord_precision']}{extra}")
+    print("  (* = estimated, not published)")
 
 
 if __name__ == "__main__":

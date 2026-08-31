@@ -22,6 +22,10 @@ export interface BundleSite {
   lon: number;
   lat: number;
   capacity_t: number | null;
+  /** true when capacity_t is the A4 district allocation, false when it is a published
+   *  figure (the two ports, the three T-Ports sites). Optional only so a bundle built
+   *  before issue #20 still loads; absent means "assume estimated". */
+  capacity_estimated?: boolean;
   commodities: string[];
 }
 
@@ -201,6 +205,9 @@ export interface SiteView {
   stockByC: number[]; // per COMMODITIES order, tonnes
   queue: number;
   cumReceivedT: number;
+  /** storage capacity as the run actually enforces it: the bundle figure with
+   *  upcountryCapScale already applied where that capacity is estimated (A4). */
+  capacityT: number;
 }
 
 export interface VesselView {

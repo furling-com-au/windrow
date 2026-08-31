@@ -289,9 +289,14 @@ export class Sim {
         if (s.commodities.length >= 3) accepts[COMMODITIES.indexOf("other")] = true;
       }
       const name = s.name;
-      const capacityT =
-        s.capacity_t ??
-        (isTports ? 145000 : 120000) * (params.upcountryCapScale ?? 1); // A4 assumed (lever-scalable)
+      // A4: every site now carries a capacity from the bundle - published where one
+      // exists (both ports, all three T-Ports sites), otherwise the district allocation
+      // r1_build_sites.py computes. upcountryCapScale is the lever on the estimated
+      // ones only; a published tonnage is not an assumption to sweep. The `??` is a
+      // safety net for a bundle built before issue #20, not the live path.
+      const capEstimated = s.capacity_estimated ?? s.capacity_t == null;
+      const baseCapacityT = s.capacity_t ?? (isTports ? 145000 : 120000);
+      const capacityT = capEstimated ? baseCapacityT * (params.upcountryCapScale ?? 1) : baseCapacityT;
       const st: SiteState = {
         idx: this.sites.length,
         name,
@@ -1051,7 +1056,14 @@ export class Sim {
         byC[c] = Math.round(s.stock[c]!);
         st += s.stock[c]!;
       }
-      return { id: s.idx, stockT: Math.round(st), stockByC: byC, queue: s.queue.length, cumReceivedT: Math.round(s.cumReceivedT) };
+      return {
+        id: s.idx,
+        stockT: Math.round(st),
+        stockByC: byC,
+        queue: s.queue.length,
+        cumReceivedT: Math.round(s.cumReceivedT),
+        capacityT: Math.round(s.capacityT),
+      };
     });
     const vessels: VesselView[] = this.vessels
       .filter((v) => v.state === V_ANCHOR || v.state === V_BERTH || (v.state === V_DONE && this.tick - v.berthedAt < DAY_TICKS))
