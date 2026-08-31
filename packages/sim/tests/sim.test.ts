@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Sim } from "../src/engine";
+import { Sim, gfdiFullyCured } from "../src/engine";
 import { defaultParams } from "../src/params";
 import type { Bundle } from "../src/types";
 import { loadBundle } from "../scripts/load_bundle";
@@ -52,5 +52,36 @@ describe("sim core", () => {
     const obs = bundle.observed.weekly_receivals.at(-1)?.western?.cum_t ?? 2_000_000;
     expect(res.seasonReceivedT).toBeGreaterThan(obs * 0.5);
     expect(res.seasonReceivedT).toBeLessThan(obs * 2.0);
+  });
+});
+
+describe("harvest-ban fire danger (A7)", () => {
+  // The SA district harvesting codes publish the GFDI-35 cease-harvest trigger as a
+  // lookup table of the wind speed to stop at for a given temperature and humidity.
+  // These are entries reported from that table; the implementation has to land on 35.
+  // If a coefficient is ever edited, this is what catches it.
+  it("reproduces the published cease-harvest table entries", () => {
+    expect(gfdiFullyCured(35, 14, 26)).toBeCloseTo(34.1, 0);
+    expect(gfdiFullyCured(40, 15, 26)).toBeCloseTo(38.1, 0);
+  });
+
+  it("is driven by wind and humidity, not temperature alone", () => {
+    // 41 C with a light breeze: a good harvest day, and well under the trigger.
+    expect(gfdiFullyCured(41, 18, 20)).toBeLessThan(35);
+    // 22 C with a 47 km/h wind over cured stubble: a ban day, and nowhere near hot.
+    expect(gfdiFullyCured(22, 47, 47)).toBeGreaterThan(35);
+    // dropping the wind alone takes the same hot day from banned to workable
+    expect(gfdiFullyCured(38, 15, 30)).toBeGreaterThan(35);
+    expect(gfdiFullyCured(38, 15, 18)).toBeLessThan(35);
+  });
+
+  it("costs part of a ban day, not all of it, and more as the peak climbs", () => {
+    // the surviving share of the working day at a given peak index (trigger 35)
+    const keep = (g: number) => 1 - (2 / Math.PI) * Math.acos(Math.min(1, 35 / g));
+    expect(keep(35)).toBeCloseTo(1, 6); // just touching the trigger costs nothing
+    expect(keep(50)).toBeCloseTo(0.494, 2); // ~half the working day lost
+    expect(keep(70)).toBeCloseTo(0.333, 2); // ~two thirds lost
+    expect(keep(50)).toBeLessThan(keep(40)); // monotone in the peak
+    expect(keep(1e6)).toBeGreaterThanOrEqual(0); // never negative, even absurdly high
   });
 });

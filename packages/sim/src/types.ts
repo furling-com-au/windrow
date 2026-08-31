@@ -150,6 +150,9 @@ export interface Params {
   siteServiceMin: number; // A2: sample+weigh+tip cycle per truck per bay, minutes
   travelTimeScale: number; // A5: multiplier on all drive times (1 = matrix as built)
   rainStopMm: number; // A7: daily rain (mm) that halts harvest
+  harvestBanGfdi: number; // A7: grassland fire danger index at which harvesting is suspended
+  //   (SA Grain Harvesting Code of Practice: 35). Not a fitted knob — a published
+  //   threshold, exposed here so the ERA5 wind bias can be sensitivity-tested.
   carryInScale: number; // A17: multiplier on opening carry-over stocks
   upcountryCapScale: number; // A4: multiplier on ASSUMED (unpublished) upcountry capacities
   portAttractBias: number; // multiplier on port attractiveness for direct-to-port share

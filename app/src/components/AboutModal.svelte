@@ -18,6 +18,15 @@
       Bay as alternative gateways. It is built entirely on open or freely published data and is
       calibrated against published weekly receivals and port statistics.
     </p>
+    <p>
+      Two things stop a header in the model, as in the paddock. <strong>Rain</strong> — 5&nbsp;mm
+      halts the day, and wet ground keeps costing for two more. And <strong>fire danger</strong>:
+      the SA Grain Harvesting Code of Practice tells growers to suspend harvesting once the local
+      Grassland Fire Danger Index passes <strong>35</strong>, so the model computes that index
+      from temperature, humidity and wind and takes out the part of the day it sits above the
+      line. Heat alone is not it — a 41&nbsp;°C day with a light breeze is a good harvest day;
+      it is the wind and the dry air arriving with the heat that stop the machines.
+    </p>
     <p class="warn">
       <strong>This is a simulation, not operational data.</strong> Truck movements, queues, site
       stocks and vessel loading progress are modelled. The dashed gold series (observed receivals)
@@ -30,7 +39,7 @@
       Season totals are close: on the held-out 2024/25 season the simulation's total
       tonnage was within <strong>0.3%</strong> of published receivals, and Port Lincoln
       vessel call counts matched exactly. The weaker spot is
-      <strong>within-season timing</strong> — weekly RMSE runs 40–66% of the mean weekly
+      <strong>within-season timing</strong> — weekly RMSE runs 41–65% of the mean weekly
       tonnage, mostly because the exact week the harvest peak lands in can shift by a
       week or more even when the season's shape is right. Full numbers are in
       <code>docs/calibration_report.md</code> in the repository.

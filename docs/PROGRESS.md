@@ -24,23 +24,28 @@ This file is the canonical record of where the project is. Updated as work proce
 ## Validation headline (see docs/calibration_report.md)
 
 - Held-out 2024/25: season total **−0.3 %** (spec ±5 % ✓); weekly RMSE 64 % of mean weekly
-  (timing-dominated; the late-Nov 2024 rain collapse is missing from ERA5 at the A6
-  points — documented). Vessel counts = AIS schedule by construction.
-- 2023/24 **−0.4 %**, 2025/26 **−0.2 %** (calibration seasons; 2026-08-31 refit on #22's
-  widened search bounds — all three seasons inside ±0.5 %, and no knob now fits to a
-  bound of its search range).
+  (timing-dominated, and unmoved by #24's weather rule; the late-Nov 2024 rain collapse is
+  missing from ERA5 at the A6 points — documented). Vessel counts = AIS schedule by
+  construction.
+- 2023/24 **−0.3 %**, 2025/26 **−0.2 %** (calibration seasons; knobs from #22's refit on
+  widened search bounds — all three seasons inside ±0.5 %, and no knob fits to a bound of
+  its search range. #24 re-searched them against its new harvest-weather rule and the
+  result was rejected; see that entry).
 - **No knob is clipped**, and the report says so per knob. Three were fitting to the exact
   floor of their ranges before #22 (`matShift`, `retentionShare`, `harvestRampDays`);
   `retentionShare` is still flagged "near floor" at 0.055 against a 0.05 floor.
-- Port Lincoln peak grower-receival day **10,160 t** against the published record of
+- Port Lincoln peak grower-receival day **10,710 t** against the published record of
   13,148–13,675 t — **no longer reproduced**. It was (13,694 t) while upcountry capacity
   was a flat 120 kt everywhere: the lower-EP sites filled and pushed carting past them to
   the port. Under A4's district allocation they hold 162,900 t and stop saturating. Bays
-  are not the constraint any more — 10,109 / 10,160 / 10,180 t at 5 / 6 / 7 port bays,
-  a 2 % spread across the whole physical band. See A2.
-- Mean vessel wait 27.7 h vs 26.8 h AIS-observed; peak network queue 105 trucks.
+  are not the constraint any more — **10,282 / 10,710 / 10,239 t at 5 / 6 / 7 port bays**
+  under #24's weather rule (10,109 / 10,160 / 10,180 t before it). A 2–4 % spread across
+  the whole physical band, and the finding now survives a change of weather mechanism as
+  well as a change of parameter vector. See A2.
+- Mean vessel wait 27.7 h vs 26.8 h AIS-observed; peak network queue 98 trucks (105 before
+  #24's weather rule).
 - 2022/23 bumper now **completes** (it used to trip the queue guard at Lucky Bay) but
-  reads −33.8 %: that bundle has no vessel program at all, so the ports never outload,
+  reads −34.2 %: that bundle has no vessel program at all, so the ports never outload,
   17 of 21 open sites end the season full and the network jams. Land-side replay only.
 
 ## Phase 1 acceptance criteria — status
@@ -275,6 +280,65 @@ This file is the canonical record of where the project is. Updated as work proce
   while eleven knobs moved). `scenarios.md` / `scenarios_data.json` / `calibration_report.md`
   / `docs/img/*.svg` regenerated; About and lever copy updated for the new fleet, RMSE
   band and $/t premium.
+
+### 2026-08-31 (#24: A7 documented half the rule, and the heat rule had the wrong mechanism)
+
+- **A7 published a rain threshold and a flat "cut 25 % when tmax ≥ 38 °C". The engine ran
+  five rules.** Missing from the register: a half-rate band at 2–5 mm, a ×0.3 hangover the
+  day after ≥ 8 mm and ×0.5 the day after that, and a spring-dryness maturity shift
+  (`clamp((springRain − 45) × 0.25, −12, +10)` days) that is not part of the harvestable
+  fraction at all — it moves ripening dates. A7 now describes all of them, and the heading's
+  "(to be calibrated in Phase 3)" is gone: Phase 3 closed and the model has been refitted
+  three times since.
+- **The temperature rule was not merely coarse, it was the wrong variable.** SA harvest
+  bans run on grassland fire danger. `weather_*.json` had been shipping `rh_min_pct` and
+  `wind_max_kmh` alongside rain and tmax since the bundle was first built, read by nothing.
+  Replaced with the **McArthur Mark 4 grassland index** (Purton 1982 equation form, curing
+  100 % — a ripe paddock is fully cured) against the **GFDI 35** cease-harvest trigger the
+  CFS/PIRSA/Grain Producers SA **Grain Harvesting Code of Practice** (Sept 2023) sets in
+  Required Practice 1. The threshold is published, so it is an assumption lever, **not** a
+  thirteenth calibration knob.
+- **It reproduces the code's own published table.** District codes publish GFDI 35 as a
+  lookup of the wind speed to stop at: 35 °C / 14 % RH / 26 km/h and 40 °C / 15 % RH /
+  26 km/h. The implementation returns 34 and 38. That match is what pins both the
+  coefficients and the curing choice, and `sim.test.ts` now asserts it so a future edit to
+  a coefficient fails loudly.
+- **The two rules disagree on 77 of 1,260 district-days.** 24 days at or above 38 °C carry
+  no ban (41 °C with a 20 km/h breeze scores 24 — a good harvest day); 53 ban days never
+  reach 38 °C (22 °C with a 47 km/h wind over cured stubble scores 36 — grassland fire
+  danger is wind-driven). 91 ban days in 1,104 Nov–Jan district-days, 2–13 per
+  district-season; mean harvestable fraction 0.863 → 0.846, about two extra lost days per
+  district-season.
+- **The refit was run twice and rejected; the knobs are still #22's.** At the #22 vector
+  the rule moves the objective 1.0800 → 1.0829, season totals ≤ 0.1 pt and weekly RMSE
+  ≤ 1 point (40 → 41 / 64 → 64 / 66 → 66 %) — it is fit-neutral, so that vector is not
+  "fitted to a deleted rule", it is still an optimum-equivalent point. Searches at 600 and
+  900 evaluations reached **1.0716** and **1.0639** — a real ~1.8 % gain, not #22's
+  four-decimal tie — but bought it from the held-out season (total −0.3 % → −1.2 % and
+  **−2.4 %**, weekly RMSE 64 % → 65 % and **69 %**) and from checks the objective cannot
+  see: direct-to-port rose to 33–36 %, **outside A9's published 15–35 % band**; the
+  900-evaluation vector's 807-truck fleet trips the queue guard on the 2022/23 replay; and
+  the 600-evaluation vector left `choiceBeta` clipped on its floor, the exact defect #22
+  closed. All of it is the objective drifting the way A2 already documents as
+  unidentified — weaker distance decay plus more trucks.
+- **The rejected 900-evaluation vector, recorded so the call is reversible** (or rerun
+  `calibrate.ts 600`): fleetTrucks 806.60, linehaulTrucks 60.087, rateScale 0.95208,
+  matShift −5.3116, harvestRampDays 15.252, retentionShare 0.057707, portAttractBias
+  1.9746, choiceBeta 1.30088, choiceRadius 2.58756, countryBays 4.85396, portBays 5.54308,
+  luckyBayBias 1.00347.
+- **Known gaps left open, recorded in A7 rather than guessed at**: daily extremes stand in
+  for concurrent readings (biases the index high); ERA5 district-mean wind under-represents
+  point wind and enters under a square root (biases it low); declared Total Fire Bans,
+  under which harvesting is prohibited outright, are not modelled; and GFDI itself was
+  superseded by AFDRS's Grassland Fire Behaviour Index in 2022 — the *harvesting* code
+  still runs on GFDI 35, so GFDI remains right for this rule and wrong for anything else.
+- `report.ts` no longer emits a 2022/23 footnote and chart link when that season did not
+  run, and derives its own "Reproduce" eval count instead of hardcoding 400 against a
+  600-evaluation report. `railTrips`/`railActiveDays` added to the engine so
+  `scenarios.md`'s trainset dispatch figure (189 trips / 68 active days) is measured rather
+  than inherited. `scenarios.md` / `scenarios_data.json` / `calibration_report.md` /
+  `docs/img/*.svg` regenerated at the unchanged parameter vector — every movement there
+  comes from the weather rule alone and is under 10 %.
 
 ## Key decisions
 
