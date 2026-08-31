@@ -1010,4 +1010,47 @@
     line-height: 1.45;
     color: #c8d4e0;
   }
+
+  /* ─── mobile (#30) ────────────────────────────────────────────────────────
+     Inside the bottom sheet, nothing drops below 12px, and the two faint greys
+     used for supporting copy clear 4.5:1 against the panel backgrounds:
+     #64788c measured 3.76:1 and #5b6d80 (the "≈ no change" rows) 3.22:1. */
+  @media (max-width: 800px) {
+    .t {
+      font-size: 13px;
+    }
+    .reset,
+    .reset.mini {
+      font-size: 12px;
+      padding: 4px 10px;
+    }
+    .story,
+    label,
+    .toggles button,
+    .tkt,
+    .uchg,
+    .econ-head,
+    .assump-toggle,
+    ul.plain li,
+    .row {
+      font-size: 12px;
+    }
+    .fine,
+    .live {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+    .row.dim {
+      color: #7a8b9d;
+    }
+    .verdict {
+      font-size: 13px;
+    }
+    label input {
+      margin-top: 0;
+    }
+    .toggles button {
+      padding: 6px 4px;
+    }
+  }
 </style>

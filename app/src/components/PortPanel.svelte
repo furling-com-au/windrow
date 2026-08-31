@@ -175,4 +175,35 @@
     color: #64788c;
     font-size: 9px;
   }
+
+  /* mobile (#30): App.svelte renders this inside the bottom sheet instead of
+     floating it over the map, so the panel stops positioning itself. Plus the
+     12px text floor and 4.5:1 on #64788c (was 3.99:1). */
+  @media (max-width: 800px) {
+    .portpanel {
+      position: static;
+      right: auto;
+      bottom: auto;
+      width: auto;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .pstock,
+    .wait,
+    .vname,
+    .vt,
+    .idle {
+      font-size: 12px;
+    }
+    .vname {
+      width: 96px;
+    }
+    .bar {
+      height: 10px;
+    }
+    .occl {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+  }
 </style>

@@ -209,4 +209,27 @@
   .annkey .k.first { color: #7dd3a8; }
   .annkey .k.record { color: #e8c568; }
   .annkey .k.rain { color: #6aa9e8; }
+
+  /* mobile (#30): 12px floor, and 4.5:1 on the two faint greys. The axis labels are
+     SVG user units scaled by the viewBox — the chart renders ~1.16x its 300-unit
+     width inside the sheet, so 10.5/11 land just over 12 CSS px. */
+  @media (max-width: 800px) {
+    .title {
+      font-size: 12px;
+    }
+    .title .unit {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+    .annkey {
+      font-size: 12px;
+      color: #7d90a4;
+      line-height: 1.5;
+    }
+    .ylab,
+    .xlab {
+      font-size: 11px;
+      fill: #8fa3b8;
+    }
+  }
 </style>

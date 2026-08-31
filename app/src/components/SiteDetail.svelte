@@ -199,4 +199,40 @@
     color: #64788c;
     font-size: 9.5px;
   }
+
+  /* mobile (#30): a 250px card pinned to the right edge doesn't work at 393px —
+     it becomes a full-width sheet-topper that stays above the bottom sheet
+     (which is z-index 8), with the 12px text floor and 4.5:1 on #64788c. */
+  @media (max-width: 800px) {
+    .detail {
+      left: 10px;
+      right: 10px;
+      top: 10px;
+      width: auto;
+      max-height: 44vh;
+      overflow-y: auto;
+      font-size: 13px;
+      z-index: 10;
+    }
+    .name {
+      font-size: 16px;
+    }
+    .x {
+      font-size: 22px;
+    }
+    .sub,
+    .chip,
+    .row,
+    .cl,
+    .row2 {
+      font-size: 12px;
+    }
+    .fine {
+      font-size: 12px;
+      color: #7d90a4;
+    }
+    .stack {
+      height: 14px;
+    }
+  }
 </style>

@@ -90,4 +90,21 @@
     line-height: 1.4;
     white-space: normal;
   }
+
+  /* mobile (#30): a bigger chip is easier to tap, and the tip text clears the 12px
+   *  floor used everywhere else in the bottom sheet. The chip stays well under the
+   *  44px control floor in app/src/mobile.css on purpose — it's exempted there
+   *  (button:not(.q)) because it sits inline in a sentence, which is the WCAG
+   *  2.5.8 "inline target" case, not a free-standing tap target. */
+  @media (max-width: 800px) {
+    .q {
+      width: 16px;
+      height: 16px;
+      line-height: 15px;
+      font-size: 10.5px;
+    }
+    .tip {
+      font-size: 12px;
+    }
+  }
 </style>
