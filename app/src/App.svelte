@@ -10,6 +10,7 @@
   import SiteDetail from "./components/SiteDetail.svelte";
   import Tour from "./components/Tour.svelte";
   import Intro from "./components/Intro.svelte";
+  import InfoTip from "./components/InfoTip.svelte";
   import { narrate } from "./lib/narrator";
   import SimWorker from "./worker/sim.worker?worker";
 
@@ -49,11 +50,12 @@
     siteReceivedByDay: number[][];
   };
 
+  // `spoken` is the label a screen reader gets: "1 h/s" reads as "one h slash s"
   const SPEEDS = [
-    { label: "1 h/s", v: 3600 },
-    { label: "6 h/s", v: 21600 },
-    { label: "1 d/s", v: 86400 },
-    { label: "3 d/s", v: 259200 },
+    { label: "1 h/s", spoken: "1 hour per second", v: 3600 },
+    { label: "6 h/s", spoken: "6 hours per second", v: 21600 },
+    { label: "1 d/s", spoken: "1 day per second", v: 86400 },
+    { label: "3 d/s", spoken: "3 days per second", v: 259200 },
   ];
 
   function post(msg: unknown) {
@@ -331,20 +333,25 @@
   };
 </script>
 
+<!-- deck.gl gives its canvas tabIndex=0 (mjolnir.js does it for keyboard pan/zoom), which
+     makes the map the first tab stop on the page and swallows arrow keys. Everything a
+     keyboard user actually needs is in the panel, so offer a way straight to it (#31). -->
+<a class="skip-link" href="#controls">Skip to simulation controls</a>
+
 <div class="map" bind:this={mapEl}></div>
 
-<div class="panel">
+<div class="panel" id="controls" tabindex="-1" role="region" aria-label="Simulation controls">
   <header>
     <div>
       <h1>Windrow</h1>
       <span class="sub">Watch an Eyre Peninsula harvest move from paddock to ship</span>
     </div>
-    <button class="help" title="Guided tour" onclick={() => { app.tourStep = 0; app.showTour = true; }}>?</button>
+    <button class="help" aria-label="Take the guided tour" title="Guided tour" onclick={() => { app.tourStep = 0; app.showTour = true; }}>?</button>
   </header>
 
-  <div class="modes">
-    <button class:active={app.viewMode === "simple"} onclick={() => setMode("simple")}>Simple</button>
-    <button class:active={app.viewMode === "advanced"} onclick={() => setMode("advanced")} title="Levers, dollar takeaways, truck-flow heatmap, CSV export">Advanced</button>
+  <div class="modes" role="group" aria-label="Level of detail">
+    <button class:active={app.viewMode === "simple"} aria-pressed={app.viewMode === "simple"} onclick={() => setMode("simple")}>Simple</button>
+    <button class:active={app.viewMode === "advanced"} aria-pressed={app.viewMode === "advanced"} onclick={() => setMode("advanced")}>Advanced</button>
   </div>
 
   <div class="row">
@@ -372,18 +379,27 @@
       </button>
     {/if}
     {#each SPEEDS as sp}
-      <button class:active={app.speed === sp.v} onclick={() => setSpeed(sp.v)} title="simulation speed">{sp.label}</button>
+      <button
+        class:active={app.speed === sp.v}
+        aria-pressed={app.speed === sp.v}
+        aria-label="Simulation speed: {sp.spoken}"
+        onclick={() => setSpeed(sp.v)}>{sp.label}</button
+      >
     {/each}
   </div>
 
   <div class="row date-row">
     <span class="date">{prettyDate}</span>
     <div class="scrub">
+      <!-- the raw value is a day index (0-364), which on its own announces as a bare
+           number — aria-valuetext gives the date the sighted user sees instead (#31) -->
       <input
         type="range"
         min="0"
         max="364"
         value={scrubDay}
+        aria-label="Date in the season — drag or use arrow keys to jump to a day"
+        aria-valuetext={prettyDate}
         oninput={(e) => {
           dragging = true;
           scrubDay = parseInt(e.currentTarget.value);
@@ -397,34 +413,76 @@
     </div>
   </div>
 
+  <!-- Sites are only clickable on the map, and their names live in WebGL glyphs that no
+       screen reader can see — so without this list a keyboard user can never open the
+       site detail the map key tells them to click for (#31). -->
+  {#if app.sites.length}
+    <div class="row">
+      <label class="sitepick">
+        Open a site's detail
+        <select
+          value={app.selectedSite ?? ""}
+          onchange={(e) => {
+            const v = e.currentTarget.value;
+            app.selectedSite = v === "" ? null : parseInt(v);
+          }}
+        >
+          <option value="">Choose a site…</option>
+          <optgroup label="Ports">
+            {#each app.sites.filter((s) => s.role === "port") as s}<option value={s.id}>{s.name}</option>{/each}
+          </optgroup>
+          <optgroup label="Country silos">
+            {#each app.sites.filter((s) => s.role !== "port") as s}<option value={s.id}>{s.name}</option>{/each}
+          </optgroup>
+        </select>
+      </label>
+    </div>
+  {/if}
+
   {#if app.snap}
     <div class="kpis">
-      <div class="kpi" title="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published weekly figure, shown only on the week-ending date it was reported — the observed total doesn't move between Sundays. Deliveries to T-Ports Lucky Bay are counted separately.">
+      <div class="kpi">
         <span class="v">{(app.snap.kpi.receivedT / 1e6).toFixed(2)}</span>
-        <span class="l">million t delivered (sim)</span>
+        <span class="l"
+          >million t delivered (sim)<InfoTip
+            label="million tonnes delivered"
+            text="Grain delivered into the main network's silos and ports so far (simulated). 'actual' = the operator's published weekly figure, shown only on the week-ending date it was reported — the observed total doesn't move between Sundays. Deliveries to T-Ports Lucky Bay are counted separately."
+          /></span
+        >
         {#if obsCumAtDay}<span class="o">actual {(obsCumAtDay.value / 1e6).toFixed(2)} (w/e {fmtWeekEnding(obsCumAtDay.weekEnding)})</span>{/if}
       </div>
       {#if app.viewMode === "simple"}
-        <div class="kpi" title="Trucks currently loading, driving or queued in the simulation">
+        <div class="kpi">
           <span class="v">{app.snap.trucks.length}</span>
-          <span class="l">trucks on the road now</span>
+          <span class="l"
+            >trucks on the road now<InfoTip
+              label="trucks on the road now"
+              text="Trucks currently loading, driving or queued in the simulation."
+            /></span
+          >
         </div>
       {:else}
-        <div
-          class="kpi"
-          title="Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay). Ships also load stock carried over from last season, so this can exceed this season's deliveries."
-        >
+        <div class="kpi">
           <span class="v">{(app.snap.kpi.shippedT / 1e6).toFixed(2)}</span>
-          <span class="l">million t shipped out</span>
+          <span class="l"
+            >million t shipped out<InfoTip
+              label="million tonnes shipped out"
+              text="Grain loaded onto ships at all three ports (Port Lincoln, Thevenard, Lucky Bay). Ships also load stock carried over from last season, so this can exceed this season's deliveries."
+            /></span
+          >
           {#if app.snap.kpi.carryInT > 10000}<span class="o">season opened with {(app.snap.kpi.carryInT / 1e6).toFixed(2)} carried over</span>{/if}
         </div>
-        <div class="kpi" title="Trucks waiting to unload across all sites right now">
+        <div class="kpi">
           <span class="v">{app.snap.kpi.queueTrucks}</span>
-          <span class="l">trucks queued</span>
+          <span class="l"
+            >trucks queued<InfoTip label="trucks queued" text="Trucks waiting to unload across all sites right now." /></span
+          >
         </div>
-        <div class="kpi" title="Ships at anchor waiting for a berth or for grain">
+        <div class="kpi">
           <span class="v">{app.snap.kpi.vesselsWaiting}</span>
-          <span class="l">ships waiting</span>
+          <span class="l"
+            >ships waiting<InfoTip label="ships waiting" text="Ships at anchor waiting for a berth or for grain." /></span
+          >
         </div>
       {/if}
     </div>
@@ -434,9 +492,15 @@
   <LeversPanel onchange={() => initSim(350)} />
 
   {#if app.viewMode === "advanced"}
-    <div class="row tools">
-      <button class:active={app.heatmapOn} onclick={toggleHeatmap} title="Cumulative loaded tonnes per route">🚚 truck-flow heatmap</button>
-      <button onclick={downloadCsv} title="Daily sim series + actual weekly deliveries (CSV)">⬇ CSV</button>
+    <div class="tools">
+      <div class="row">
+        <button class:active={app.heatmapOn} aria-pressed={app.heatmapOn} onclick={toggleHeatmap}>🚚 truck-flow heatmap</button>
+        <button onclick={downloadCsv}>⬇ CSV</button>
+      </div>
+      <InfoTip
+        label="the heatmap and CSV export"
+        text="Truck-flow heatmap: shades each route by the cumulative loaded tonnes carried over it this season. CSV: the daily simulated series (delivered and shipped) alongside the operator's actual weekly deliveries, for the season and scenario on screen."
+      />
     </div>
   {/if}
 
@@ -456,9 +520,11 @@
   </footer>
 </div>
 
-{#if narratorText}
-  <div class="narrator" class:shift={app.viewMode === "advanced"}>{narratorText}</div>
-{/if}
+<!-- the narrator is the running commentary on what the map is doing; without a live region
+     its updates never reach a screen reader at all (#31). "polite" so it waits its turn. -->
+<div class="narrator" class:shift={app.viewMode === "advanced"} class:hidden={!narratorText} role="status" aria-live="polite" aria-atomic="true">
+  {narratorText}
+</div>
 
 <PortPanel snap={app.snap} sites={app.sites} {plBerthedByDay} live={app.observed?.live ?? false} />
 <SiteDetail {siteHistory} />
@@ -469,7 +535,7 @@
   <div class="legend">
     <div class="lg-head">
       <b>Map key</b>
-      <button class="lg-x" onclick={() => (legendOpen = false)}>×</button>
+      <button class="lg-x" aria-label="Hide the map key" onclick={() => (legendOpen = false)}>×</button>
     </div>
     <div><span class="sw" style="background:linear-gradient(90deg,#3e7040,#c4a85c)"></span> paddocks: green = crop standing, gold = harvested</div>
     <div class="lg-sub">moving dots are trucks, coloured by their load:</div>
@@ -481,7 +547,10 @@
       <span><i style="background:#009e73"></i>beans</span>
       <span><i style="background:#5ac8eb"></i>silo→port shuttle</span>
     </div>
-    <div><span class="sw ring"></span> silo/site: turns bright blue as storage fills · red ring = trucks queued · click it for detail</div>
+    <div>
+      <span class="sw ring"></span> silo/site: turns bright blue as storage fills · red ring = trucks queued · click it for
+      detail, or pick it from “Open a site's detail” in the panel
+    </div>
     <div><span class="sw dot" style="background:#f0c850"></span> ship waiting at anchor</div>
     <div><span class="sw dot" style="background:#50dca0"></span> ship loading at berth</div>
   </div>
@@ -492,9 +561,35 @@
 {#if app.showAbout}<AboutModal onclose={() => (app.showAbout = false)} />{/if}
 
 <style>
+  /* off-screen until focused: the first Tab on the page lands here, ahead of deck.gl's
+     canvas, and jumps straight to the controls */
+  .skip-link {
+    position: absolute;
+    top: -60px;
+    left: 12px;
+    z-index: 40;
+    background: #2b578a;
+    color: #fff;
+    border: 1px solid #3e73b3;
+    border-radius: 0 0 8px 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
   .map {
     position: absolute;
     inset: 0;
+  }
+  .panel:focus {
+    outline: none;
+  }
+  /* site names are long — this one select gets the full panel width */
+  .sitepick select {
+    max-width: none;
+    width: 100%;
   }
   .panel {
     position: absolute;
@@ -586,6 +681,14 @@
   button:hover {
     background: #1d3049;
   }
+  /* every control needs a focus ring a keyboard user can actually see */
+  button:focus-visible,
+  select:focus-visible,
+  input:focus-visible,
+  a:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 2px;
+  }
   button.active {
     background: #2b578a;
     border-color: #3e73b3;
@@ -646,6 +749,12 @@
     backdrop-filter: blur(4px);
     pointer-events: none;
     z-index: 4;
+  }
+  /* the live region has to stay mounted for its updates to be announced, so an empty
+     narrator fades out rather than unmounting (it is absolutely positioned, so this
+     costs no layout) */
+  .narrator.hidden {
+    opacity: 0;
   }
   @media (max-width: 1100px) {
     .narrator {

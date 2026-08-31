@@ -1,5 +1,6 @@
 <script lang="ts">
   import { app } from "../state.svelte";
+  import { dialog } from "../lib/a11y";
 
   let { onwatch }: { onwatch: () => void } = $props();
 
@@ -17,9 +18,19 @@
 </script>
 
 <div class="backdrop">
-  <div class="card">
+  <!-- Escape does the same as "Watch the season": dismiss and start watching. It does not
+       silently skip the intro without recording it, so a keyboard user gets the same
+       "don't show this again" behaviour the buttons give. -->
+  <div
+    class="card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="intro-title"
+    tabindex="-1"
+    use:dialog={{ onclose: watch }}
+  >
     <div class="kicker">A living map of a real harvest</div>
-    <h2>Every spring, South Australia's Eyre Peninsula strips 2–3 million tonnes of grain.</h2>
+    <h2 id="intro-title">Every spring, South Australia's Eyre Peninsula strips 2–3 million tonnes of grain.</h2>
     <p>
       It moves entirely by truck — paddock to country silo, silo to port — and then ships to
       the world from Port Lincoln. <strong>Windrow rebuilds that whole system as a working
@@ -96,6 +107,17 @@
   }
   .go:hover {
     background: #347a51;
+  }
+  .card:focus {
+    outline: none;
+  }
+  .card:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 3px;
+  }
+  .btns button:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 2px;
   }
   .alt {
     background: #17263a;

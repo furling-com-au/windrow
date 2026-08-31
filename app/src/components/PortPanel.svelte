@@ -54,19 +54,31 @@
 </script>
 
 {#if snap && ports.length}
-  <div class="portpanel">
+  <div class="portpanel" role="region" aria-label="Port activity">
     {#each ports as p, i}
       <div class="port" class:major={i === 0}>
         <div class="phead">
           <span class="pname">{p.short}</span>
-          <span class="pstock" title="tonnes of grain in storage at this port">{Math.round(p.stockT / 1000) * 1000 >= 1000 ? (Math.round(p.stockT / 1000) * 1000).toLocaleString() : Math.round(p.stockT).toLocaleString()} t stored</span>
+          <span class="pstock">{Math.round(p.stockT / 1000) * 1000 >= 1000 ? (Math.round(p.stockT / 1000) * 1000).toLocaleString() : Math.round(p.stockT).toLocaleString()} t stored</span>
           {#if p.waiting > 0}<span class="wait">{p.waiting} at anchor</span>{/if}
         </div>
         {#each p.berthed as v}
           <div class="vessel">
             <span class="vname">{v.name}</span>
-            <div class="bar"><div class="fill" style="width:{v.pct}%"></div></div>
-            <span class="vt" title="loaded / modelled cargo, thousand tonnes — allocated from the monthly port total, not a shipping plan">{(v.loadedT / 1000).toFixed(0)}k / {(v.targetT / 1000).toFixed(0)}k t</span>
+            <!-- what the bar and the "45k / 60k t" beside it mean was a mouse-only title;
+                 as a real progressbar it is announced properly instead (#31) -->
+            <div
+              class="bar"
+              role="progressbar"
+              aria-label="{v.name} cargo loaded"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={Math.round(v.pct)}
+              aria-valuetext="{(v.loadedT / 1000).toFixed(0)} thousand tonnes loaded of {(v.targetT / 1000).toFixed(0)} thousand modelled — allocated from the monthly port total, not a shipping plan"
+            >
+              <div class="fill" style="width:{v.pct}%"></div>
+            </div>
+            <span class="vt" aria-hidden="true">{(v.loadedT / 1000).toFixed(0)}k / {(v.targetT / 1000).toFixed(0)}k t</span>
           </div>
         {:else}
           <div class="idle">{live ? "no shipping schedule yet" : "berth idle"}</div>

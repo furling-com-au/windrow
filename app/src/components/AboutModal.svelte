@@ -1,16 +1,29 @@
 <script lang="ts">
+  import { dialog } from "../lib/a11y";
+
   let { onclose }: { onclose: () => void } = $props();
 </script>
 
-<div
-  class="backdrop"
-  onclick={onclose}
-  onkeydown={(e) => e.key === "Escape" && onclose()}
-  role="button"
-  tabindex="-1"
->
-  <div class="modal" onclick={(e) => e.stopPropagation()} role="dialog" tabindex="-1" onkeydown={() => {}}>
-    <h2>About Windrow</h2>
+<!--
+  The backdrop is a pointer-only convenience for dismissing the modal. It used to carry
+  role="button" and tabindex="-1", which made a screen reader announce a button whose
+  accessible name was the entire About text (the "button" wrapped the whole modal), and
+  put the Escape handler on an element that never received focus — so Escape did nothing.
+  The keyboard equivalents are Escape and the Close button, both handled inside the dialog.
+-->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="backdrop" onclick={onclose}>
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="about-title"
+    tabindex="-1"
+    use:dialog={{ onclose }}
+    onclick={(e) => e.stopPropagation()}
+  >
+    <h2 id="about-title">About Windrow</h2>
     <p>
       Windrow is an <strong>agent-level simulation</strong> of the Eyre Peninsula (South Australia) grain
       supply chain: weather-gated paddock harvest, farm trucks choosing receival sites, site
@@ -169,5 +182,18 @@
     border-radius: 6px;
     padding: 7px 14px;
     cursor: pointer;
+  }
+  /* focus lands here when the dialog opens, so keep the ring quiet — the dialog's own
+     border already says where you are — but make the Close button's ring obvious */
+  .modal:focus {
+    outline: none;
+  }
+  .modal:focus-visible {
+    outline: 2px solid #3e73b3;
+    outline-offset: 2px;
+  }
+  button:focus-visible {
+    outline: 2px solid #7db3e8;
+    outline-offset: 2px;
   }
 </style>

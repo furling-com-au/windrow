@@ -74,6 +74,35 @@ export class DeckMap {
         return t ? { text: t } : null;
       },
     });
+    this.labelCanvas(container);
+  }
+
+  /**
+   * deck.gl (via mjolnir.js) puts tabIndex="0" on its canvas so arrow keys can pan and
+   * +/- can zoom, which makes the map the first tab stop on the page — previously an
+   * unnamed one, so a screen reader announced nothing at all there (#31).
+   *
+   * Everything the map draws is WebGL glyphs: site names, stocks and queue counts exist
+   * in no accessibility tree, and picking a site is pointer-only. So the label says what
+   * the canvas is, what its keys do, and where the keyboard route to a site actually is.
+   */
+  private labelCanvas(container: HTMLElement) {
+    const apply = () => {
+      const canvas = container.querySelector("canvas");
+      if (!canvas) return false;
+      canvas.setAttribute("role", "application");
+      canvas.setAttribute(
+        "aria-label",
+        "Map of the Eyre Peninsula showing paddocks, trucks, receival sites and ships. " +
+          "Arrow keys pan the map and plus or minus zoom. The map is drawn graphically, so " +
+          "site names, stocks and queues are not readable here — use “Open a site's detail” " +
+          "in the simulation controls to open any site.",
+      );
+      return true;
+    };
+    // the canvas exists by the time the Deck constructor returns in current deck.gl, but
+    // that is not a documented guarantee — fall back to the next frame if it does not
+    if (!apply()) requestAnimationFrame(apply);
   }
 
   destroy() {
