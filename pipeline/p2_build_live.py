@@ -24,8 +24,13 @@ from pathlib import Path
 import polars as pl
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from p2_build_observed import carry_in_window, mean_of_covered, month_coverage
 from r2_parse_receivals import parse_report, season_of
 from wlib import PROCESSED, RAW, ROOT, fetch
+
+# the two prior calendar years whose Oct+Nov shipments seed 2026/27's provisional
+# carry-in (A17/A20) -- see build_observed() and #36
+CARRY_PRIOR_YEARS = (2024, 2025)
 
 APP_DATA = ROOT / "app" / "public" / "data"
 SEASON = "2026/27"
@@ -171,13 +176,33 @@ def build_observed():
             & (((pl.col("year") == 2026) & (pl.col("month") >= 10)) | (pl.col("year") == 2027))
         ).iter_rows(named=True)
     ]
-    # provisional carry-in: mean of the last two seasons' Oct+Nov shipments
-    prior = ships.filter(
-        pl.col("port").is_in(["Port Lincoln", "Thevenard"])
-        & (((pl.col("year") == 2024) | (pl.col("year") == 2025)) & pl.col("month").is_in([10, 11]))
-    )
-    pl_t = prior.filter(pl.col("port") == "Port Lincoln")["export_t"].sum() / 2
-    the_t = prior.filter(pl.col("port") == "Thevenard")["export_t"].sum() / 2
+    # provisional carry-in: mean of the last two years' Oct+Nov shipments, with the
+    # same source-coverage check build_carry_in applies to every historical season
+    # (#21) -- this is a scheduled live-refresh job, so it can land squarely on the
+    # kind of upstream workbook gap that check exists for (#36). A silent halved
+    # total (dividing by 2 regardless of whether both years actually landed) is
+    # worse than a smaller, honestly-labelled mean over whichever year did.
+    covered = month_coverage(ships)
+    windows = {y: carry_in_window(ships, covered, y) for y in CARRY_PRIOR_YEARS}
+    prior = mean_of_covered(windows)
+    gap_years = [y for y, (_, missing) in windows.items() if missing]
+    pl_t, the_t = prior["Port Lincoln"], prior["Thevenard"]
+    if pl_t is None:  # both prior years gapped: no honest estimate to build
+        pl_t = the_t = 0.0
+        carry_note = (
+            "A17/A20 provisional: no estimate available -- Flinders shipment data for "
+            f"both {' and '.join(str(y) for y in CARRY_PRIOR_YEARS)} Oct-Nov has a source "
+            "gap. This is an absence of data, not a measured empty port."
+        )
+    elif gap_years:
+        used = [y for y in CARRY_PRIOR_YEARS if y not in gap_years]
+        carry_note = (
+            f"A17/A20 provisional: mean of {' and '.join(str(y) for y in used)} Oct-Nov "
+            f"shipments (2026 not yet published; {', '.join(str(y) for y in gap_years)} "
+            "dropped for a source gap in the Flinders data)."
+        )
+    else:
+        carry_note = "A17/A20 provisional: mean of 2024+2025 Oct-Nov shipments (2026 not yet published)."
     obs = {
         "season": SEASON,
         "live": True,
@@ -192,7 +217,7 @@ def build_observed():
         "carry_in": {
             "port_lincoln_t": round(pl_t), "thevenard_t": round(the_t),
             "upcountry_t": round(0.2 * (pl_t + the_t)),
-            "provenance": "A17/A20 provisional: mean of 2024+2025 Oct-Nov shipments (2026 not yet published)",
+            "provenance": carry_note,
         },
         "annotations": [],
     }

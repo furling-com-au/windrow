@@ -548,8 +548,17 @@ harvest curve.
 
 ## A20 — provisional 2026/27 live-season demand
 - **Value**: district×crop production = mean of PIRSA 2022/23–2025/26 estimates
-  (2.88 Mt EP total); carry-in = mean of prior two seasons' Oct+Nov shipments.
+  (2.88 Mt EP total); carry-in = mean of prior two calendar years' (2024, 2025)
+  Oct+Nov shipments.
 - **Used in**: `demand_2026-27.json` etc. via `pipeline/p2_build_live.py`.
+- **Source coverage**: since 2026-08-31 (#36) the carry-in mean applies the same
+  month-level coverage check A17 does (`month_coverage`/`carry_in_window` in
+  `p2_build_observed.py`, shared rather than reimplemented): a prior year missing an
+  Oct or Nov Flinders workbook is dropped from the mean instead of being summed in as
+  a silent 0, which would otherwise halve the estimate whenever this scheduled
+  live-refresh job runs against a source gap. Before the fix the two years were
+  divided by 2 unconditionally — correct only because both happened to be fully
+  covered every time this has actually run.
 - **Upgrade path**: replace automatically when PIRSA publishes 2026/27 estimates and
   as live receivals/shipments land (re-run the live builder).
 

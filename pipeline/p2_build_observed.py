@@ -39,6 +39,42 @@ def season_window(season: str) -> tuple[date, date]:
     return date(y, 10, 1), date(y + 1, 9, 30)
 
 
+def month_coverage(ships: pl.DataFrame) -> set[tuple[int, int]]:
+    """(year, month) pairs the Flinders source actually has a parsed workbook for."""
+    return {(r["year"], r["month"]) for r in ships.select("year", "month").unique().iter_rows(named=True)}
+
+
+def carry_in_window(ships: pl.DataFrame, covered: set[tuple[int, int]], y0: int) -> tuple[dict[str, float], list[str]]:
+    """Oct+Nov {y0} shipment totals per CARRY_PORTS, and which of those two months
+    the source has no workbook for at all (as opposed to a workbook with no grain
+    row for that port -- see build_carry_in). Shared by build_carry_in (one call
+    per historical season) and p2_build_live.py (two calls, a fixed prior-year
+    window rather than a season list -- see #36).
+    """
+    missing = [f"{y0}-{m:02d}" for m in CARRY_MONTHS if (y0, m) not in covered]
+    agg = (
+        ships.filter(
+            pl.col("port").is_in(list(CARRY_PORTS))
+            & (pl.col("year") == y0)
+            & pl.col("month").is_in(list(CARRY_MONTHS))
+        )
+        .group_by("port")
+        .agg(pl.col("export_t").sum().alias("t"))
+    )
+    t = {r["port"]: r["t"] for r in agg.iter_rows(named=True)}
+    return {p: t.get(p, 0.0) for p in CARRY_PORTS}, missing
+
+
+def mean_of_covered(
+    windows: dict[object, tuple[dict[str, float], list[str]]], ports: tuple[str, ...] = CARRY_PORTS
+) -> dict[str, float | None]:
+    """Mean per-port total across whichever of `windows` (each a carry_in_window()
+    result, keyed by season or year -- any hashable label) had no missing months.
+    None for a port with no fully-covered window to draw on at all."""
+    full = [k for k, (_, missing) in windows.items() if not missing]
+    return {p: (sum(windows[k][0][p] for k in full) / len(full) if full else None) for p in ports}
+
+
 def build_carry_in(ships: pl.DataFrame, seasons: list[str]) -> dict[str, dict]:
     """A17 opening stocks per season, with an explicit source-coverage check.
 
@@ -67,31 +103,14 @@ def build_carry_in(ships: pl.DataFrame, seasons: list[str]) -> dict[str, dict]:
     what is missing. It also matches how p2_build_live.py primes the unpublished
     live season and how A20 fills provisional production.
     """
-    covered = {
-        (r["year"], r["month"]) for r in ships.select("year", "month").unique().iter_rows(named=True)
-    }
+    covered = month_coverage(ships)
 
-    obs: dict[str, dict[str, float]] = {}
-    gaps: dict[str, list[str]] = {}
-    for season in seasons:
-        y0 = int(season[:4])
-        gaps[season] = [f"{y0}-{m:02d}" for m in CARRY_MONTHS if (y0, m) not in covered]
-        agg = (
-            ships.filter(
-                pl.col("port").is_in(list(CARRY_PORTS))
-                & (pl.col("year") == y0)
-                & pl.col("month").is_in(list(CARRY_MONTHS))
-            )
-            .group_by("port")
-            .agg(pl.col("export_t").sum().alias("t"))
-        )
-        t = {r["port"]: r["t"] for r in agg.iter_rows(named=True)}
-        obs[season] = {p: t.get(p, 0.0) for p in CARRY_PORTS}
+    windows = {season: carry_in_window(ships, covered, int(season[:4])) for season in seasons}
+    obs = {season: windows[season][0] for season in seasons}
+    gaps = {season: windows[season][1] for season in seasons}
 
     full = [s for s in seasons if not gaps[s]]
-    prior = {
-        p: (sum(obs[s][p] for s in full) / len(full) if full else None) for p in CARRY_PORTS
-    }
+    prior = mean_of_covered(windows)
 
     out: dict[str, dict] = {}
     for season in seasons:
