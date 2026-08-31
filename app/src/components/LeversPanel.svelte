@@ -6,6 +6,8 @@
 
   function setA<K extends keyof typeof app.assump>(k: K, v: (typeof app.assump)[K]) {
     app.assump = { ...app.assump, [k]: v };
+    app.scenario = "custom"; // an assumption lever is a what-if too (F13) — the scenario
+    //   dropdown, story text and "back to normal" button all key off this
     onchange();
   }
   function setE<K extends keyof typeof app.econ>(k: K, v: (typeof app.econ)[K]) {
@@ -25,8 +27,13 @@
     onchange();
   }
 
+  // F13: this used to leave assumption/econ levers untouched, so "back to normal" from a
+  // scenario preset could still leave a dirty assumption lever behind with no way to see
+  // or clear it from here (the scenario would already read "baseline" again)
   function reset() {
     app.levers = { ...DEFAULT_LEVERS };
+    app.assump = { ...DEFAULT_ASSUMP };
+    app.econ = { ...DEFAULT_ECON };
     app.scenario = "baseline";
     onchange();
   }
@@ -487,7 +494,7 @@
 <div class="levers">
   <div class="head">
     <span class="t">{app.viewMode === "advanced" ? "What-if levers" : "What-if"}</span>
-    {#if app.scenario !== "baseline"}<button class="reset" onclick={reset}>back to normal</button>{/if}
+    {#if app.scenario !== "baseline" || assumpDirty}<button class="reset" onclick={reset}>back to normal</button>{/if}
   </div>
   <p class="story">{story}</p>
 
