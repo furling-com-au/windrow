@@ -567,7 +567,7 @@
           <span>Silo unload cycle <b>{app.assump.serviceMin} min</b></span>
           <input type="range" min="6" max="25" step="1" value={app.assump.serviceMin} oninput={(e) => setA("serviceMin", parseFloat(e.currentTarget.value))} />
         </label>
-        <label title="A5: scales every drive time (default speeds: 90 km/h highways down to 60 on minor roads). Distances are routed on the real road network and do not move with this lever, so the kilometre and freight figures stay put.">
+        <label title="A5: scales every drive time (default speeds: 90 km/h highways down to 60 on minor roads). Distances are routed on the real road network and do not move with this lever, so the kilometre figure is unaffected. Freight can still shift a little — slower or faster travel changes which sites look most attractive, not how far apart anything is.">
           <span>Travel times <b>×{app.assump.travelScale.toFixed(2)}</b></span>
           <input type="range" min="0.8" max="1.3" step="0.05" value={app.assump.travelScale} oninput={(e) => setA("travelScale", parseFloat(e.currentTarget.value))} />
         </label>
