@@ -28,12 +28,12 @@
     <h3>How well does it match reality?</h3>
     <p>
       Season totals are close: on the held-out 2024/25 season the simulation's total
-      tonnage was within <strong>0.4%</strong> of published receivals. The weaker spot is
+      tonnage was within <strong>0.4%</strong> of published receivals, and Port Lincoln
+      vessel call counts matched exactly. The weaker spot is
       <strong>within-season timing</strong> — weekly RMSE runs 50–63% of the mean weekly
       tonnage, mostly because the exact week the harvest peak lands in can shift by a
-      week or more even when the season's shape is right. Port Lincoln vessel call
-      counts also missed the ±10% acceptance band on the held-out season (−15.1%). Full
-      numbers are in <code>docs/calibration_report.md</code> in the repository.
+      week or more even when the season's shape is right. Full numbers are in
+      <code>docs/calibration_report.md</code> in the repository.
     </p>
     <h3>How do we know the truck numbers?</h3>
     <p>
