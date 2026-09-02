@@ -189,6 +189,19 @@
     "Canola": 625.31,
     "Wheat": 280.94
    }
+  },
+  "2026-09-02": {
+   "bids": 137,
+   "sites": 24,
+   "buyers": [
+    "Inghams Enterprises"
+   ],
+   "epBids": 0,
+   "medianPerT": {
+    "Barley": 234.91,
+    "Canola": 625.31,
+    "Wheat": 280.3
+   }
   }
  }
 }
