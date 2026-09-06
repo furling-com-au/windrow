@@ -428,6 +428,16 @@ courtesy and to check the regulatory record, not to invite a comment on any part
 
 ## 5. What to re-check immediately before publication
 
+> **All five checked 2026-08-31 — results and evidence in `docs/data_refresh_2026-08-31.md` §2.**
+> Summary: the page has **not** rolled to 26/27, but a mid-harvest Internet Archive snapshot
+> (14 Jan 2026) now carries the closure line for **both** bunkers beside live segregations at
+> Lucky Bay and Wallaroo; no Murdinga tender outcome is published (offers closed 21 Aug 2026);
+> no T-Ports sale completion is published; and the Wheat Port Code is **not** a bare sunset —
+> a three-year streamlined **remake was drafted and consulted on in July 2026** and no
+> remake/repeal decision is published (`wheat-port-code-2026` in `data/SOURCES.md`). The three
+> pinned files are git-clean and the headline re-runs at 66.8%. Re-check items 2–4 again on the
+> day: all three can move between now and 1 October.
+
 - The T-Ports harvest page (archived copy vs live), and whether it has rolled to 26/27.
 - The Murdinga tender outcome.
 - Whether T-Ports has been sold.

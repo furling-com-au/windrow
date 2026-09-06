@@ -19,3 +19,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# Claude Code agent worktrees (local scratch copies of the repo)
+.claude/worktrees/

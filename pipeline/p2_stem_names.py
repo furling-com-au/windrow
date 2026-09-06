@@ -108,8 +108,15 @@ def main():
     ent = df.filter(pl.col("date_min").is_not_null()).with_columns(
         pl.col("date_min").str.to_date(), pl.col("date_max").str.to_date()
     )
-    # dedupe by vessel + rough month
-    ent = ent.with_columns(pl.col("date_min").dt.strftime("%Y-%m").alias("mon")).unique(subset=["vessel", "mon"], keep="first")
+    # dedupe by vessel + rough month. Both the sort and maintain_order matter: polars'
+    # unique() does not preserve order by default, and the greedy match below resolves
+    # ties by iteration order — without a total order over the candidates the published
+    # name_candidate labels shuffle between identical builds.
+    ent = (
+        ent.with_columns(pl.col("date_min").dt.strftime("%Y-%m").alias("mon"))
+        .sort(["vessel", "mon", "date_min", "date_max", "source_file"])
+        .unique(subset=["vessel", "mon"], keep="first", maintain_order=True)
+    )
 
     for season in ("2023-24", "2024-25", "2025-26"):
         fpath = APP_DATA / f"vessels_{season}.json"
@@ -125,7 +132,9 @@ def main():
                 lo = e["date_min"] - timedelta(days=6)
                 hi = e["date_max"] + timedelta(days=6)
                 if lo <= t0 <= hi:
-                    score = abs((e["date_min"] - t0).days)
+                    # (day gap, vessel, month) is a total order, so equal-gap candidates
+                    # resolve the same way on every run.
+                    score = (abs((e["date_min"] - t0).days), e["vessel"], e["mon"])
                     if best is None or score < best[0]:
                         best = (score, e)
             if best:

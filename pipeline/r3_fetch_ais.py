@@ -10,7 +10,7 @@ Layout: timestamp=<epoch of Jan 1>/polygon=<WKB hex box>/cts_srr_MM_YYYY_pt.parq
 The polygon box covering (0..180E, 90S..0) holds all Australian mainland waters
 (~45 MB/month); a second small box covers the western SRR remainder.
 
-We take months 2023-10 .. 2026-07 (three shipping years) for the big box only.
+We take months 2023-10 .. 2026-08 (three shipping years) for the big box only.
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ PREFIX = "aggregated_amsa_nonqc.parquet"
 OUT = RAW / "amsa_cts"
 
 MONTHS = [(y, m) for y in (2023, 2024, 2025, 2026) for m in range(1, 13)]
-MONTHS = [(y, m) for (y, m) in MONTHS if (2023, 10) <= (y, m) <= (2026, 7)]
+MONTHS = [(y, m) for (y, m) in MONTHS if (2023, 10) <= (y, m) <= (2026, 8)]
 
 
 def year_epoch(year: int) -> int:

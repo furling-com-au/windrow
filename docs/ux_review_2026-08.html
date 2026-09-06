@@ -1,0 +1,1711 @@
+<title>Windrow Field Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #EFEDE4;
+    --surface: #F8F7F2;
+    --surface-2: #E7E5DA;
+    --ink: #1F2A24;
+    --ink-soft: #5C6660;
+    --ink-faint: #8A938C;
+    --rule: #D3D0C4;
+    --rule-soft: #E2DFD4;
+    --accent: #1E4640;
+    --accent-lift: #2C635A;
+
+    --sev-crit: #A6321C;
+    --sev-crit-wash: #F3E2DC;
+    --sev-major: #8A6410;
+    --sev-major-wash: #F1E9D5;
+    --sev-minor: #47606F;
+    --sev-minor-wash: #E3E7EA;
+    --sev-good: #3B6647;
+    --sev-good-wash: #E0E9E1;
+
+    --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --f-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+    --measure: 70ch;
+    --pad: clamp(1.1rem, 4vw, 2.5rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #171A17;
+      --surface: #1E221D;
+      --surface-2: #262B25;
+      --ink: #E7E5DA;
+      --ink-soft: #A3ABA3;
+      --ink-faint: #7A837B;
+      --rule: #343A33;
+      --rule-soft: #2A2F29;
+      --accent: #7FBFB2;
+      --accent-lift: #9AD3C6;
+
+      --sev-crit: #E28066;
+      --sev-crit-wash: #3A231C;
+      --sev-major: #D9AE55;
+      --sev-major-wash: #332915;
+      --sev-minor: #93AEBE;
+      --sev-minor-wash: #202A31;
+      --sev-good: #82BC91;
+      --sev-good-wash: #1E2A21;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #171A17;
+    --surface: #1E221D;
+    --surface-2: #262B25;
+    --ink: #E7E5DA;
+    --ink-soft: #A3ABA3;
+    --ink-faint: #7A837B;
+    --rule: #343A33;
+    --rule-soft: #2A2F29;
+    --accent: #7FBFB2;
+    --accent-lift: #9AD3C6;
+
+    --sev-crit: #E28066;
+    --sev-crit-wash: #3A231C;
+    --sev-major: #D9AE55;
+    --sev-major-wash: #332915;
+    --sev-minor: #93AEBE;
+    --sev-minor-wash: #202A31;
+    --sev-good: #82BC91;
+    --sev-good-wash: #1E2A21;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  /* ---------- masthead ---------- */
+
+  .mast {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+  }
+  .eyebrow b { color: var(--accent); font-weight: 600; }
+  h1 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(2.3rem, 6.5vw, 4rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .standfirst {
+    max-width: var(--measure);
+    font-size: 1.1875rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .standfirst em { color: var(--ink-soft); }
+
+  /* ---------- generic type ---------- */
+
+  section > h2 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.4vw, 2rem);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin: 0 0 0.5rem;
+    text-wrap: balance;
+  }
+  .kicker {
+    font-family: var(--f-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+  }
+  .sec-note {
+    max-width: var(--measure);
+    color: var(--ink-soft);
+    margin: 0 0 1.75rem;
+    font-size: 1rem;
+  }
+  p { max-width: var(--measure); }
+  a { color: var(--accent-lift); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent-lift); outline-offset: 2px; }
+  code, .mono { font-family: var(--f-mono); font-size: 0.86em; }
+  code { background: var(--surface-2); padding: 0.1em 0.34em; border-radius: 2px; }
+
+  /* ---------- verdict ---------- */
+
+  .verdict {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .vcell {
+    background: var(--surface);
+    padding: 1.25rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .vcell .k {
+    font-family: var(--f-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .vcell .v {
+    font-family: var(--f-display);
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .vcell .d { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.45; }
+  .vcell.crit .v { color: var(--sev-crit); }
+  .vcell.major .v { color: var(--sev-major); }
+  .vcell.good .v { color: var(--sev-good); }
+
+  /* ---------- theme blocks ---------- */
+
+  .theme {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+  .theme > h3 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(1.25rem, 2.8vw, 1.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+    max-width: 46ch;
+    text-wrap: balance;
+  }
+  .theme > .lede { margin: 0; color: var(--ink-soft); }
+
+  /* ---------- findings ---------- */
+
+  .findings { display: flex; flex-direction: column; gap: 1rem; }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 5px solid var(--sev);
+    padding: 1.2rem clamp(1rem, 2.5vw, 1.6rem) 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    scroll-margin-top: 1.5rem;
+  }
+  .finding.crit  { --sev: var(--sev-crit);  --wash: var(--sev-crit-wash); }
+  .finding.major { --sev: var(--sev-major); --wash: var(--sev-major-wash); }
+  .finding.minor { --sev: var(--sev-minor); --wash: var(--sev-minor-wash); }
+  .finding.good  { --sev: var(--sev-good);  --wash: var(--sev-good-wash); }
+
+  .f-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.45rem 0.75rem;
+    font-family: var(--f-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+  .f-id { font-weight: 600; color: var(--sev); }
+  .chip {
+    background: var(--wash);
+    color: var(--sev);
+    padding: 0.2em 0.55em;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .chip.plain { background: var(--surface-2); color: var(--ink-soft); }
+
+  .finding h4 {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: clamp(1.08rem, 2.2vw, 1.28rem);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    margin: 0;
+    max-width: 48ch;
+    text-wrap: balance;
+  }
+  .finding p { margin: 0; }
+  .where {
+    font-family: var(--f-mono);
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    word-break: break-word;
+    max-width: none;
+  }
+
+  .ev {
+    background: var(--surface-2);
+    border-left: 2px solid var(--rule);
+    padding: 0.7rem 0.9rem;
+    font-family: var(--f-mono);
+    font-size: 0.775rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--ink);
+    margin: 0;
+  }
+  .ev b { color: var(--sev); font-weight: 600; }
+  .ev.wrap-ok { white-space: pre-wrap; }
+
+  .lbl {
+    font-family: var(--f-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .fix { border-top: 1px solid var(--rule-soft); padding-top: 0.8rem; }
+  .fix p { color: var(--ink-soft); font-size: 0.98rem; }
+
+  ul.tight { margin: 0; padding-left: 1.15rem; max-width: var(--measure); }
+  ul.tight li { margin-bottom: 0.35rem; }
+  ul.tight li:last-child { margin-bottom: 0; }
+
+  /* ---------- tables ---------- */
+
+  .scroller { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  table th, table td {
+    text-align: left;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  table thead th {
+    font-family: var(--f-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  table tbody tr:last-child td { border-bottom: none; }
+  td.calc { font-family: var(--f-mono); font-size: 0.79rem; font-variant-numeric: tabular-nums; }
+  td.a { white-space: nowrap; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; font-weight: 500; }
+  .mark { font-family: var(--f-mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .mark.ok { color: var(--sev-good); }
+  .mark.no { color: var(--sev-crit); }
+  .mark.part { color: var(--sev-major); }
+
+  /* ---------- order of work ---------- */
+
+  ol.work { counter-reset: w; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+  ol.work li {
+    counter-increment: w;
+    display: grid;
+    grid-template-columns: 2.1rem 1fr;
+    gap: 0.9rem;
+    align-items: start;
+    max-width: calc(var(--measure) + 3rem);
+  }
+  ol.work li::before {
+    content: counter(w);
+    font-family: var(--f-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--surface);
+    background: var(--accent);
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+  ol.work b { font-family: var(--f-display); font-weight: 600; }
+  ol.work .why { color: var(--ink-soft); display: block; font-size: 0.96rem; }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.25rem;
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 640px) {
+    .finding { border-left-width: 4px; }
+    body { font-size: 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">
+      <span>Field review</span>
+      <span>27 Aug 2026</span>
+      <span><b>Windrow</b> — EP grain supply chain simulation</span>
+      <span>rev c08513c</span>
+    </div>
+    <h1>Windrow Field Review</h1>
+    <p class="standfirst">
+      The evidence spine of this project is genuinely strong, the engine does almost everything it
+      claims, and the honesty discipline in the docs is better than most published models manage.
+      Almost none of that survives the trip to the screen. <em>The default view tells first-time
+      visitors the model is wrong by 1771%. The flagship rail scenario promises 2.5 million truck-km
+      saved and then reports freight going up. The season labelled "live" has no weather, no ships
+      and no crop data, and the copy calls it the season as it really ran.</em> Every finding below
+      was reproduced — in the running app, by instrumenting the engine, or by redoing the arithmetic.
+    </p>
+  </header>
+
+  <section>
+    <p class="kicker">Verdict</p>
+    <h2>The model is better than the app says, and the app says things the model doesn't support</h2>
+    <p class="sec-note">
+      Those are two different problems and they compound. The physics is calibrated to ~1% on season
+      totals; the presentation layer then manufactures errors that aren't there, and asserts
+      conclusions the engine contradicts.
+    </p>
+    <div class="verdict">
+      <div class="vcell good">
+        <span class="k">Season-total accuracy</span>
+        <span class="v">−1.0%</span>
+        <span class="d">2025/26 finishes 2.227 Mt simulated vs 2.249 Mt observed. Across three seasons −0.4% to −1.6%, including the held-out one. This is the real headline and the app never leads with it.</span>
+      </div>
+      <div class="vcell crit">
+        <span class="k">What the default screen says</span>
+        <span class="v">1771%</span>
+        <span class="d">"Reality check", 3 Nov, default season, nothing touched: <em>"1771% ahead of reality."</em> The same unchanged model reads +252% one day and +82% the next.</span>
+      </div>
+      <div class="vcell crit">
+        <span class="k">Rail scenario freight</span>
+        <span class="v">+$197k</span>
+        <span class="d">"Bring back the trains" promises ~2.5M truck-km saved. The only trucking figure shown says freight got <em>worse</em>. The 2.74M truck-km the model does save is computed and thrown away.</span>
+      </div>
+      <div class="vcell crit">
+        <span class="k">Clicks to a hard crash</span>
+        <span class="v">2</span>
+        <span class="d">Bumper harvest + more grain to Lucky Bay, default season, throws <code>QUEUE INSANE at Thevenard: 408</code> and dead-ends the app with a raw exception string.</span>
+      </div>
+      <div class="vcell major">
+        <span class="k">Touch targets at 44px</span>
+        <span class="v">0 / 24</span>
+        <span class="d">On a 393px viewport, with 56% of the panel hidden behind an unindicated inner scroll and type down to 7px — for a phone-first rural audience.</span>
+      </div>
+      <div class="vcell major">
+        <span class="k">Fitted params pinned at a bound</span>
+        <span class="v">5 / 12</span>
+        <span class="d">rateScale, matShift, retentionShare, portAttractBias and luckyBayBias all sit exactly on their lower search bound. The report presents all twelve as an interior fit.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 1 · Credibility</p>
+    <h2>The app is its own worst reviewer</h2>
+    <p class="sec-note">
+      The single highest-damage defect in the project, and among the cheapest to fix. It is the first
+      number a new visitor reads.
+    </p>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding crit" id="F1">
+          <div class="f-top">
+            <span class="f-id">F1</span><span class="chip">Critical</span>
+            <span class="chip plain">Measured live</span><span class="chip plain">Arithmetic</span>
+          </div>
+          <h4>"Reality check" compares a continuous curve against a week-stale step, and reports the gap as model error</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:181–192 (<code>simVsActual</code>), rendered :456–461 · app/src/App.svelte:238–249 (KPI "actual")</p>
+          <p>
+            Both loops keep the last weekly report whose <code>week_ending &lt;= sim.day</code>, then
+            divide by it. The simulated cumulative advances every tick; the observed cumulative only
+            exists on Sundays. During peak harvest that denominator can be six days and ~490,000 t old.
+          </p>
+          <pre class="ev">Default view, 2025/26, "The season as it happened", untouched:
+
+   3 Nov 2025   "0.16 million t ... vs 0.01 reported  —  <b>1771% ahead of reality</b>"
+   6 Dec 2025   "1.44 million t ... vs 0.78 reported  —  <b>  86% ahead of reality</b>"
+  ~day 140      "2.23 million t ... vs 2.25 reported  —  <b>   1% behind reality</b>"
+
+Arithmetic at 6 Dec:
+  observed cum, week ending 30 Nov     776,461 t   <- what the app divides by
+  observed cum, week ending  7 Dec   1,222,446 t
+  implied rate                           63,712 t/day
+  interpolated to 6 Dec              1,158,734 t
+
+  sim 1.44 Mt vs 776,461     ->  <b>+85%</b>  (displayed)
+  sim 1.44 Mt vs 1,158,734   ->  <b>+24%</b>  (like-for-like)</pre>
+          <p>
+            So roughly two-thirds of the headline is manufactured by the comparison — at day 62 the
+            split measures as ~29 points real, ~21 points artefact. Because the denominator jumps
+            weekly, the same unchanged model reads <b>+252% one day and +82% the next</b>.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Compare only at week-ending dates and label it "as at week ending 30 Nov". Suppress the
+              percentage while the denominator is small — it is meaningless in October either way.
+              Then lead with the metric that is actually good: season totals inside 1.6% on three
+              seasons.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F2">
+          <div class="f-top">
+            <span class="f-id">F2</span><span class="chip">Major</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>The real weakness — intra-season timing — is never disclosed, while the app implies weekly-level agreement</h4>
+          <p class="where">docs/calibration_report.md vs app/src/components/AboutModal.svelte · app/src/components/Tour.svelte:21</p>
+          <pre class="ev">weekly Western receivals, 2025/26 (sim vs observed, kt)
+  19 Oct   sim  31   obs   1        <- harvest starts ~2-3 weeks early
+   9 Nov   sim 171   obs  24
+  30 Nov   sim 299   obs 331
+  14 Dec   sim 291   obs 487        <- and finishes early
+   4 Jan   sim  36   obs  76
+  season   sim 2.228 Mt  obs 2.249 Mt   = <b>-0.9%</b>
+
+calibration_report.md, held-out 2024/25 vs acceptance criteria:
+  season total error     -0.4%     +/-5%        <b>PASS</b>
+  weekly RMSE / mean       63%     &lt;=15% band   "see note"
+  vessel call count      -15.1%    +/-10%       <b>FAIL</b></pre>
+          <p>
+            The report prints its own FAIL — that is to its credit. The app surfaces neither the failed
+            vessel-call criterion nor the 50–63% weekly RMSE, and the tour's step 4 calls the chart gap
+            "the honest measure of the model" without saying which axis is weak.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              One sentence in About: totals land within 1.6%, weekly timing is the weak axis, the
+              held-out season under-counts vessel calls by 15%. That reads as more credible than
+              "validated", not less.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F3">
+          <div class="f-top">
+            <span class="f-id">F3</span><span class="chip">Major</span><span class="chip plain">Source</span><span class="chip plain">Mislabel</span>
+          </div>
+          <h4>Everything labelled "vs the real season" is measured against a second simulation run</h4>
+          <p class="where">app/src/components/LeversPanel.svelte (<code>ROW_TIPS</code>, <code>sentences</code>, "Delivery pace") vs app/src/worker/sim.worker.ts:83–113 (<code>computeBaseline</code>, <code>defaultParams()</code>)</p>
+          <p>
+            The baseline lifecycle is otherwise sound — always <code>defaultParams()</code> for the
+            loaded season, nulled on season change, season-checked on receipt, cached with correct
+            invalidation. The problem is purely the words: <em>"~7 days behind the real season"</em>,
+            <em>"30% longer than the real season"</em>, <em>"vs the real season at the same date"</em>.
+            Say "the modelled normal season". The project draws that line rigorously everywhere else,
+            which is why this reads as a slip rather than a stance.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 2 · Scenarios</p>
+    <h2>The flagship scenarios report the opposite of their own stories</h2>
+    <p class="sec-note">
+      Each of these is a scenario a reader will click first, whose punchline the panel then contradicts,
+      cuts, or paints the wrong colour.
+    </p>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding crit" id="F4">
+          <div class="f-top">
+            <span class="f-id">F4</span><span class="chip">Critical</span><span class="chip plain">Headless, reproduced</span>
+          </div>
+          <h4>"Bring back the trains" reports freight going up, because trainset tonne-km land in the truck accumulator and are priced at the road rate</h4>
+          <p class="where">packages/sim/src/engine.ts:842 (trains share <code>tonneKm</code>) · priced at LeversPanel.svelte:208–209, rendered :127–133</p>
+          <pre class="ev">engine.ts:842   this.tonneKm += (minutes / 60) * 75 * load;
+                 // in stepLinehaul — taken by trainsets too; isTrain (:800)
+                 // only redirects routing and handling, never the counter
+
+rail patch (railReinstated + linehaulTrucks 32), 2025/26:
+  tonneKm    302,307,208 -> 304,279,214    <b>+1.97M (+0.65%)</b>
+  renders    "+2.0M t.km  ·  +$197k freight"   in the amber "worse" colour
+
+  truckKm     17,636,975 ->  14,896,096    <b>-2.74M truck-km saved</b>
+  kpi.truckKm exists (engine.ts:1038) — grep app/src: <b>zero uses</b>
+
+Simple mode, day 364, rail scenario:
+  "<b>Barely any difference from the real season.</b>"  +  "No meaningful differences yet"</pre>
+          <p>
+            The story card promises "about 2.5 million truck-km" saved, the lever tooltip repeats it,
+            and A21 documents it. The 2.74M saving the model actually produces matches that promise —
+            and is never shown. Two related defects compound it: trainsets run on the <em>road</em>
+            travel-time matrix at road speeds, reaching <b>4.0 cycles/trainset/day (12,800 t/day)</b>
+            against the "~2 cycles/day ceiling" asserted in A21, docs/scenarios.md and the engine's own
+            comment; and the "road line-haul fleet cut by one-third" in A21 is applied only by
+            <code>scripts/scenarios.ts</code>, not by the app's rail lever.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Split the counter — a <code>railTonneKm</code> incremented inside the <code>isTrain</code>
+              branch — price only road tonne-km at A18, and add a truck-km row driven by
+              <code>kpi.truckKm</code> plus a new baseline series so the scenario's real saving is on
+              screen. Then either give trains a rail transit time or enforce the stated cycle cap, and
+              correct the "~2 cycles/day" claim in all three places.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F5">
+          <div class="f-top">
+            <span class="f-id">F5</span><span class="chip">Major</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>Simple mode's four-line cap cuts exactly the effect each story tells you to watch</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:313 (<code>lines.slice(0, 4)</code>), push order :245–291</p>
+          <pre class="ev">Bumper +30%, day 365 — the four bullets that fit:
+  1 crop value   +$873m      2 grain delivered  +557k t (+25%)
+  3 Lucky Bay    +210k t     4 freight          +$5.41m
+  5 queues       139 -> 450 trucks (+224%)      <b>CUT</b>
+
+  ...printed directly above it, the verdict:
+  "A bigger crop gets through — <b>but watch the queues</b> and where the surplus goes."
+
+Drought -40%: same four slots fill; the ships-waiting line is 5th and cut,
+  under a story ending "<b>ships sit at anchor waiting for grain that never comes</b>".</pre>
+          <p>Simple mode is the default. The two most-clicked scenarios are the two whose punchline is silently dropped.</p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Rank the lines by |effect| relative to each row's threshold rather than by a fixed push order, or pin the row the scenario's own verdict names.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F6">
+          <div class="f-top">
+            <span class="f-id">F6</span><span class="chip">Major</span><span class="chip plain">Headless</span><span class="chip plain">Unbounded</span>
+          </div>
+          <h4>The drought scenario's $158.5m of ship waiting is an artefact of a program that never cancels</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:212–214 · root cause packages/sim/src/engine.ts:889–908 (V_ANCHOR has no give-up)</p>
+          <pre class="ev">Drought (-40%), 2025/26:
+  mean vessel wait   day 90:  20 h    day 250: 358 h    day 364: <b>1,093.5 h</b>
+  baseline                                              day 364:      28.3 h
+  119 arrivals  ->  (1093.5 - 28.3) x 119 / 24 x $30,000 = <b>+$158.5m</b>
+
+  whole-season simulated cartage bill  ~$30m
+  i.e. the largest dollar figure the app can produce is <b>5x</b> the freight task,
+  and it means "46 demurrage days per ship, and nobody re-issued the program".</pre>
+          <p>
+            docs/scenarios.md carries the real explanation — the fixed export program becomes
+            infeasible, and in 2024/25 the program itself shrank. Nothing at the point of display says so.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Cap anchorage before it becomes fiction: let vessels sail short-loaded or cancel after a
+              plausible lay-time, and put the "the program is held fixed" caveat in the row, not only
+              in the repo docs.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F7">
+          <div class="f-top">
+            <span class="f-id">F7</span><span class="chip">Major</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>"Crop value (farm gate)" is a whole-season total sitting at the top of a strictly to-date table</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:215–220, <code>unshift</code>-ed to the top at :164–170; header at :487</p>
+          <pre class="ev">farmgate = (productionScale - 1) x prod x FARMGATE_PER_T   // no reference to s.day
+
+Bumper +30%, before pressing play, on 1 October:
+  table header   "running comparison, to <b>2025-10-01</b>"
+  row 1          "Crop value (farm gate)  <b>+$331m</b>"     <- full-season figure
+  every other row  "= no change"
+
+...then identical for all 365 days, so nothing tells the reader it isn't accruing.</pre>
+        </article>
+
+        <article class="finding minor" id="F8">
+          <div class="f-top">
+            <span class="f-id">F8</span><span class="chip">Polish</span><span class="chip plain">Source</span>
+          </div>
+          <h4>The comparison table paints good outcomes amber and bad outcomes green</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:590–595 (<code>.row.up</code> amber / <code>.row.down</code> green); <code>dir</code> is pure sign, set at :121 and :169</p>
+          <pre class="ev">Drought:  "Crop value -$442m"  and  "Grain delivered -824k t"   -> <b>green</b>
+Bumper:   "Crop value +$331m"  and  "Grain delivered +557k t"   -> <b>amber</b>
+
+5 of 9 rows have up = worse (trucking, queue, holding, ships waiting, pace behind);
+the tonnage and farm-gate rows invert it. The two most screenshot-able scenarios
+read backwards at a glance.</pre>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 3 · Arithmetic</p>
+    <h2>Numbers in the takeaways panel that are simply wrong</h2>
+    <p class="sec-note">
+      Not framing issues — computation defects, each reproduced against the real engine.
+    </p>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding crit" id="F9">
+          <div class="f-top">
+            <span class="f-id">F9</span><span class="chip">Critical</span><span class="chip plain">Headless, reproduced</span>
+          </div>
+          <h4>"Delivery pace" prints hundreds of days of nonsense — the crossing-day search has no bound and no fallback</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:221–226, rendered :141–148 and :270–276</p>
+          <pre class="ev">while (j &lt; b.receivedByDay.length && (b.receivedByDay[j] ?? 0) &lt; s.kpi.receivedT) j++;
+paceLagDays = s.day - j;      // no bound, no fallback
+
+(a) run exceeds the baseline's season total -> j runs to 365:
+    rail   day 140 -> <b>-225</b>   day 200 -> <b>-165</b>   day 300 -> -65
+(b) baseline stops receiving at day 96, so j freezes for ~270 days:
+    fleet 500  day 364 -> <b>+273</b>      drought  day 364 -> <b>+299</b>
+
+Rendered: "~299 days behind the real season" / "~275 days ahead".
+
+Worst case: at day 200 the rail scenario clears no other threshold, so its
+ONE bullet under "Barely any difference from the real season." is
+  "<b>Deliveries run about 165 days ahead of the real season.</b>"</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Return null when the search hits the end of the array or the baseline series has plateaued, and render that as "not comparable" rather than a day count.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F10">
+          <div class="f-top">
+            <span class="f-id">F10</span><span class="chip">Major</span><span class="chip plain">Headless</span><span class="chip plain">Undocumented constant</span>
+          </div>
+          <h4>An undocumented flat 75 km/h converts travel minutes into every kilometre and dollar the model reports</h4>
+          <p class="where">packages/sim/src/engine.ts:747, :842, :1038 · vs data/ASSUMPTIONS.md A5</p>
+          <pre class="ev">engine.ts:747   const km = (tr.legMin / 60) * 75;   // "mean 75 km/h (A5-derived)"
+engine.ts:842   this.tonneKm += (minutes / 60) * 75 * load;
+engine.ts:1038  truckKm: Math.round((this.truckTravelMin / 60) * 75)
+
+The matrix carries ONLY minutes, built at A5's class speeds:
+  trunk/primary 90 · secondary 80 · tertiary 70 · unclassified 60 · residential 40
+75 contradicts every one of them, and grep '75 km' over data/ docs/ README: <b>nothing</b>.
+
+Consequence, worked: Wudinna -> Port Lincoln is 143.3 matrix minutes,
+  reported as <b>179 km</b> where the 90 km/h network implies <b>~215 km</b>.
+So trunk line-haul is understated ~17% and low-class farm legs overstated up to 25%
+  (of 17.6M truck-km: 13.3M farm->site, 4.4M line-haul — net sign indeterminate).
+What IS understated ~17% is the rail saving, which is all trunk line-haul —
+  including the "2.5 million truck-km" a reader sees in the scenario story.</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Export leg distances from the OSM routing step and accumulate real km. If that's deferred, register the 75 km/h constant as its own assumption and state which displayed figures lean which way.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F11">
+          <div class="f-top">
+            <span class="f-id">F11</span><span class="chip">Major</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>The travel-time assumption slider fabricates $7.9m of freight although no truck drives an extra kilometre</h4>
+          <p class="where">packages/sim/src/engine.ts:747–748, :842 (time-derived km) · slider at LeversPanel.svelte:406–409</p>
+          <pre class="ev">"tonne-km" is really tonne-HOURS x 75, and legMin is already scaled by travelTimeScale.
+
+travel times x1.30  ->  "+79.2M t.km  ·  <b>+$7.9m freight</b>"   deliveries move -1,992 t
+travel times x0.80  ->  "-51.8M t.km  ·  -$5.2m freight"        deliveries move   +209 t
+
+Simple mode says: "Trucks travel further overall — grain gets double-handled
+(farm to silo now, silo to port later) — roughly <b>$7.9m extra in freight</b>."
+Both halves false: same roads, and deliveries changed by 2,000 t out of 2.23M.</pre>
+          <p>
+            This is the panel whose own instruction is <em>"if a conclusion flips when you nudge one,
+            treat it with care"</em> — and the conclusion it manufactures comes from a pure speed
+            assumption.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Divide <code>travelTimeScale</code> back out at the two km conversions and at <code>truckKm</code>, so it affects cycle times and queues but not distance.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F12">
+          <div class="f-top">
+            <span class="f-id">F12</span><span class="chip">Major</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>Mid-season deltas compare a mid-day live snapshot against a midnight baseline entry</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:203 (<code>i = s.day - 1</code>) feeding every delta :204–232</p>
+          <pre class="ev">The index is CORRECT at midnight — but the worker emits ~30 snapshots per sim-day
+while i stays fixed, so each delta ramps up over the day and snaps back.
+
+Tod Hwy closed, day 63 (a peak day: 65,450 t and 6.31M t.km):
+  tick +0    dRec  <b>-1,428 t</b>   freight +$1.01m      <- the true same-instant answer
+  tick +144  dRec  +30,872 t         freight +$1.44m
+  tick +287  dRec  <b>+64,352 t</b>  freight +$1.70m      <- 68% overstated
+
+Pause or screenshot mid-day and Simple mode asserts "64,000 tonnes more grain
+reaches the silos and ports (+5%)" when the correct answer is a small DECREASE.</pre>
+          <p>Self-correcting at every midnight, on any scrub, and at season end — so it damages the live watching experience rather than the final numbers.</p>
+        </article>
+
+        <article class="finding major" id="F13">
+          <div class="f-top">
+            <span class="f-id">F13</span><span class="chip">Major</span><span class="chip plain">Source</span>
+          </div>
+          <h4>Assumption levers never mark the run as a what-if — the scenario still reads "The season as it happened"</h4>
+          <p class="where">app/src/components/LeversPanel.svelte:7–10 (<code>setA</code> omits <code>scenario = "custom"</code>), :28–32 (<code>reset</code> ignores <code>assump</code>), :352, :470 · App.svelte:148, :158 (CSV)</p>
+          <pre class="ev">Nudge "Crop kept on farm" 10% -> 5%:
+  dRec +100,384 t (+4.5%) and +$1.68m freight against a default-assumption baseline
+
+  Scenario dropdown still reads   "<b>The season as it happened</b>"
+  Story still reads               "Real crop sizes ... and the network as it ran"
+  "back to normal" button         <b>hidden</b> (scenario is still "baseline")
+  Switch to Simple and the        "Your change:" line is <b>suppressed</b>
+  Export CSV                      <b>windrow_2025-26_baseline.csv</b>, header "scenario baseline"</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Add <code>app.scenario = "custom"</code> to <code>setA</code>, extend <code>reset()</code> to the assumption and econ levers, and gate the reset button on <code>assumpDirty</code> too.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 4 · First run</p>
+    <h2>The living map isn't living by the time anyone looks at it</h2>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding crit" id="F14">
+          <div class="f-top">
+            <span class="f-id">F14</span><span class="chip">Critical</span><span class="chip plain">Measured live, timed</span>
+          </div>
+          <h4>The season plays out underneath the intro overlay, so "Watch the season" often has nothing left to watch</h4>
+          <p class="where">app/src/App.svelte:190–192 (worker <code>"ready"</code> → <code>app.playing = true</code>) · Intro.svelte</p>
+          <pre class="ev">t = 10s   sim already at  9 Oct 2025  — intro still covering the map
+t = 57s   dismissed intro at <b>25 Nov 2025</b> — 8 weeks in, past the "first
+          delivery" marker the chart annotates
+full season ~190s wall-clock (130 d at 1 d/s, then 4 d/s)
+
+Also observed: intro never dismissed, sim reached <b>1 Oct 2026</b> — season over,
+0 trucks on the road — with the overlay still up.</pre>
+          <p>
+            57 seconds is a brisk read of a ~120-word card, and the alternative button offers a
+            "1-minute tour" of six dense steps whose step 3 says "The season is already playing at one
+            day per second". This is the direct cost of the fix logged in stakeholder_review.md ("the
+            dashboard was dead on arrival … the season now auto-plays"): auto-play was added without
+            pausing for the modals on top of it.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Don't start the clock until the intro and tour are dismissed, or seek back to day 0 on dismissal. An ambient pan behind the card keeps it alive without spending the season.</p>
+          </div>
+        </article>
+
+        <article class="finding crit" id="F15">
+          <div class="f-top">
+            <span class="f-id">F15</span><span class="chip">Critical</span><span class="chip plain">Measured live</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>After any scrub, the narrator asserts "peak harvest. Grain is pouring in" for the rest of the year</h4>
+          <p class="where">app/src/App.svelte:43–49, 66–71, 78 (<code>resetHistories</code> + backfill) · app/src/lib/narrator.ts:27, 36, 50–52</p>
+          <pre class="ev">On a jump, resetHistories() empties dailyReceived and the backfill loop starts at
+snap.day exactly — so every lower index is a HOLE. Then:
+
+narrator.ts:27  recent = snap.kpi.receivedT - (dailyReceived[day - 7] <b>?? 0</b>)
+                -> the hole makes `recent` the FULL CUMULATIVE (~2.2 Mt), not ~0
+
+maxWeekObs = 486,931 (2025/26)  ->  threshold  recent > 267,812  is ALWAYS true
+harvestOver = day > 110 && recent &lt; 8000       can NEVER fire</pre>
+          <p>
+            So a farmer follows the tour's own instruction to "drag the date slider to jump anywhere",
+            lands on a frozen April frame with no headers and no trucks in the paddocks, and the largest
+            text on screen reads <em>"Mid April: peak harvest. Grain is pouring in."</em>
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Backfill instead of clearing — have the worker's <code>seek</code> step day-by-day (the pattern <code>computeBaseline</code> already uses) and post the series with the snapshot. Stopgap: treat an absent history as "unknown" in the narrator rather than zero.</p>
+          </div>
+        </article>
+
+        <article class="finding crit" id="F16">
+          <div class="f-top">
+            <span class="f-id">F16</span><span class="chip">Critical</span><span class="chip plain">Measured live</span><span class="chip plain">Benchmarked</span>
+          </div>
+          <h4>Dragging the date slider queues one full-season re-simulation per input event, locking the app for tens of seconds with no busy indicator</h4>
+          <p class="where">app/src/App.svelte:298–304 (<code>oninput</code>, no debounce), :105–108 · app/src/worker/sim.worker.ts:161–175 (uncapped, contrast the cap at :66)</p>
+          <pre class="ev">Each seek rebuilds from scratch: new Sim(...) then sim.step(day * DAY_TICKS), synchronous.
+Benchmarked on the real 2025/26 bundle:
+  day 30   192 ms      day 90   473 ms      day 180  726 ms      day 364  <b>1,347 ms</b>
+
+The slider spans 365 values in ~220 px, so a one-second drag emits <b>30-60 input events</b>
+-> <b>20-60 s</b> of grinding after the user's hand stops. The thumb also fights the cursor,
+because value={app.snap?.day} is re-applied from every arriving snapshot.
+app.loading is only set in initSim(), so <b>no indicator appears at all</b>.
+
+Tour step 3 tells every first-time visitor to do exactly this.</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Commit on release (<code>onchange</code>) with a local <code>scrubDay</code> driving the thumb during the drag; stamp seeks with an id in the worker and skip superseded targets; set a <code>seeking</code> flag and reuse the existing loading line.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F17">
+          <div class="f-top">
+            <span class="f-id">F17</span><span class="chip">Major</span><span class="chip plain">Benchmarked</span>
+          </div>
+          <h4>The worker blocks ~1.4s computing the baseline immediately after telling the UI to start playing</h4>
+          <p class="where">app/src/worker/sim.worker.ts:83–113 (synchronous 365-day loop), scheduled at :135, frame interval only created at :146 · App.svelte:190–192</p>
+          <pre class="ev">computeBaseline: 365 days + snapshot = <b>1,371 ms</b> on this desktop
+                 -> <b>4-7 s</b> on a mid-range phone
+
+Meanwhile App.svelte:190-192 has already set playing = true, so the button reads
+"<b>&#9208; Pause</b>" throughout the stall, and queued play/speed/seek messages
+cannot be serviced. app.loading was cleared before the stall, so nothing indicates
+the app is busy. Recurs on every season change (baselineCache is cleared).</pre>
+          <p>
+            The code comment above the autoplay reads "the map should live immediately — a frozen
+            dashboard reads as broken". The stall produces exactly the frozen dashboard it set out to
+            avoid.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Chunk the baseline loop across frames (or defer it until the takeaways panel is actually visible) and show the existing loading line while it runs.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F18">
+          <div class="f-top">
+            <span class="f-id">F18</span><span class="chip">Major</span><span class="chip plain">Measured live</span>
+          </div>
+          <h4>Three time-control defects that leave the user stuck</h4>
+          <p class="where">App.svelte:66–78 (chart history), :107 (<code>seek</code> never clears <code>done</code>), :74–77 + :32–37 (auto fast-forward)</p>
+          <pre class="ev">CHART   After any scrub the simulated line disappears — verified, the sim path
+        collapsed to a 10-character `d` attribute while the gold observed line and
+        the y-axis still spanned the season. Past day 140 it stays gone for the run.
+
+DONE    seek() never clears app.done, and {#if app.done} replaces play/pause with
+        "&#8634; Replay season". So once finished, dragging back to day 200 leaves
+        <b>no play control at all</b> — the only button jumps to day 0.
+
+SPEED   At day >= 130 the app sets 345,600 (4 d/s), which is not one of the four
+        SPEEDS values, so <b>no button is highlighted</b> (verified: activeSpeeds []).
+        It then persists into Replay and every later scenario, so the next run
+        blasts past at 4 d/s with nothing lit — while the tour says "one day per second".</pre>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 5 · The live season</p>
+    <h2>The season labelled "live" is empty, and the copy calls it real</h2>
+    <div class="theme">
+      <div class="findings">
+        <article class="finding crit" id="F19">
+          <div class="f-top">
+            <span class="f-id">F19</span><span class="chip">Critical</span><span class="chip plain">Bundle inspection</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>2026/27 has no weather, no ships and no production data — so rain-gated harvest is silently switched off</h4>
+          <p class="where">app/public/data/{observed,weather,vessels,demand}_2026-27.json · state.svelte.ts:44, :106, :111 · LeversPanel.svelte:463 · engine.ts:210–230</p>
+          <pre class="ev">observed_2026-27.json   weekly_receivals: []      district_production_t: {}
+weather_2026-27.json    "source": "pre-season placeholder"
+                        rain_mm: []   tmax_c: []   for WEP / LEP / EEP
+vessels_2026-27.json    all three visit arrays empty
+demand_2026-27.json     "A20 PROVISIONAL: mean of PIRSA 2022/23-2025/26"
+
+Run to day 365:  received 1,999,165 t   shipped <b>0</b>   vesselsArrived <b>0</b>
+engine.ts:212-230 iterates an empty rain_mm, so weatherFactor stays 1 —
+  <b>the rain gating the Intro sells as "driven by real weather" is off.</b>
+
+What the copy says for this season:
+  dropdown   "2026/27 — <b>live (forecast)</b>"                  (the newest, most tempting entry)
+  story      "<b>Real crop sizes, the real shipping program</b>, and the network as it ran"
+  panel      "<b>You're watching the season as it really ran.</b>"
+  ports      "berth idle" for twelve months</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Give the live season its own story text and reality-check copy ("a placeholder crop, no
+              weather yet, no shipping program — this fills in as the season lands"), and either hide
+              the port panel's berth state or label it "no schedule yet". Until the weather series
+              exists, say so where the Intro claims real weather.
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 6 · Assumptions vs code</p>
+    <h2>The register has drifted from the model it documents</h2>
+    <p class="sec-note">
+      This is the part of the project that most deserves to be trustworthy, because the whole design
+      rests on it. Three of the register's stated sensitivities are contradicted by what the shipped
+      model measurably does.
+    </p>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding crit" id="F20">
+          <div class="f-top">
+            <span class="f-id">F20</span><span class="chip">Critical</span><span class="chip plain">Bundle + instrumented</span>
+          </div>
+          <h4>A4: the documented receivals-proportional allocation was never built, and the flat guess that replaced it drives three headline outputs</h4>
+          <p class="where">data/ASSUMPTIONS.md:72–74, :78 · packages/sim/src/engine.ts:275–277, gates at :598, :615 · SiteDetail.svelte:11, :38 · app/public/data/sites.geojson</p>
+          <pre class="ev">A4 documents: "per-site capacity allocated proportional to long-run district
+              receivals, scaled so Western upcountry total = 2.5 Mt"
+
+engine.ts:275  capacityT = s.capacity_t ?? (isTports ? 145000 : <b>120000</b>) * capScale
+sites.geojson  every Bunge upcountry feature has capacity_t: <b>null</b>
+               16 active Bunge upcountry sites x 120,000 = <b>1.92 Mt</b>, not 2.5 Mt,
+               with no proportionality to anything
+
+2025/26 calibrated baseline, per-site peak fill:
+  <b>8 of 16 pegged</b> — Warramboo, Tumby Bay, Kimba, Cummins, Lock, Arno Bay,
+  Wudinna 101% · Rudall 102%     ...while Kapinnie peaks at 5%, Yeelanna 9%
+
+A4:78 says storage "matters only when sites fill (bumper scenarios)". Falsified —
+raising upcountryCapScale to 1.5x on the CALIBRATED BASELINE moves:
+  direct-to-port share   33.1% -> <b>24.1%</b>
+  peak site queue          139 -> <b>78</b>
+  T-Ports intake        326 kt -> <b>229 kt</b></pre>
+          <p>
+            So a grower clicks Kapinnie (a faba-bean siding) and Wudinna (a major Tod Highway silo) and
+            both read "… t of 120,000 t (capacity assumed)". Then they open the register to check, and
+            it tells them capacities were allocated proportionally and only matter in bumper years.
+            Both statements are false, and the invented number is what sets the peak-queue headline.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Either write real per-site <code>capacity_t</code> (the district receivals series is
+              already parsed), or rewrite A4 to state what the code does — a flat 120,000 t, 1.92 Mt
+              total — delete the 3.27 − 0.73 derivation that mixes season receivals with peak
+              inventory, and replace the sensitivity line with the measured figures above.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding crit" id="F21">
+          <div class="f-top">
+            <span class="f-id">F21</span><span class="chip">Critical</span><span class="chip plain">Pipeline + instrumented</span>
+          </div>
+          <h4>A17: carry-in is not a measurement — it is two months of vessel scheduling and spreadsheet coverage</h4>
+          <p class="where">data/ASSUMPTIONS.md:174–182 · pipeline/p2_build_observed.py:91–107 (no coverage guard) · engine.ts:321–327</p>
+          <pre class="ev">carry_in.port_lincoln_t as built:
+  2022/23  <b>0 t</b>        <- observed_2022-23.json has NO Oct 2022 and NO Nov 2022 row
+                            (the Thevenard sheet in the same file DOES carry 2022-11)
+  2023/24  320,504 t     <- vs Port Lincoln's published 395,600 t capacity
+  2024/25   60,334 t
+  2025/26   67,585 t      <- again no Oct 2025 row
+
+2023/24: Port Lincoln's seasonal peak fill is <b>81%, on day one</b>, before a tonne
+is harvested — the opposite of real practice, where ports are run down pre-harvest.
+
+A17:181 claims "receivals calibration unaffected (carry-in is never received)".
+Falsified — 2023/24 with carryInScale 1 vs 0:
+  Bunge receivals   1.832 Mt -> <b>1.922 Mt  (+4.9%)</b>
+  direct-to-port      29.9% -> 24.2%       peak queue  91 -> 69
+The seed propagates into receivals through the capacity gates at :615 and :854.</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Add a coverage check in the builder — if a port has no Oct or Nov row, don't emit 0; fall
+              back to a named prior and record the gap in the provenance string. Then call Oct+Nov
+              shipments a lower bound on the port-held share of carry-over, not a measurement, and
+              replace the "unaffected" sensitivity with the measured effect.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F22">
+          <div class="f-top">
+            <span class="f-id">F22</span><span class="chip">Major</span><span class="chip plain">Source + instrumented</span>
+          </div>
+          <h4>Five of twelve fitted parameters sit exactly on their lower search bound, and the report presents all twelve as an interior fit</h4>
+          <p class="where">packages/sim/src/calibrated.json:3–15 · scripts/calibrate.ts:85–98, :132 · docs/calibration_report.md:6–8, :18–32</p>
+          <pre class="ev">search range              fitted value      other knobs carry 15 significant figures
+  rateScale       [0.7, 2.2]    -> <b>0.7</b>
+  matShift        [-4,   16]    -> <b>-4</b>
+  retentionShare  [0.1, 0.28]   -> <b>0.1</b>
+  portAttractBias [0.8,  2.8]   -> <b>0.8</b>
+  luckyBayBias    [0.4,  2.2]   -> <b>0.4</b>
+
+rng.range(lo,hi) hits a bound with probability zero, so the only path to these is the
+refinement clamp at calibrate.ts:132 — the optimiser pushed past the floor and was clipped.
+Those five carry no information about the data, only about the range chosen.
+
+The report also says "11 free scalars" against a 12-row table (portBays is missing
+from the prose list), and marks no knob as pinned.
+
+Downstream: realised direct-to-port share is <b>33.1%</b> (2025/26) and 29.9% (2023/24)
+against A9's stated 25% and ESCOSA's ~75/25 anchor — and the binding constraint is the
+A4 storage cap, not the bias floor. retentionShare is pinned at 0.10 against
+CALIBRATION.md's observed 20-23% residual. A23's whole $/t translation is anchored to
+luckyBayBias's pinned 0.40.</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Widen the five ranges and refit; if a knob still wants out, name it as a structural mis-specification rather than clipping it. Add a "pinned at bound" column to the report, fix the count to 12, and report the realised direct-to-port share as a calibration output alongside the 25% prior.</p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F23">
+          <div class="f-top">
+            <span class="f-id">F23</span><span class="chip">Major</span><span class="chip plain">Source + instrumented</span>
+          </div>
+          <h4>A2's bay arithmetic can't be reproduced from the code, and the per-site intake rate is dead code</h4>
+          <p class="where">data/ASSUMPTIONS.md:38–44 · packages/sim/src/engine.ts:287, :293, :655, :687–694</p>
+          <pre class="ev">A2 derives its bay counts from a "<b>14 h</b> receival day".
+engine.ts:655   sitesOpenNow = hourOfDay >= 7 && hourOfDay &lt; 19    -> a <b>12 h</b> window
+engine.ts:687   the bay-service loop is guarded only by `if (!s.open)`
+                -> bays keep tipping <b>around the clock</b>
+
+Under the code's own 12 h window, A2's own step (340 visits / 12 h / 5 per bay-hour
+= 5.7) gives <b>6</b> upcountry bays, not the 4 it settles on.
+
+engine.ts:293 assigns intakeTph (4000 Lincoln / 1400 Thevenard / 1000 port / 600
+upcountry). grep over all .ts and .svelte: <b>never read</b>. Dead code.
+
+(Throughput itself checks out: measured Port Lincoln peak 13,845 t/day at 4/6 bays
+ and 9,300 at 2/4, reproducing A2's conclusion if not its stated arithmetic.)</pre>
+        </article>
+
+        <article class="finding major" id="F24">
+          <div class="f-top">
+            <span class="f-id">F24</span><span class="chip">Major</span><span class="chip plain">Source + bundle</span>
+          </div>
+          <h4>A7's published rule omits most of the rules the engine runs, and the heat rule is attributed to the wrong mechanism</h4>
+          <p class="where">data/ASSUMPTIONS.md A7 · packages/sim/src/engine.ts:219–229 · app/public/data/weather_*.json</p>
+          <pre class="ev">bundle carries, per district:  rain_mm  tmax_c  <b>rh_min_pct</b>  <b>wind_max_kmh</b>
+                              (181 days x 8 districts, every season)
+engine reads:                 rain_mm  tmax_c    — the other two are dead payload
+
+A7's stated rule is rain >= 5mm (or >= 10 over 2 days) and a 25% cut at tmax >= 38 C.
+The engine also runs a half-rate band at rain >= 0.4*rs, a x0.3 hangover at
+rain[-1] >= 1.6*rs and x0.5 at rain[-2], plus a spring-dryness maturity shift —
+none of which appear in A7.
+
+SA harvest bans track grassland fire danger — wind, humidity, temperature and fuel
+curing together, not temperature alone. Hot days are often GOOD harvest days; it is
+the accompanying wind and low humidity that stop headers. Both missing inputs are
+already in the bundle, and the same wind series would serve open backlog item #10
+(Lucky Bay transshipment downtime against T-Ports' published wind > 21 kn limit).</pre>
+        </article>
+
+        <article class="finding major" id="F25">
+          <div class="f-top">
+            <span class="f-id">F25</span><span class="chip">Major</span><span class="chip plain">Doc comparison</span>
+          </div>
+          <h4>docs/scenarios.md no longer reproduces from the code, and contradicts itself about carry-in</h4>
+          <p class="where">docs/scenarios.md:11–17 (table), :30–32 (prose), :18 vs :88 · README.md:135–137 · ground truth in docs/scenarios_data.json</p>
+          <pre class="ev">                     scenarios.md      scenarios_data.json / my runs
+baseline received       2.18 Mt      ->  <b>2.228 Mt</b>
+peak site queue            189      ->  <b>139</b>
+truck-km                16.6 M      ->  <b>17,636,975</b>
+peak week               366 kt      ->  <b>433 kt</b>
+bumper peak queue          285      ->  <b>450</b>   (a 3x gap on the flagship metric)
+
+Same file, twenty lines apart:
+  :18  "(Numbers include A17 carry-in stocks; regenerated 2026-08-19.)"
+  :88  "No carry-in stocks at season start (README limitations)"
+README.md:135-137 still lists "No carry-in stocks: each season starts empty" as a
+limitation — while carry-in is implemented, displayed, and exposed as a lever.</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Regenerate the table from <code>scenarios_data.json</code> (the script already writes it) or add a CI check that they match. Delete the stale carry-in bullets in both files.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 7 · Physical plausibility</p>
+    <h2>Where the engine falls over, or produces numbers it shouldn't</h2>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding crit" id="F26">
+          <div class="f-top">
+            <span class="f-id">F26</span><span class="chip">Critical</span><span class="chip plain">Headless sweep</span><span class="chip plain">Dead end</span>
+          </div>
+          <h4>Two clicks crash the engine on the default season, and the user gets a raw exception string with no way back</h4>
+          <p class="where">packages/sim/src/engine.ts:576 → app/src/worker/sim.worker.ts → App.svelte (<code>{app.error}</code>)</p>
+          <pre class="ev">I swept UI-reachable combinations across all four seasons in the dropdown.
+Six of twelve throw. The shortest path is two interactions on the DEFAULT season:
+
+2025/26  bumper +30%  +  more grain to Lucky Bay   -> <b>QUEUE INSANE at Thevenard: 408</b>
+2026/27  bumper +30%  +  unload cycle 20 min       -> <b>QUEUE INSANE at Lucky Bay: 416</b>
+2025/26  max crop     +  30 min unload             -> QUEUE INSANE at Port Lincoln: 468
+2025/26  max crop     +  silo capacity x0.1        -> QUEUE INSANE at Lucky Bay: 553
+2025/26  max crop     +  max direct-to-port        -> QUEUE INSANE at Lucky Bay: 416
+2025/26  rail         +  max crop                  -> QUEUE INSANE at Lucky Bay: 402
+The crop slider alone at 135-140% also trips it.
+
+The visitor sees the map stop and a line of red text: "Error: QUEUE INSANE at
+Thevenard: 408". No reset, no explanation, no indication which lever did it. And
+because the invariant is sampled daily while the peak is tracked every tick, whether
+a given combination dies depends on when the spike lands — so it looks random.</pre>
+          <p>
+            The project already knows this wall: <code>docs/calibration_report.md</code> excludes a whole
+            real season for it — <em>"Outside the model's validity envelope (not run): 2022/23 — QUEUE
+            INSANE at Lucky Bay: 431"</em> — and the season dropdown quietly omits 2022/23. The same
+            wall is two clicks inside the UI, unguarded. The test suite's 3 tests only exercise default
+            parameters, so it cannot catch this.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Make the guard a soft cap: refuse further joins at a site and let grain back up on farm,
+              which is what actually happens — and which the engine already tracks and prices. Then
+              catch the worker error, revert the offending lever, and say something true: "at this crop
+              size the model can't keep queues physical, so it stops rather than show you a number it
+              doesn't believe." That message is an asset. Add a test that sweeps the presets and lever
+              extremes.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F27">
+          <div class="f-top">
+            <span class="f-id">F27</span><span class="chip">Major</span><span class="chip plain">Headless + arithmetic</span>
+          </div>
+          <h4>"Worst silo queue" reaches 22 hours, past the model's own stated balking tolerance, and is reported as fact</h4>
+          <p class="where">packages/sim/src/engine.ts:616–622 (balk filter and its fallback pass), :696</p>
+          <pre class="ev">2025/26 baseline                peak queue at one site   139 trucks
+2025/26 bumper +30% (a preset)  peak queue at one site   <b>450 trucks</b>
+2026/27 bumper +30%                                      <b>485 trucks</b>
+
+450 trucks / (4 bays x 5 trucks/h) = <b>22.5 hours</b> of queue
+model's own tolerance (A2, queueBalkMin) = <b>4 hours</b>
+  — "the worst turnaround ever reported on EP is ~4 h"
+
+The balk filter drops sites over 240 min, but if NO site clears the threshold a
+second pass admits them all — so balking delays the pile-up instead of bounding it.</pre>
+          <p>
+            A2's own correction note describes this exact failure once before — under-provisioned bays
+            inflating queues, which then inflated the fitted fleet. The mechanism is live again at the
+            top of the crop slider, and it is compounded by F20: the flat capacity cap is what pushes
+            the queue there.
+          </p>
+        </article>
+
+        <article class="finding major" id="F28">
+          <div class="f-top">
+            <span class="f-id">F28</span><span class="chip">Major</span><span class="chip plain">Headless</span>
+          </div>
+          <h4>The "impassable spine" leaves every silo→Port Lincoln haul at its normal drive time</h4>
+          <p class="where">packages/sim/src/engine.ts:342–370 (closure applied to <code>clusterCand</code> only) vs :825 (line-haul reads an untouched <code>matrix.site_minutes</code>) · state.svelte.ts:50</p>
+          <pre class="ev">roadClosure is read in exactly three places, all inside the cluster-candidate build:
+  if (near(c.lon, c.lat, s.lon, s.lat)) cand.minutes *= params.roadClosure.factor;
+Line-haul at :825 has no closure term at all.
+
+2025/26 baseline: silo->port line-haul moves <b>716 kt</b>, of which <b>209 kt</b>
+(Warramboo, Wudinna, Lock -> Port Lincoln) the engine's OWN near() test would flag —
+yet all 716 kt run at normal minutes with the corridor "closed".
+
+So "Tod Highway closed" returns +1.4M truck-km, <b>all of it farm-to-silo</b>. The
+traffic the Tod actually carries into Port Lincoln is modelled as unaffected.
+(Kimba->Port Lincoln isn't even caught by near(): its straight-line midpoint falls
+outside the 0.18 deg proxy — so the fix has to be sharper than reusing that test.)</pre>
+          <p>
+            The in-app story says "The peninsula's central spine is impassable (detours = 2.5× travel
+            time)" with no caveat; only docs/scenarios.md admits the straight-line heuristic.
+          </p>
+        </article>
+
+        <article class="finding major" id="F29">
+          <div class="f-top">
+            <span class="f-id">F29</span><span class="chip">Major</span><span class="chip plain">Headless</span><span class="chip plain">Published figure</span>
+          </div>
+          <h4>Ports and silos store more grain than their capacity</h4>
+          <p class="where">packages/sim/src/engine.ts:598, :615, :854 (capacity gates)</p>
+          <pre class="ev">bumper +30%, peak stock vs capacity:
+  Port Lincoln   411,260 t  /  395,600 t  (published)   <b>104%</b>
+  Thevenard      351,693 t  /  335,925 t  (published)   <b>105%</b>
+  Lucky Bay      389,403 t  /  384,000 t  (published)   <b>101%</b>
+  8 upcountry sites in the CALIBRATED baseline           <b>101-102%</b>
+
+The gates stop trucks CHOOSING a site at >= 99.5% full, and reject a line-haul load
+that would overshoot — but direct-to-port farm tips and seeded carry-in still push past.</pre>
+          <p>Small physically; it matters because these are published figures, and because the bumper story is "watch silos fill toward their limits".</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 8 · Access</p>
+    <h2>Accessibility and mobile</h2>
+    <p class="sec-note">
+      The mobile gap is logged as backlog #14 "partial", so it is known. Worth restating why it
+      outranks its current priority: the primary audience is Eyre Peninsula growers and local
+      community — phone-first, on rural bandwidth — and the first load is ~3.2 MB of uncompressed
+      JSON for one season (<code>paths.json</code> alone is 1.7 MB).
+    </p>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding major" id="F30">
+          <div class="f-top">
+            <span class="f-id">F30</span><span class="chip">Major</span><span class="chip plain">Measured live</span>
+          </div>
+          <h4>On a phone the panel covers the map, the narrator covers the panel, and 56% of the content is hidden</h4>
+          <p class="where">App.svelte:703–713 (the only ≤800px rule) · :552–560 (narrator ≤1100px) · legend button and site-detail card unmoved</p>
+          <pre class="ev">Measured at 393 x 851:
+  panel               473 px tall, holding 1092 px of content  -> <b>56% hidden</b>
+                      behind an unindicated inner scroll, layered over a pan/zoom canvas
+  narrator overlay    overlaps the panel <b>334 x 75 px</b> — covers the app title,
+                      the tagline, the Simple/Advanced toggle and the "?" tour button
+  map-key button      overlaps the panel 81 x 29 px
+  usable map          collapses to roughly a <b>100 px strip</b> between the two panels
+  panel width         calc(100vw - 24px) with left:12px -> 18 px wider than the
+                      viewport, pushing its right padding and scrollbar off-screen
+
+  tap targets         <b>0 of 24</b> controls reach 44 px tall
+                      modes 20 px · sliders 16 px · About link 14 px · help "?" 24 px
+  type sizes in use   <b>7 px</b> (x4) · 7.5 px (x5) · 8.5 px · 9 px (x5) · 9.5 px
+  contrast            .fine and .phases ~<b>3.92:1</b> (AA needs 4.5:1), over a
+                      translucent panel whose effective ground varies with the map</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Restructure rather than shrink: a bottom sheet with a drag handle at two heights (peek =
+              date + KPIs, expanded = everything), so the map keeps the top two-thirds; suppress the
+              narrator when the sheet is expanded; move the map key inside. Then a floor of 12 px on
+              type, 44 px on controls, 4.5:1 on the smallest text.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding major" id="F31">
+          <div class="f-top">
+            <span class="f-id">F31</span><span class="chip">Major</span><span class="chip plain">Live a11y tree</span>
+          </div>
+          <h4>The app contains no ARIA at all, and its core interactions are mouse-only</h4>
+          <p class="where">all of app/src — the only <code>role</code>/<code>tabindex</code> in the codebase is AboutModal.svelte:9–12</p>
+          <pre class="ev">SLIDERS   all five expose no accessible name:
+          textbox "58"  <- the date scrubber, announcing a bare day index
+          textbox "1"   textbox "730"   textbox "0.4"   textbox "0.8"
+
+MODALS    0 elements with role="dialog" / aria-modal at load
+          Intro:  Escape does <b>not</b> close it; focus never moves in; the first Tab
+                  lands on the deck.gl canvas, then walks 12 controls BEHIND the
+                  overlay before reaching "Watch the season"
+          About:  its Escape handler sits on a tabindex="-1" backdrop that never
+                  receives focus, so Escape doesn't close that either; the backdrop is
+                  exposed as a <b>button whose accessible name is the entire About text</b>
+
+MAP       the deck.gl canvas is the FIRST tab stop (mjolnir.js sets tabIndex 0), with
+          no name, and it swallows arrow keys. All 26 site names, stocks and queue
+          counts exist only as WebGL glyphs. Sites are pickable with onClick and no
+          keyboard equivalent, so SiteDetail is <b>unreachable without a pointer</b> —
+          while the legend says "click it for detail".
+
+NARRATOR  a bare &lt;div&gt;, no aria-live, so the running commentary is never re-announced.
+
+TITLE=""  12 attributes carry load-bearing explanation (KPI definitions, provenance,
+          scenario mechanics) — invisible on touch, unreachable by keyboard.</pre>
+          <p>
+            <code>svelte-check</code> reports 0 errors and 0 warnings partly because
+            <code>role="button"</code> and <code>onkeydown={() =&gt; {}}</code> were added to the About
+            backdrop to satisfy the lint rather than to make it work.
+          </p>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>
+              Highest value per line changed: <code>aria-label</code> and
+              <code>aria-valuetext</code> on the five sliders (the scrubber should announce the date);
+              <code>role="dialog" aria-modal="true"</code>, autofocus, focus trap and working Escape on
+              the three modals; a keyboard route to site selection — a site listbox would help pointer
+              users find a specific silo on a dense map too; and move the 12 <code>title</code>
+              explanations into visible text or a tap-friendly popover.
+            </p>
+          </div>
+        </article>
+
+        <article class="finding minor" id="F32">
+          <div class="f-top">
+            <span class="f-id">F32</span><span class="chip">Polish</span><span class="chip plain">Live + source</span>
+          </div>
+          <h4>Four smaller access defects</h4>
+          <pre class="ev">COLOUR ONLY   truck load colours (wheat #ebc85a, barley #d6a864, canola #fadc28) are
+              not colour-blind safe and carry no second channel — the legend depends
+              entirely on hue discrimination across five similar yellows.
+INTRO CARD    no max-height or overflow, so its headline clips off the top of short
+              viewports.
+MOTION        no prefers-reduced-motion handling, on an app whose default state is a
+              continuously animating map.
+REDRAW        every snapshot rebuilds a 5,324-object parcel array (and the land
+              polygons), forcing deck.gl to re-upload geometry that never moves.</pre>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Theme 9 · Copy</p>
+    <h2>Claims and provenance at the point of display</h2>
+    <div class="theme">
+      <div class="findings">
+
+        <article class="finding major" id="F33">
+          <div class="f-top">
+            <span class="f-id">F33</span><span class="chip">Major</span><span class="chip plain">Source</span>
+          </div>
+          <h4>Tour step 1 claims everything modelled is checked against reality — contradicting About and step 6 of the same tour</h4>
+          <p class="where">app/src/components/Tour.svelte:7 vs Tour.svelte:27 and AboutModal.svelte:22–26</p>
+          <pre class="ev">Tour step 1: "It's built only from public data, and <b>everything modelled is checked
+             against what really happened</b>."
+About:       "Truck movements, queues, site stocks and vessel loading progress are
+             modelled ... everything else is simulated. Site storage capacities ...
+             and truck cycle parameters are assumptions."
+Tour step 6: repeats the honest version.
+
+What is actually validated: weekly Western receival totals, the AIS median anchorage
+stay, and the Port Lincoln daily record. <b>No per-site tonnage, queue count or
+tonne-km figure has been compared with any published number.</b></pre>
+        </article>
+
+        <article class="finding major" id="F34">
+          <div class="f-top">
+            <span class="f-id">F34</span><span class="chip">Major</span><span class="chip plain">Source</span><span class="chip plain">Reputational</span>
+          </div>
+          <h4>Real vessel names are shown loading specific tonnages, with the caveat buried in About</h4>
+          <p class="where">app/src/lib/narrator.ts:33 · app/src/components/PortPanel.svelte:62 (tooltip "planned cargo") · caveat at AboutModal.svelte:82</p>
+          <pre class="ev">The largest text on the map, on a real date:
+  "<b>The Star Jeannette is loading 5,000 t at Port Lincoln.</b>"
+
+The name is a date-window join from ~monthly archived stem PDFs. The tonnage is a
+monthly port total divided across that month's calls. The loading progress is simulated.
+The PortPanel tooltip calls that allocation "<b>planned cargo</b>" — asserting knowledge
+of a commercial shipping plan the project does not have.
+
+This is the single most checkable statement in the app for a Flinders Ports or Bunge
+reader, and the project's own docs flag a wrong name against a real ship as "the most
+likely complaint".</pre>
+          <div class="fix">
+            <span class="lbl">Fix</span>
+            <p>Hedge at the point of display — "A ship (likely <em>Star Jeannette</em>) is loading — about 5,000 t modelled" — and change the tooltip to "modelled cargo, allocated from the monthly port total". Or drop the name from the narrator and keep it in the hover with a "probable match" note.</p>
+          </div>
+        </article>
+
+        <article class="finding minor" id="F35">
+          <div class="f-top">
+            <span class="f-id">F35</span><span class="chip">Polish</span><span class="chip plain">Source + live</span>
+          </div>
+          <h4>Precision, units and raw enums</h4>
+          <pre class="ev">FALSE PRECISION   fmtMoney renders one decimal at $m scale: "<b>$441.9m</b>", "$159.4m"
+                  — two lines from the app calling these "rough, order-of-magnitude
+                  estimates". Round to 2 s.f. above $1m and keep a leading "~".
+
+FIVE FORMATS      on one screen: "2.23 million t" · "+35k t" · "824,000 tonnes" ·
+                  "stock 47 kt / 120 kt" · "delivered here this season (sim):
+                  <b>236,412 t</b>" (tonne-exact, 16 lines below a figure rounded to
+                  the nearest 100 t). Pick one convention.
+
+PROVENANCE GAP    SiteDetail flags "(capacity assumed)"; the map hover shows the same
+                  invented "120 kt" with <b>no flag at all</b>.
+
+RAW ENUMS         SiteDetail renders "Bunge (ex-Viterra) · upcountry · <b>active 2025 26</b>"
+                  and commodity chips "<b>WH BA</b>" — two lines above the same
+                  component's own legend spelling out "wheat 12k t". The fallback
+                  "no 25/26 segregations" is hardcoded, so it fires on 2023/24 too.
+
+KPI CAPTION       "0.01 million t shipped out / <b>incl. 0.11 carry-over</b>" — prints
+                  total opening stock as though it were inside the shipped figure.
+
+JARGON            "Windrow" — the app's own name — is never explained anywhere in the
+                  app, and nothing in the modelled chain involves windrowing. Also
+                  unglossed on first use: line-haul, upcountry, segregations, t.km,
+                  tonne-days, carry-over, cash bids.
+
+FARM-GATE vs BIDS "$380/t" farm-gate sits in the same panel as posted bids of
+                  "wheat ~$268/t · barley ~$238/t" under the heading "What grain
+                  actually sells for" — with no reconciliation, and those bids are
+                  explicitly "none at EP sites off-season". A grower will notice.</pre>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Assumptions: the arithmetic, checked</h2>
+    <p class="sec-note">
+      Every load-bearing calculation in the register, recomputed against the published anchors it
+      cites and against what the code measurably does. Most of the arithmetic holds — the register is
+      unusually disciplined in tone. What has gone wrong is drift between the register and the model.
+    </p>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>A#</th><th>Claim</th><th>Check</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="a">A1</td>
+            <td>48 loaded trucks/day ≈ 2,100–2,200 t/day implies ~45 t per line-haul load</td>
+            <td class="calc">48 × 45 = 2,160 t/day — inside the cited band. 72 t ≈ 65% of an AB-triple at 110 t HML; 85 t ≈ 64% of Type 2 CML 132.83 t. Internally coherent.</td>
+            <td><span class="mark ok">Holds</span></td>
+          </tr>
+          <tr>
+            <td class="a">A2</td>
+            <td>Port Lincoln's 13,148 t/day record requires ≥5 bays; 4 upcountry / 6 port</td>
+            <td class="calc">throughput reproduces (measured PL peak 13,845 t/day at 4/6, 9,300 at 2/4) — but the derivation assumes a 14 h receival day where the code dispatches 12 h and never closes the bays; under the code's own window A2's step gives 6 upcountry bays, not 4. See <a href="#F23">F23</a>.</td>
+            <td><span class="mark part">Conclusion ok, derivation unreproducible</span></td>
+          </tr>
+          <tr>
+            <td class="a">A2</td>
+            <td>Bay counts registered as an <em>assumption</em></td>
+            <td class="calc">calibrate.ts fits them (countryBays 4.404, portBays 5.699) — they are fitted parameters, and the app's "stress-test the assumptions" panel doesn't expose them</td>
+            <td><span class="mark part">Category confusion</span></td>
+          </tr>
+          <tr>
+            <td class="a">A4</td>
+            <td>Western upcountry ≈ 2.5 Mt = 3.27 Mt max harvest − 0.73 Mt port; capacity allocated proportional to district receivals; "matters only when sites fill"</td>
+            <td class="calc">subtraction is right (3.27 − 0.73 = 2.54) but mixes <em>season throughput</em> with <em>peak inventory</em>. Allocation never built: flat 120,000 t × 16 sites = <b>1.92 Mt</b>. Cap binds at 8 of 16 sites in the calibrated baseline and drives direct-to-port, peak queue and T-Ports intake. See <a href="#F20">F20</a>.</td>
+            <td><span class="mark no">Not implemented; sensitivity false</span></td>
+          </tr>
+          <tr>
+            <td class="a">A5</td>
+            <td>Loaded grain trucks at 90 km/h on trunk/primary, per class below that</td>
+            <td class="calc">at the legal maximum for a loaded road train off the Eyre Hwy, and A5's own reasoning says trucks "cruise below limits". Worse: an undocumented flat <b>75 km/h</b> — not any A5 class speed — converts minutes into every km and dollar shown. See <a href="#F10">F10</a>.</td>
+            <td><span class="mark no">Overridden by an unregistered constant</span></td>
+          </tr>
+          <tr>
+            <td class="a">A7</td>
+            <td>Rain ≥ 5 mm stops harvest; 25% cut at tmax ≥ 38 °C</td>
+            <td class="calc">engine also runs a half-rate band, two hangover multipliers and a spring-dryness shift, none registered. Heat rule attributed to harvest bans, which track grassland fire danger (wind + RH + temp + curing) — both inputs ship in the bundle unread. See <a href="#F24">F24</a>.</td>
+            <td><span class="mark part">Incomplete; wrong driver</span></td>
+          </tr>
+          <tr>
+            <td class="a">A9</td>
+            <td>~25% direct-to-port, per ESCOSA's "~75% to upcountry sites"</td>
+            <td class="calc">realised share measures <b>33.1%</b> (2025/26) and 29.9% (2023/24) — a third more grain bypassing upcountry sites than the published anchor, driven by the A4 cap. So the line-haul task the rail scenario exists to displace is understated ~10%.</td>
+            <td><span class="mark no">Model runs 33%, not 25%</span></td>
+          </tr>
+          <tr>
+            <td class="a">A17</td>
+            <td>Carry-in = observed Oct+Nov shipments; "receivals calibration unaffected"</td>
+            <td class="calc">2022/23 emits 0 t from two missing spreadsheet rows; 2023/24 opens Port Lincoln 81% full on day one. carryInScale 1 vs 0 moves 2023/24 receivals 1.832 → <b>1.922 Mt (+4.9%)</b>. See <a href="#F21">F21</a>.</td>
+            <td><span class="mark no">Not a measurement; sensitivity false</span></td>
+          </tr>
+          <tr>
+            <td class="a">A21</td>
+            <td>2 trainsets × 1,600 t, 4 h handling ⇒ "~2 cycles/day ceiling"; road fleet cut a third</td>
+            <td class="calc">trains use the <em>road</em> matrix at road speeds and reach <b>4.0 cycles/trainset/day (12,800 t/day)</b> — ~6× Viterra's published replacement task. The fleet cut is applied only by scripts/scenarios.ts, not the app's lever. See <a href="#F4">F4</a>.</td>
+            <td><span class="mark no">Ceiling not enforced</span></td>
+          </tr>
+          <tr>
+            <td class="a">A18</td>
+            <td>10¢/t·km ⇒ ≈$14/t over the 144 km average haul</td>
+            <td class="calc">144 × 0.10 = $14.40 ✓, a fifth to a quarter of the cited $60–75/t whole-of-chain at 200 km. Sound as a level; but it is payload-invariant, so the register's finding that heavier road trains leave freight dollars unchanged is a property of the cost function, not a result.</td>
+            <td><span class="mark part">Level holds; inference doesn't</span></td>
+          </tr>
+          <tr>
+            <td class="a">A19</td>
+            <td>A$30k/vessel-day at anchor</td>
+            <td class="calc">consistent with US$15–25k/day for handy-to-panamax. The problem is the quantity it multiplies: anchorage is unbounded, giving 1,093 h/ship in drought. See <a href="#F6">F6</a>.</td>
+            <td><span class="mark ok">Rate holds</span></td>
+          </tr>
+          <tr>
+            <td class="a">A22</td>
+            <td>9¢/t/day = ~$380/t financed at ~9% p.a.</td>
+            <td class="calc">380 × 0.09 ÷ 365 = 9.4¢ ✓ — and the register explicitly refuses to price weather, insect and quality risk rather than guessing</td>
+            <td><span class="mark ok">Holds</span></td>
+          </tr>
+          <tr>
+            <td class="a">A23</td>
+            <td>Lucky Bay premium at β = 1.965; "2.5× ≈ +$6/t"</td>
+            <td class="calc">code has <code>choiceBeta: 2.199</code>. The scenario sets 2.5 against a fitted default of 0.4, i.e. <b>6.25×</b>, and the app displays <b>$6.79/t</b> — so the "$6/t" roughly survives and the "2.5×" does not.</td>
+            <td><span class="mark part">Stale β, wrong multiplier</span></td>
+          </tr>
+          <tr>
+            <td class="a">—</td>
+            <td>stakeholder_review.md: fleet is "589 at peak"</td>
+            <td class="calc">current fitted value is <b>731</b></td>
+            <td><span class="mark no">Stale</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Verified as claimed — and genuinely good</h2>
+    <p class="sec-note">
+      A review that only listed defects would misrepresent this project. Everything here was checked,
+      not assumed, and several of these are better than what most published models do.
+    </p>
+    <div class="findings">
+
+      <article class="finding good">
+        <div class="f-top"><span class="f-id">VERIFIED</span><span class="chip">Holds up</span><span class="chip plain">Headless</span></div>
+        <h4>The engine does what the README says it does</h4>
+        <pre class="ev">5-minute tick        288/day, 105,120 ticks/season, full season in ~1.4 s   <b>&#10003;</b>
+seeded sfc32         no Math.random, no Date.now anywhere                  <b>&#10003;</b>
+determinism          two runs -> identical event-log hash 21dd3f75          <b>&#10003;</b>
+                     bulk-step equals day-by-day step, so seek is faithful  <b>&#10003;</b>
+mass conservation    the invariant is real, includes carry-in correctly,
+                     and never fired in any run made during this review     <b>&#10003;</b>
+Huff site choice     attract / (minutes + queue + service)^beta, beta from
+                     calibrated.json                                       <b>&#10003;</b>
+weather gating       rain gating, harvest ramp, spring-dryness shift,
+                     per-commodity maturity — all as documented             <b>&#10003;</b>
+berth parameters     Port Lincoln 2 berths / 3,000 t.h, Thevenard 1,000 —
+                     match ports.json                                      <b>&#10003;</b>
+like-for-like scope  kpi.receivedT is receivedBungeT only, so the KPI's
+                     claim that Lucky Bay is counted separately is correct  <b>&#10003;</b>
+carry-in isolation   seeding touches s.stock and carryInT, never
+                     cumReceivedT — it does not leak into "delivered"       <b>&#10003;</b>
+baseline alignment   i = s.day - 1 correctly matches the worker's
+                     post-step push (exact at every midnight)               <b>&#10003;</b></pre>
+      </article>
+
+      <article class="finding good">
+        <div class="f-top"><span class="f-id">KEEP</span><span class="chip">Strength</span></div>
+        <h4>The assumptions panel frames uncertainty better than most published models</h4>
+        <pre class="ev wrap-ok">"These don't change the world — they change the model's guesses.
+ If a conclusion flips when you nudge one, treat it with care."</pre>
+        <p>
+          That is the correct instruction for a sensitivity control, in one sentence, in plain English —
+          and the honest split between adjustable assumptions and the "not adjustable (baked into the
+          data)" list is exactly right. It is also the reason F11 stings: the panel currently
+          manufactures one of those flipped conclusions itself.
+        </p>
+      </article>
+
+      <article class="finding good">
+        <div class="f-top"><span class="f-id">KEEP</span><span class="chip">Strength</span></div>
+        <h4>"How do we know the truck numbers?" volunteers its own weakness</h4>
+        <p>
+          About states the fleet is fitted rather than counted, calls it weakly identified, and gives
+          the trade-off explicitly — ~900 small trucks, ~730 average, or ~500 road trains all reproduce
+          the same season, with the flow being what the data actually pins down. Very few models tell
+          you which of their numbers not to trust.
+        </p>
+      </article>
+
+      <article class="finding good">
+        <div class="f-top"><span class="f-id">KEEP</span><span class="chip">Strength</span></div>
+        <h4>Two places the project refuses to answer a question it can't</h4>
+        <p>
+          The rail story gives the truck-km saving as a payload-dependent range and states outright
+          that it counts no rail capital or operating cost — "which is why the real line closed in
+          2019". A22 prices financing only and names weather, insect and quality risk as unpriced
+          rather than guessing them. Both are the right way to publish a partial answer.
+        </p>
+      </article>
+
+      <article class="finding good">
+        <div class="f-top"><span class="f-id">KEEP</span><span class="chip">Strength</span></div>
+        <h4>A2's correction note documents the project's own past error</h4>
+        <p>
+          Recording that 2/4 bays could not physically reproduce a published record day, and that the
+          calibrator had been "buying missing site throughput with imaginary trucks", is the kind of
+          note that makes a model trustworthy. It also diagnoses F27 in advance.
+        </p>
+      </article>
+
+      <article class="finding good">
+        <div class="f-top"><span class="f-id">KEEP</span><span class="chip">Strength</span></div>
+        <h4>Craft details that are easy to get wrong and are right here</h4>
+        <ul class="tight">
+          <li>The comparison table holds a fixed shape — quiet rows dim to "≈ no change" instead of popping in and out.</li>
+          <li>Lever readouts are translated into human units — "100% ≈ 2.9 million t", "as in reality" — not raw multipliers.</li>
+          <li>The narrator sentences are well written and a pure function of state; the failure in F15 is upstream of them.</li>
+          <li>The baseline lifecycle is genuinely sound: correct params, nulled on season change, season-checked on receipt, cached with proper invalidation. No path found to compare against the wrong season.</li>
+          <li>Self-contained basemap — no tile server, no runtime API, so the page can't rot.</li>
+          <li>Hashed event logs, a held-out season, and one-command regeneration of the whole data chain.</li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>The order I'd fix them in</h2>
+    <p class="sec-note">Sequenced by damage per unit of work. The first four are mostly small diffs with outsized effect on whether a reader trusts anything else.</p>
+    <ol class="work">
+      <li><span><b>F1 — the reality-check comparison.</b> <span class="why">Highest damage, smallest diff. The app is currently its own worst reviewer, and the honest numbers are better than the ones it prints.</span></span></li>
+      <li><span><b>F4 — the rail scenario's freight sign, and surface <code>truckKm</code>.</b> <span class="why">The flagship policy scenario currently contradicts its own story. The number that vindicates it is already computed and discarded.</span></span></li>
+      <li><span><b>F9, F13, F7 — the wrong numbers in the takeaways.</b> <span class="why">Delivery pace printing "299 days behind", assumption runs labelled "the season as it happened", a full-season figure at the top of a to-date table. All local fixes.</span></span></li>
+      <li><span><b>F19 + F33 + F25 — the honesty pass.</b> <span class="why">Mostly copy: give the live season its own text, fix the tour's step-1 overclaim, regenerate scenarios.md, delete the stale carry-in limitation in two files.</span></span></li>
+      <li><span><b>F14, F15, F16, F17, F18 — first run and time controls.</b> <span class="why">Pause behind the intro; backfill history on seek so the narrator stops lying; commit the scrubber on release; chunk the baseline; clear <code>done</code>.</span></span></li>
+      <li><span><b>F26 + F27 — soften the queue guard.</b> <span class="why">Engine change plus a designed failure message. Until this lands, the Advanced mode built for exploration punishes exploring.</span></span></li>
+      <li><span><b>F20, F21, F22, F10 — reconcile the register with the code.</b> <span class="why">Either build A4's allocation or document the flat constant; guard the carry-in builder; widen the pinned search bounds and refit; register the 75 km/h constant. This is the credibility spine.</span></span></li>
+      <li><span><b>F31 — the accessibility floor.</b> <span class="why">Slider labels, three working modals, a keyboard route to site selection. Roughly a day for a large share of the benefit.</span></span></li>
+      <li><span><b>F30 — mobile as a bottom sheet.</b> <span class="why">The largest job here, and the one that decides whether the intended audience can use this at all.</span></span></li>
+      <li><span><b>F5, F6, F12, F23, F24, F28, F29, F32, F34, F35.</b> <span class="why">Mostly independent; several are one-line copy or constant changes.</span></span></li>
+    </ol>
+  </section>
+
+  <footer>
+    Reviewed against the local preview build at rev c08513c · 27 Aug 2026.<br>
+    Live measurements taken in-browser at viewports 1280×720, 750×1624, 393×851, 375×812, 667×375 and
+    358×506. Engine behaviour reproduced by instrumenting the real bundles headlessly across seasons
+    2023/24, 2024/25, 2025/26 and 2026/27, seed 42. Arithmetic recomputed from data/ASSUMPTIONS.md,
+    data/CALIBRATION.md, docs/calibration_report.md, docs/scenarios_data.json and the shipped
+    app/public/data JSON.<br>
+    67 findings survived adversarial verification across seven independent audit lenses (52 confirmed,
+    15 plausible-with-corrected-severity, 0 refuted); consolidated here into 35 distinct items.<br>
+    <code>npm --workspace packages/sim run test</code> — 3 passed. <code>npm --workspace app run check</code> — 0 errors, 0 warnings. Working tree unchanged by this review.
+  </footer>
+
+</div>

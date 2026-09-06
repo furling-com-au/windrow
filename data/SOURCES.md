@@ -40,7 +40,10 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
 - **What**: post-migration news/report listing + 26 report article pages (2025/26 weekly
   reports under Bunge branding, monthly receivals reports with shipping statements).
 - **URL**: `https://www.bunge.com.au/sitecore/api/ssc/Controllers/Search/1/getarticles?...`
-  + article pages. **Retrieved**: 2026-08-19 · **Licence**: publisher content, cited.
+  + article pages. **Retrieved**: 2026-08-19; **re-checked 2026-08-31 — the live listing
+  is item-for-item identical to the cached `getarticles_p01.json` (40 items, newest
+  2026-08-18 "New bunge.com.au website is now live"), so no receivals report has been
+  published since the 2026-08-04 monthly** · **Licence**: publisher content, cited.
 - **Format**: JSON + HTML. **Cadence**: monthly (weekly in harvest).
 - **Local cache**: `data/raw/bunge_news/`
 
@@ -76,7 +79,9 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
 ## amsa-cts-aodn-parquet
 - **What**: AMSA Craft Tracking System vessel positions (speed, course, draught, type,
   length, anonymised per-vessel `craftID`), monthly files, Oct 2023 – May 2026 (32
-  months; Jun/Jul 2026 not yet published upstream).
+  months; Jun/Jul 2026 not yet published upstream). **Re-checked 2026-08-31: the S3
+  partition listing still ends at May 2026 — Jun, Jul and Aug 2026 are all absent, so the
+  three-month publication lag is the upstream cadence, not a fetch gap.**
 - **URL**: `https://aodn-cloud-optimised.s3.ap-southeast-2.amazonaws.com/aggregated_amsa_nonqc.parquet/`
   ("Australian SAR Region Vessel Tracking — Aggregated data product", NESP MaC 5.9 /
   IMOS / AODN; metadata uuid 2a5739e7-0cb8-444a-b83b-b2bc841b0c).
@@ -88,7 +93,9 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   `vessel_calls.parquet`.
 - **Restrictions/notes**: vessel identities (MMSI/IMO/name/callsign) deleted at source;
   positions thinned to ≥60 min/vessel; **Feb–Apr 2024 files cover only ~half of each UTC
-  day** (documented in CALIBRATION.md); May 2024 file has a case-variant name.
+  day** (documented in CALIBRATION.md); May 2024 file has a case-variant name. The
+  **May 2026 file is 29.3 MB against a ~46 MB monthly norm** — treat it as partial until
+  a later republication is checked.
 - **Local cache**: `data/raw/amsa_cts/`
 
 ## bunge-shipping-stem (current + Wayback history)
@@ -100,11 +107,22 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   `.../loading-statement.ashx` (stable). History: Wayback snapshots of two Viterra DAM
   UUIDs (`375b51d1…` Nov 2021–Oct 2024, `ec53083b…` Oct 2024–present) — 53 unique PDFs,
   ≈ monthly granularity.
-- **Retrieved**: 2026-08-19 · **Licence**: published by Bunge Operations "in accordance
-  with the Port Terminal Access (Bulk Wheat) Code of Conduct"; public disclosure docs.
+- **Retrieved**: 2026-08-19 (17 Aug stem); **refreshed 2026-08-31** (31 Aug stem +
+  31 Aug loading statement, cached as `260831-*`; the landing page now links the stem at
+  a version-less `shipping-stem.ashx`) · **Licence**: published by Bunge Operations "in
+  accordance with the Port Terminal Access (Bulk Wheat) Code of Conduct"; public
+  disclosure docs.
 - **Format**: PDF (text-extractable; parse in Phase 2). **Cadence**: each business day.
 - **Notes**: `delivery.bunge.com` serves 403 to non-browser TLS fingerprints; fetched
   via curl with a desktop UA (no robots.txt exists on either bunge host).
+- **Operational facts on the 31 Aug 2026 stem** (verbatim notices): "THE TERMINAL WILL BE
+  CLOSED FOR SHIPPING DUE TO MAINTENANCE BETWEEN 1 - 30 SEPTEMBER 2026" (**Port Lincoln**;
+  Outer Harbor carries the same notice for 1–15 September), plus loading closures at Port
+  Lincoln on **24 November 2026**, **28 February 2027** and **21 March 2027** for cruise-ship
+  arrivals. The Port Lincoln section carries **no vessel rows** on that stem — the 18 Aug
+  line-up (PORT VERA CRUZ, 55,000 t wheat for Brahman Commodities) had sailed. This is why
+  `stem_entries.parquet` is unchanged at 428 rows over 42 snapshots after the refresh: an
+  empty section, not a parse failure.
 - **Local cache**: `data/raw/stems/wayback/`, `data/raw/stems/current/`
 
 ## tports-shipping-stem
@@ -124,12 +142,30 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   2025/26 finding in `docs/r0_choice_geometry.md` rests on it.
 - **URL**: `https://tports.com/harvest/` · **Retrieved**: 2026-08-31 (earlier read
   2026-08-19) · **Licence**: operator public disclosure.
-- **Local cache**: `data/raw/press/tports_harvest__20260831.html`
-- **Caveat**: both reads are **off-season live-page reads**, the same method that produced
-  the roster defect in `docs/roster_audit_2026-08.md` §1 on the incumbent's side. Unlike
-  that case the wording here is an explicit closure statement rather than an empty list, so
-  it is not the same inference — but the page will roll to 26/27 and the claim should be
-  corroborated with T-Ports directly. Not yet submitted to the Wayback Machine.
+- **IN-SEASON CORROBORATION (added 2026-08-31)**: the Internet Archive holds 46 snapshots of
+  this page, and the one taken **14 January 2026 12:54:03 UTC — mid-harvest, inside the
+  2025/26 season** — carries `Site closed for 25/26 season` under **both** `LOCK` and
+  `KIMBA`, while `LUCKY BAY` and `WALLAROO` carry `By Appt.` hours **and live segregation
+  lists** (`WH - H1, H2, APW…`, `BA - MALT1, BAR1…`, `LE - NIPT1, HAL1…`). Two sites
+  advertising segregations beside two sites carrying a closure line, in season, is
+  positive evidence rather than the absence of evidence an off-season read gives.
+  `https://web.archive.org/web/20260114125403/https://tports.com/harvest/`
+  → `data/raw/press/tports_harvest__wayback20260114125403.html`.
+- **The off-season failure mode, demonstrated**: the snapshot of **16 September 2025** shows
+  **all four** sites — Lucky Bay and Wallaroo included — as `Closed` with no segregations.
+  That is the same page state `docs/roster_audit_2026-08.md` §1 diagnoses on the incumbent's
+  side, now observable on this operator's page too: an off-season read cannot distinguish a
+  closed site from a dormant one.
+  `https://web.archive.org/web/20250916225530/https://tports.com/harvest/`
+  → `data/raw/press/tports_harvest__wayback20250916225530.html`.
+- **Local cache**: `data/raw/press/tports_harvest__20260831.html`,
+  `tports_harvest__wayback20260114125403.html`, `tports_harvest__wayback20250916225530.html`
+- **Caveat**: the two 2026-08 reads are **off-season live-page reads**, and as at 2026-08-31
+  the live page has **not rolled to 26/27** — both bunkers still read `Site closed for 25/26
+  season` and all four sites show off-season hours. The January snapshot is what carries the
+  2025/26 claim; the live reads only show it has not since changed. Still worth putting to
+  T-Ports directly in the reply round. A fresh Wayback capture of the current page has not
+  been submitted (the archive was returning 429/offline for most of 2026-08-31).
 
 ## tports-site-capacities
 - **What**: T-Ports Lucky Bay page — source for the capacity figures used in
@@ -180,7 +216,9 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   8 annual archives): per-port bulk cargo tonnes by commodity (incl. Grain
   wheat/barley/etc.) and per-port monthly vessel calls by class.
 - **URL**: `https://www.flindersportholdings.com.au/port-statistics/` →
-  `/wp-content/uploads/...xlsx`. **Retrieved**: 2026-08-19 · **Licence**: publicly
+  `/wp-content/uploads/...xlsx`. **Retrieved**: 2026-08-19; **re-checked 2026-08-31 —
+  the listing page still ends at `07-Statistics-July-26.xlsx`, so July 2026 is the latest
+  published month and the August workbook is not yet out** · **Licence**: publicly
   published statistics; attribution. robots.txt allows all with `Crawl-delay: 10`
   (honoured; curl with desktop UA — site WAF rejects non-browser TLS).
 - **Format**: XLSX (3 layout generations, all handled) →
@@ -228,13 +266,20 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
 
 ## open-meteo-climate
 - **What**: daily rain, tmax/tmin, RH mean/min, wind/gusts, ET0 for 8 EP district points,
-  2020-09-01 → 2026-02-28 (ERA5-family reanalysis).
+  2020-09-01 → **2026-08-27** (ERA5-family reanalysis).
 - **URL**: `https://archive-api.open-meteo.com/v1/archive?...` · **Retrieved**: 2026-08-19
+  (window to 2026-02-28); **extended to 2026-08-27 on 2026-08-31**
   · **Licence**: CC BY 4.0 (open-meteo.com; underlying Copernicus ERA5 — attribution:
   "Contains modified Copernicus Climate Change Service information").
 - **Format**: JSON → `data/processed/climate_daily.parquet`.
 - **Notes**: used instead of SILO point data (SILO API requires an identifying email —
-  see ASSUMPTIONS A6 for the deviation + upgrade path).
+  see ASSUMPTIONS A6 for the deviation + upgrade path). Each fetched window is cached
+  under its own filename (`openmeteo_{station}__to{END}.json`) so raw files are never
+  overwritten; `r5_parse_climate.py` keeps the latest window per station.
+  ⚠ **The 2026-08-31 refresh revised `et0_mm` on 15,514 of 16,056 pre-existing rows**
+  (order 0.01–0.1 mm; an upstream model revision). `rain_mm`, `tmax_c`, `tmin_c`, wind,
+  gusts and both humidity columns are **bit-identical** over the whole overlap, so no
+  input the engine reads moved — `et0_mm` is carried in the parquet and consumed nowhere.
 - **Local cache**: `data/raw/climate/`
 
 ## reference-documents
@@ -349,6 +394,41 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   ESCOSA $15.84/t (marginal, 2018–19 A$) < ACH $29.90/t (full, 2026) < SAGIT $35.00/t
   (budgeted, 2026). The gap is the fixed and time cost the marginal rate excludes by design.
   Not cached locally.
+
+## wheat-port-code-2026 — the regulation the piece is published into
+
+- **What**: the *Port Terminal Access (Bulk Wheat) Code of Conduct* ("Wheat Port Code"),
+  the mandatory code prescribed under the *Competition and Consumer Act 2010* that governs
+  access to bulk wheat export port terminals — the regime Bunge's Port Lincoln loading
+  protocols are published under (see `bunge-shipping-stem`).
+- **Status as at 2026-08-31, verbatim from the ACCC page**: "The expiry date for the wheat
+  port code has been deferred until 1 October 2026. The code will remain in operation
+  until 1 October 2026, unless the Australian Government makes a decision to either remake
+  or repeal the code at an earlier date." **No remake or repeal decision is published as at
+  this retrieval.**
+- **Draft remake out for consultation**: the federal government released a draft
+  streamlined remake in **July 2026**, intended to run **three years** while industry
+  develops a self-regulatory framework, consulted for three weeks through the
+  Department of Agriculture, Fisheries and Forestry's Have Your Say platform. GrainGrowers
+  and Grain Producers Australia both oppose full deregulation and are split on the model.
+  The article records the ACCC noting "the number of port operator competitors to the three
+  major port export operators, with smaller enterprises setting up lower cost operations,
+  utilising equipment such as mobile ship loaders" — the same class of operator this piece
+  is about.
+- **URLs**: `https://www.accc.gov.au/business/industry-codes/wheat-port-code-of-conduct`;
+  `https://www.theland.com.au/story/9306486/federal-government-wheat-port-code-draft-splits-grower-groups/`
+  (The Land, 8–9 July 2026); `https://www.graincentral.com/news/wheat-port-code-extended-by-up-to-two-years/`
+  · **Retrieved**: 2026-08-31 · **Licence**: government page + publisher content, quoted
+  with attribution.
+- **Local cache**: `data/raw/press/accc_wheat_port_code_20260831.html`,
+  `data/raw/press/theland_9306486_wheat-port-code-draft_20260831.html`,
+  `data/raw/press/graincentral_wheat-port-code-extended_20260831.html`
+- **Why it is load-bearing**: `docs/prepublication_review.md` §5 flags that the piece may
+  publish in the last weeks before the 1 October 2026 sunset. The re-check changes the
+  framing available: it is **not** a bare sunset — a three-year remake is drafted and
+  consulted on, and the decision is still open. Re-check again immediately before
+  publication; a decision landing between now and 1 October would date the piece on its
+  first read.
 
 ## published-claims — press and government reporting (verification pass 2026-08-31)
 

@@ -59,8 +59,8 @@
       "capacity_source": "https://tports.com/lucky-bay/ ('Lock bunker site: 140,000 tonnes in six bunkers')",
       "commodities": ["WH", "BA"],
       "commodities_source": "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/",
-      "sources": ["https://tports.com/lucky-bay/", "https://tports.com/harvest/"],
-      "notes": "'Site closed for 25/26 season' per tports.com/harvest (2026-08-19); operated prior seasons from 2019"
+      "sources": ["https://tports.com/lucky-bay/", "https://tports.com/harvest/", "https://web.archive.org/web/20260114125403/https://tports.com/harvest/"],
+      "notes": "'Site closed for 25/26 season' per tports.com/harvest; operated prior seasons from 2019. Read live 2026-08-19 and 2026-08-31, and confirmed IN SEASON on the Internet Archive snapshot of 14 January 2026 (mid-harvest), where Lucky Bay and Wallaroo carry 'By Appt.' hours and live segregations while Lock and Kimba carry the closure line and none."
     },
     {
       "name": "Kimba (T-Ports bunker)",
@@ -74,8 +74,8 @@
       "capacity_source": "https://tports.com/lucky-bay/ ('Kimba bunker site: 150,000 tonnes in four bunkers')",
       "commodities": ["WH", "BA"],
       "commodities_source": "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/",
-      "sources": ["https://tports.com/lucky-bay/", "https://tports.com/harvest/", "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/"],
-      "notes": "Built for 2021 harvest; 'Site closed for 25/26 season' per tports.com/harvest (verified 2026-08-31, same wording the page carries for Lock). Until 2026-08-31 this entry carried the closed_2025_26_season status with NO closure evidence recorded - only Lock's quote had been transcribed - while every 2025/26 finding in docs/r0_choice_geometry.md depended on both bunkers being closed."
+      "sources": ["https://tports.com/lucky-bay/", "https://tports.com/harvest/", "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/", "https://web.archive.org/web/20260114125403/https://tports.com/harvest/"],
+      "notes": "Built for 2021 harvest; 'Site closed for 25/26 season' per tports.com/harvest, on the same line the page carries for Lock (verified 2026-08-31). Confirmed IN SEASON on the Internet Archive snapshot of 14 January 2026 (mid-harvest) - the closure is not an off-season page state. Until 2026-08-31 this entry carried the closed_2025_26_season status with NO closure evidence recorded - only Lock's quote had been transcribed - while every 2025/26 finding in docs/r0_choice_geometry.md depended on both bunkers being closed."
     },
     {
       "name": "Minnipa (closed)", "operator": "ex-Viterra", "role": "closed", "status": "closed_2019",

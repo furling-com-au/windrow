@@ -33,7 +33,10 @@ POINTS = {
     "ceduna_far_west": (-32.127, 133.673),
 }
 
-START, END = "2020-09-01", "2026-02-28"
+# The archive endpoint lags real time by a few days (ERA5T); END is bumped by hand when
+# the series is refreshed, and each window is cached under its own filename so nothing in
+# data/raw/ is overwritten. r5_parse_climate.py keeps the latest window per station.
+START, END = "2020-09-01", "2026-08-27"
 
 URL = (
     "https://archive-api.open-meteo.com/v1/archive"
@@ -50,7 +53,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     saved = []
     for name, (lat, lon) in POINTS.items():
-        dest = out / f"openmeteo_{name}.json"
+        dest = out / f"openmeteo_{name}__to{END}.json"
         url = URL.format(lat=lat, lon=lon, start=START, end=END)
         data = fetch(url, dest, timeout=180)
         status = "cached" if data is None else f"{len(data)/1e3:.0f} kB"
