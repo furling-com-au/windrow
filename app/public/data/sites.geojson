@@ -35,6 +35,16 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 143,
+    "operating_seasons": [
+     "2018/19",
+     "2020/21",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -63,6 +73,16 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 101,
+    "operating_seasons": [
+     "2018/19",
+     "2020/21",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-09] Another five sites received their first 2025/26 season deliveries; Lock, Rudall, Tumby Bay, Wirrulla and Cummins on the Eyre Peninsula.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -80,7 +100,7 @@
     "name": "Penong",
     "operator": "Bunge (ex-Viterra)",
     "role": "upcountry",
-    "status": "dormant",
+    "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/1436f217-8ded-4bc6-989e-a91301835864 (retrieved 2026-08-19)",
     "commodities_2025_26": [],
@@ -89,6 +109,17 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 131,
+    "operating_seasons": [
+     "2019/20",
+     "2020/21",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
+    "status_provenance": "corrected: off-season segregations read listed none, but the operator's own 2025/26 weekly report names it receiving - [2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -121,6 +152,19 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 821,
+    "operating_seasons": [
+     "2016/17",
+     "2017/18",
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-09] Another five sites received their first 2025/26 season deliveries; Lock, Rudall, Tumby Bay, Wirrulla and Cummins on the Eyre Peninsula.",
     "district": "LEP",
     "capacity_estimated": true
    }
@@ -149,6 +193,14 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 186,
+    "operating_seasons": [
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-23] \u201cHarvest has now kicked off at our Darke Peak, Streaky Bay, Yeelanna, Karoonda and Monarto South sites, bringing us to 40 sites receiving grain,\u201d Gavin says.",
     "district": "LEP",
     "capacity_estimated": true
    }
@@ -177,6 +229,14 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 199,
+    "operating_seasons": [
+     "2019/20",
+     "2022/23",
+     "2023/24",
+     "2024/25"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2024-11-24] Wheat made up two thirds of the delivered tonnes and four more Viterra sites welcomed their first 2024/25 harvest deliveries, including Kapinnie, Saddleworth, Keith and Wolseley.",
     "district": "LEP",
     "capacity_estimated": true
    }
@@ -203,6 +263,12 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 108,
+    "operating_seasons": [
+     "2022/23",
+     "2023/24"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2023-10-15] Nine sites received their first 2023/24 harvest loads during the week including Port Lincoln, Rudall, Witera, Tumby Bay, and Nunjikompita in the Western region and Ardrossan, Rosew",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -233,6 +299,17 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 1906,
+    "operating_seasons": [
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-02] In addition to Inner Harbour and Pinnaroo, Bunge sites to receive the first 2025/26 harvest deliveries included Kimba, Witera and Wudinna in the Western region, and Ardrossan, Bowm",
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -250,7 +327,7 @@
     "name": "Darke Peak",
     "operator": "Bunge (ex-Viterra)",
     "role": "upcountry",
-    "status": "dormant",
+    "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/4a6f63f5-00d4-46e4-9fc8-a9130183585f (retrieved 2026-08-19)",
     "commodities_2025_26": [],
@@ -259,6 +336,16 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 166,
+    "operating_seasons": [
+     "2018/19",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-23] \u201cHarvest has now kicked off at our Darke Peak, Streaky Bay, Yeelanna, Karoonda and Monarto South sites, bringing us to 40 sites receiving grain,\u201d Gavin says.",
+    "status_provenance": "corrected: off-season segregations read listed none, but the operator's own 2025/26 weekly report names it receiving - [2025-11-23] \u201cHarvest has now kicked off at our Darke Peak, Streaky Bay, Yeelanna, Karoonda and Monarto South sites, bringing us to 40 sites receiving grain,\u201d Gavin says.",
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -290,6 +377,20 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 345,
+    "operating_seasons": [
+     "2016/17",
+     "2017/18",
+     "2018/19",
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-09] Another five sites received their first 2025/26 season deliveries; Lock, Rudall, Tumby Bay, Wirrulla and Cummins on the Eyre Peninsula.",
     "district": "LEP",
     "capacity_estimated": true
    }
@@ -318,6 +419,14 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 153,
+    "operating_seasons": [
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-12-07] \u201cEdillilie received its first delivery last week as farmers in the lower EP move to harvesting canola.\u201d Bunge Central region Operations Manager, Jack Tansley says the second half o",
     "district": "LEP",
     "capacity_estimated": true
    }
@@ -347,6 +456,14 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 219,
+    "operating_seasons": [
+     "2017/18",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -377,6 +494,18 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 611,
+    "operating_seasons": [
+     "2016/17",
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-09] Another five sites received their first 2025/26 season deliveries; Lock, Rudall, Tumby Bay, Wirrulla and Cummins on the Eyre Peninsula.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -407,6 +536,18 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 470,
+    "operating_seasons": [
+     "2016/17",
+     "2017/18",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-10-19] On Thursday our Arno Bay site also welcomed its first delivery for the harvest, a load of barley.",
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -436,6 +577,17 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 47,
+    "operating_seasons": [
+     "2016/17",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-02] In addition to Inner Harbour and Pinnaroo, Bunge sites to receive the first 2025/26 harvest deliveries included Kimba, Witera and Wudinna in the Western region, and Ardrossan, Bowm",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -464,6 +616,16 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 108,
+    "operating_seasons": [
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-10-26] Our Port Lincoln, Port Neill and Port Pirie sites also received their first deliveries for the harvest during the week.",
     "district": "LEP",
     "capacity_estimated": true
    }
@@ -481,7 +643,7 @@
     "name": "Buckleboo",
     "operator": "Bunge (ex-Viterra)",
     "role": "upcountry",
-    "status": "dormant",
+    "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/b89e1868-2309-47b6-b26b-a9130183585f (retrieved 2026-08-19)",
     "commodities_2025_26": [],
@@ -490,6 +652,17 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 129,
+    "operating_seasons": [
+     "2018/19",
+     "2019/20",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
+    "status_provenance": "corrected: off-season segregations read listed none, but the operator's own 2025/26 weekly report names it receiving - [2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -507,7 +680,7 @@
     "name": "Elliston",
     "operator": "Bunge (ex-Viterra)",
     "role": "upcountry",
-    "status": "dormant",
+    "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/c90de8a9-a1c7-4c0a-91ad-a9130183585f (retrieved 2026-08-19)",
     "commodities_2025_26": [],
@@ -516,6 +689,16 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 50,
+    "operating_seasons": [
+     "2018/19",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
+    "status_provenance": "corrected: off-season segregations read listed none, but the operator's own 2025/26 weekly report names it receiving - [2025-11-16] \u201cHarvest kicked off at our Buckleboo, Elliston, Penong, Poochera and Warramboo sites with the first deliveries for the season coming in,\u201d Nick says.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -546,6 +729,18 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 210,
+    "operating_seasons": [
+     "2016/17",
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-10-19] This includes four new drive-over hopper stackers across the Bunge network, a second inwards weighbridge at Tailem Bend, and an additional classification office at Wudinna to suppo",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -576,6 +771,19 @@
     "capacity_provenance": "ACCC Final Determinations Port Lincoln & Thevenard, 20 Jul 2021, Table 3.1 (https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf); T-Ports: https://tports.com/lucky-bay/ + ACCC ibid.",
     "region": "western",
     "nearest_osm_silo_m": 289,
+    "operating_seasons": [
+     "2016/17",
+     "2017/18",
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-10-19] Harvest in South Australia has officially kicked off, after we received our first delivery for the 2025/26 season with a load of lentils delivered to our Thevenard site on Monday 1",
     "district": "WEP",
     "capacity_estimated": false
    }
@@ -606,6 +814,16 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 1586,
+    "operating_seasons": [
+     "2016/17",
+     "2020/21",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-09] Another five sites received their first 2025/26 season deliveries; Lock, Rudall, Tumby Bay, Wirrulla and Cummins on the Eyre Peninsula.",
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -636,6 +854,20 @@
     "capacity_provenance": "ACCC Final Determinations Port Lincoln & Thevenard, 20 Jul 2021, Table 3.1 (https://www.accc.gov.au/system/files/Viterra%20Final%20Determinations%20for%20Port%20Lincoln%20and%20Thevenard.pdf); T-Ports: https://tports.com/lucky-bay/ + ACCC ibid.",
     "region": "western",
     "nearest_osm_silo_m": 121,
+    "operating_seasons": [
+     "2016/17",
+     "2017/18",
+     "2018/19",
+     "2019/20",
+     "2020/21",
+     "2021/22",
+     "2022/23",
+     "2023/24",
+     "2024/25",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-10-26] Our Port Lincoln, Port Neill and Port Pirie sites also received their first deliveries for the harvest during the week.",
     "district": "LEP",
     "capacity_estimated": false
    }
@@ -665,6 +897,14 @@
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
     "nearest_osm_silo_m": 140,
+    "operating_seasons": [
+     "2020/21",
+     "2022/23",
+     "2023/24",
+     "2025/26"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2025-11-23] \u201cHarvest has now kicked off at our Darke Peak, Streaky Bay, Yeelanna, Karoonda and Monarto South sites, bringing us to 40 sites receiving grain,\u201d Gavin says.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -701,6 +941,9 @@
     ],
     "notes": "Transshipment port opened 2019; no berth for ocean vessels - TSV MV Lucky Eyre shuttles to anchorage",
     "nearest_osm_silo_m": 11581,
+    "operating_seasons": [],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": null,
     "district": "EEP",
     "capacity_estimated": false
    }
@@ -735,6 +978,9 @@
     ],
     "notes": "'Site closed for 25/26 season' per tports.com/harvest (2026-08-19); operated prior seasons from 2019",
     "nearest_osm_silo_m": 220,
+    "operating_seasons": [],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": null,
     "district": "WEP",
     "capacity_estimated": false
    }
@@ -768,8 +1014,11 @@
      "https://tports.com/harvest/",
      "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/"
     ],
-    "notes": "Built for 2021 harvest",
+    "notes": "Built for 2021 harvest; 'Site closed for 25/26 season' per tports.com/harvest (verified 2026-08-31, same wording the page carries for Lock). Until 2026-08-31 this entry carried the closed_2025_26_season status with NO closure evidence recorded - only Lock's quote had been transcribed - while every 2025/26 finding in docs/r0_choice_geometry.md depended on both bunkers being closed.",
     "nearest_osm_silo_m": 440,
+    "operating_seasons": [],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": null,
     "district": "EEP",
     "capacity_estimated": false
    }
@@ -796,10 +1045,14 @@
     "capacity_provenance": null,
     "region": "western",
     "sources": [
-     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/",
-     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/"
+     "https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/",
+     "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed in Viterra's 2019 network rationalisation after EP rail shutdown",
+    "notes": "Named closed in Viterra's June 2019 rationalisation of 17 up-country sites, six of them on EP. Primary source: Alisha Fogden, 'SILO SLASH: 17 Viterra grain sites to close', Stock Journal, 6 Jun 2019 (upd. 7 Jun 2019), and 'Croppers angry as upper EP silos take a hit', Stock Journal, 6 Jun 2019 - 'The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed.' The Farm Online item is the 7 Jun 2019 syndication of the first ('This story first appeared on Stock Journal') and is listed as a reprint, not as an independent outlet. Viterra's stated reasons, per operations manager Michael Hill: average truck size up 30 per cent since 2010 with bigger trucks going to bigger sites; quality-management and food-safety requirements; the closed sites were 'less than 2pc of total receivals (based on a five-year average)'. One of only TWO of the six that were operating the year before: 'six sites open last year at Minnipa, Kyancutta, Brinkworth, Paskeville, Millicent and Walpeup in Vic would not play a future role in the Viterra network'. NO PUBLISHED SOURCE ATTRIBUTES THE 2019 CLOSURES TO THE MAY 2019 EP RAIL SHUTDOWN. Neither Stock Journal story gives rail as a cause; 'freight redirection' survives only in a URL slug and appears nowhere in either body. Rail is mentioned once across both stories, by Minnipa cropper Matt Cook, about a different and earlier local closure. Any rail link is this project's inference and must be labelled as one. (Corrected 2026-08-31: this note previously read 'Closed in Viterra's 2019 network rationalisation after EP rail shutdown'. The trailing clause was unsourced and is withdrawn.)",
+    "operating_seasons": [],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": null,
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -826,9 +1079,16 @@
     "capacity_provenance": null,
     "region": "western",
     "sources": [
+     "https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/",
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed 2019",
+    "notes": "Named closed in Viterra's June 2019 rationalisation of 17 up-country sites, six of them on EP. Primary source: Alisha Fogden, 'SILO SLASH: 17 Viterra grain sites to close', Stock Journal, 6 Jun 2019 (upd. 7 Jun 2019), and 'Croppers angry as upper EP silos take a hit', Stock Journal, 6 Jun 2019 - 'The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed.' The Farm Online item is the 7 Jun 2019 syndication of the first ('This story first appeared on Stock Journal') and is listed as a reprint, not as an independent outlet. Viterra's stated reasons, per operations manager Michael Hill: average truck size up 30 per cent since 2010 with bigger trucks going to bigger sites; quality-management and food-safety requirements; the closed sites were 'less than 2pc of total receivals (based on a five-year average)'. One of only TWO of the six that were operating the year before: 'six sites open last year at Minnipa, Kyancutta, Brinkworth, Paskeville, Millicent and Walpeup in Vic would not play a future role in the Viterra network'. NO PUBLISHED SOURCE ATTRIBUTES THE 2019 CLOSURES TO THE MAY 2019 EP RAIL SHUTDOWN. Neither Stock Journal story gives rail as a cause; 'freight redirection' survives only in a URL slug and appears nowhere in either body. Rail is mentioned once across both stories, by Minnipa cropper Matt Cook, about a different and earlier local closure. Any rail link is this project's inference and must be labelled as one. Checked against the operator's weekly reports and NOT contradicted: its only post-2019 mention is 'east of Kyancutta', a paddock location, correctly rejected under A12's evidence rule.",
+    "operating_seasons": [
+     "2016/17"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2016-10-16] The first load for the 2016/17 season was a load of peas into Kyancutta on the Eyre Peninsula.",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -855,9 +1115,16 @@
     "capacity_provenance": null,
     "region": "western",
     "sources": [
+     "https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/",
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019 (dormant before)",
+    "notes": "Named closed in Viterra's June 2019 rationalisation of 17 up-country sites, six of them on EP. Primary source: Alisha Fogden, 'SILO SLASH: 17 Viterra grain sites to close', Stock Journal, 6 Jun 2019 (upd. 7 Jun 2019), and 'Croppers angry as upper EP silos take a hit', Stock Journal, 6 Jun 2019 - 'The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed.' The Farm Online item is the 7 Jun 2019 syndication of the first ('This story first appeared on Stock Journal') and is listed as a reprint, not as an independent outlet. Viterra's stated reasons, per operations manager Michael Hill: average truck size up 30 per cent since 2010 with bigger trucks going to bigger sites; quality-management and food-safety requirements; the closed sites were 'less than 2pc of total receivals (based on a five-year average)'. NOT operating the year before: it is in the group of 11 'that were not open the year prior' that 'would also be closed permanently'. A pre-2019 network state that counts it as open overstates the 2018/19 network. NO PUBLISHED SOURCE ATTRIBUTES THE 2019 CLOSURES TO THE MAY 2019 EP RAIL SHUTDOWN. Neither Stock Journal story gives rail as a cause; 'freight redirection' survives only in a URL slug and appears nowhere in either body. Rail is mentioned once across both stories, by Minnipa cropper Matt Cook, about a different and earlier local closure. Any rail link is this project's inference and must be labelled as one. CONTRADICTED, AND THE CONTRADICTION IS UNRESOLVED: Viterra's own weekly harvest report for the week ending 13 Nov 2022 names Cungena among sites that 'received their first new season deliveries'. Both sources are published and neither is retracted. What they jointly support is that it was closed in June 2019 and described as permanent, that it nonetheless took first new-season deliveries in 2022/23, and that no published evidence has it operating in any other season. The bare 'closed permanently 2019' tag this note used to carry is wrong as written; the defensible statement is a season range. See data/SOURCES.md 'cungena-status-contradiction'. Corrected 2026-08-31.",
+    "operating_seasons": [
+     "2022/23"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2022-11-13] In Viterra\u2019s Central region, Ardrossan, Balaklava, Bowmans, Crystal Brook, Port Giles and Snowtown received their first new season deliveries, as well as Cungena, Elliston, Port Ne",
     "district": "WEP",
     "capacity_estimated": true
    }
@@ -884,9 +1151,14 @@
     "capacity_provenance": null,
     "region": "western",
     "sources": [
+     "https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/",
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019; rail-served until May 2019",
+    "notes": "Named closed in Viterra's June 2019 rationalisation of 17 up-country sites, six of them on EP. Primary source: Alisha Fogden, 'SILO SLASH: 17 Viterra grain sites to close', Stock Journal, 6 Jun 2019 (upd. 7 Jun 2019), and 'Croppers angry as upper EP silos take a hit', Stock Journal, 6 Jun 2019 - 'The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed.' The Farm Online item is the 7 Jun 2019 syndication of the first ('This story first appeared on Stock Journal') and is listed as a reprint, not as an independent outlet. Viterra's stated reasons, per operations manager Michael Hill: average truck size up 30 per cent since 2010 with bigger trucks going to bigger sites; quality-management and food-safety requirements; the closed sites were 'less than 2pc of total receivals (based on a five-year average)'. NOT operating the year before: it is in the group of 11 'that were not open the year prior' that 'would also be closed permanently'. A pre-2019 network state that counts it as open overstates the 2018/19 network. NO PUBLISHED SOURCE ATTRIBUTES THE 2019 CLOSURES TO THE MAY 2019 EP RAIL SHUTDOWN. Neither Stock Journal story gives rail as a cause; 'freight redirection' survives only in a URL slug and appears nowhere in either body. Rail is mentioned once across both stories, by Minnipa cropper Matt Cook, about a different and earlier local closure. Any rail link is this project's inference and must be labelled as one. (Corrected 2026-08-31: this note previously added 'rail-served until May 2019'. That clause is withdrawn - it is contradicted by the same story that closes the site, since Waddikee is in the group that was NOT open the year prior and so was not receiving grain in 2018/19 and cannot have been rail-served up to May 2019; and Waddikee is not among the rail stations named in the 2018 Eyre Peninsula Freight Study, which lists Wudinna, Kyancutta, Warramboo, Lock, Murdinga, Tooligie and Yeelanna - 'Waddikee Road' appears there only as a road name. No source in this repo supports the clause.)",
+    "operating_seasons": [],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": null,
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -913,9 +1185,14 @@
     "capacity_provenance": null,
     "region": "western",
     "sources": [
+     "https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/",
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019",
+    "notes": "Named closed in Viterra's June 2019 rationalisation of 17 up-country sites, six of them on EP. Primary source: Alisha Fogden, 'SILO SLASH: 17 Viterra grain sites to close', Stock Journal, 6 Jun 2019 (upd. 7 Jun 2019), and 'Croppers angry as upper EP silos take a hit', Stock Journal, 6 Jun 2019 - 'The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed.' The Farm Online item is the 7 Jun 2019 syndication of the first ('This story first appeared on Stock Journal') and is listed as a reprint, not as an independent outlet. Viterra's stated reasons, per operations manager Michael Hill: average truck size up 30 per cent since 2010 with bigger trucks going to bigger sites; quality-management and food-safety requirements; the closed sites were 'less than 2pc of total receivals (based on a five-year average)'. NOT operating the year before: it is in the group of 11 'that were not open the year prior' that 'would also be closed permanently'. A pre-2019 network state that counts it as open overstates the 2018/19 network. NO PUBLISHED SOURCE ATTRIBUTES THE 2019 CLOSURES TO THE MAY 2019 EP RAIL SHUTDOWN. Neither Stock Journal story gives rail as a cause; 'freight redirection' survives only in a URL slug and appears nowhere in either body. Rail is mentioned once across both stories, by Minnipa cropper Matt Cook, about a different and earlier local closure. Any rail link is this project's inference and must be labelled as one.",
+    "operating_seasons": [],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": null,
     "district": "EEP",
     "capacity_estimated": true
    }
@@ -942,9 +1219,16 @@
     "capacity_provenance": null,
     "region": "western",
     "sources": [
+     "https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/",
+     "https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/",
      "https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/"
     ],
-    "notes": "Closed permanently 2019",
+    "notes": "Named closed in Viterra's June 2019 rationalisation of 17 up-country sites, six of them on EP. Primary source: Alisha Fogden, 'SILO SLASH: 17 Viterra grain sites to close', Stock Journal, 6 Jun 2019 (upd. 7 Jun 2019), and 'Croppers angry as upper EP silos take a hit', Stock Journal, 6 Jun 2019 - 'The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed.' The Farm Online item is the 7 Jun 2019 syndication of the first ('This story first appeared on Stock Journal') and is listed as a reprint, not as an independent outlet. Viterra's stated reasons, per operations manager Michael Hill: average truck size up 30 per cent since 2010 with bigger trucks going to bigger sites; quality-management and food-safety requirements; the closed sites were 'less than 2pc of total receivals (based on a five-year average)'. NOT operating the year before: it is in the group of 11 'that were not open the year prior' that 'would also be closed permanently'. A pre-2019 network state that counts it as open overstates the 2018/19 network. NO PUBLISHED SOURCE ATTRIBUTES THE 2019 CLOSURES TO THE MAY 2019 EP RAIL SHUTDOWN. Neither Stock Journal story gives rail as a cause; 'freight redirection' survives only in a URL slug and appears nowhere in either body. Rail is mentioned once across both stories, by Minnipa cropper Matt Cook, about a different and earlier local closure. Any rail link is this project's inference and must be labelled as one. Named once in ten seasons of the operator's weekly reports, in 2016/17.",
+    "operating_seasons": [
+     "2016/17"
+    ],
+    "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
+    "operating_evidence": "[2016-11-13] Lentils have now started in the region, with Wharminda receiving some lentil deliveries last week.",
     "district": "EEP",
     "capacity_estimated": true
    }

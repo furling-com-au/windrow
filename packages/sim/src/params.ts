@@ -62,5 +62,6 @@ export function defaultParams(): Params {
     railReinstated: false,
     outage: null,
     roadClosure: null,
+    networkState: null, // engine's own open/closed rule (R5/R0/R3 override it by name)
   };
 }

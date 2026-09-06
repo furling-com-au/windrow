@@ -374,3 +374,81 @@ describe("harvest-ban fire danger (A7)", () => {
     expect(keep(1e6)).toBeGreaterThanOrEqual(0); // never negative, even absurdly high
   });
 });
+
+/**
+ * Cover for the R5 network-state override.
+ *
+ * Before this, which sites operate was not a parameter at all: `Sim.init()` derived it
+ * from the bundle's static `status` string plus a hardcoded season-string match
+ * (`season === "2025/26" || "2024/25"` closes the two T-Ports bunkers, A15). A run could
+ * not be placed at a different network state without editing the engine, which is what
+ * R5's retrospective test and R3's rationalisation scenario both need.
+ *
+ * The three things asserted here are the three ways this could quietly produce a wrong
+ * number rather than an error:
+ *   1. it is a strict no-op when unused, so no calibrated run moves;
+ *   2. a name that matches no site THROWS instead of silently changing nothing;
+ *   3. forcing open a site with no segregation list THROWS, because `chooseSite` skips
+ *      any site whose `accepts[c]` is false — such a site would look open all season and
+ *      receive zero tonnes.
+ */
+describe("network-state override (R5)", () => {
+  const BUNKERS = ["Lock (T-Ports bunker)", "Kimba (T-Ports bunker)"];
+
+  it("is a strict no-op when null, and when it only restates the engine's own rule", () => {
+    let bundle: Bundle;
+    try {
+      bundle = loadBundle("2025/26");
+    } catch {
+      console.warn("real bundle not present; skipping");
+      return;
+    }
+    // 2025/26 already closes both bunkers via the season match, so forcing them closed
+    // must reproduce the baseline event log byte for byte — the check that the override
+    // changes the network state and nothing else.
+    const base = new Sim(bundle, defaultParams(), 42).run(365);
+    const restated = new Sim(
+      bundle,
+      { ...defaultParams(), networkState: { forceClosed: BUNKERS } },
+      42,
+    ).run(365);
+    expect(restated.eventLogHash).toBe(base.eventLogHash);
+    expect(restated.seasonReceivedT).toBe(base.seasonReceivedT);
+
+    // ...and opening them is a real change, in the direction the mechanism requires:
+    // an extra inland option for the same crop takes tonnage off the Bunge network.
+    const opened = new Sim(bundle, { ...defaultParams(), networkState: { forceOpen: BUNKERS } }, 42).run(365);
+    expect(opened.eventLogHash).not.toBe(base.eventLogHash);
+    expect(opened.seasonReceivedT).toBeLessThan(base.seasonReceivedT);
+  }, 60_000);
+
+  it("throws on a site name the bundle does not contain", () => {
+    const b = tinyBundle();
+    expect(() => new Sim(b, { ...defaultParams(), networkState: { forceClosed: ["Testvile"] } }, 7)).toThrow(
+      /names no site in this bundle/,
+    );
+    // the correctly spelled name is accepted
+    const name = b.matrix.sites[0]!.name;
+    expect(() => new Sim(b, { ...defaultParams(), networkState: { forceClosed: [name] } }, 7)).not.toThrow();
+  });
+
+  it("throws rather than reopening a site that would accept nothing", () => {
+    const b = tinyBundle();
+    b.matrix.sites[0]!.status = "dormant";
+    b.matrix.sites[0]!.commodities = []; // the five dormant Bunge sites all look like this
+    const name = b.matrix.sites[0]!.name;
+    expect(() => new Sim(b, { ...defaultParams(), networkState: { forceOpen: [name] } }, 7)).toThrow(
+      /carries no commodities/,
+    );
+    // give it a segregation list and the same reopen is fine
+    b.matrix.sites[0]!.commodities = ["WH"];
+    expect(() => new Sim(b, { ...defaultParams(), networkState: { forceOpen: [name] } }, 7)).not.toThrow();
+  });
+
+  it("lets forceClosed win over forceOpen, so the result never depends on list order", () => {
+    const b = tinyBundle();
+    const name = b.matrix.sites[0]!.name;
+    const both = new Sim(b, { ...defaultParams(), networkState: { forceOpen: [name], forceClosed: [name] } }, 7);
+    expect(both.sites[0]!.open).toBe(false);
+  });
+});

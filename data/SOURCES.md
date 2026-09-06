@@ -24,13 +24,26 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
 - **Format**: HTML → `data/processed/receivals_weekly.parquet` + `receivals_notes.jsonl`
 - **Notes**: zero pages missing from Wayback. Parsed totals match Grain Central
   re-publications digit-for-digit (3 seasons checked).
+- ⚠ **128 is this source's own page count and is NOT the corpus denominator.** Anything
+  counted over `data/processed/receivals_notes.jsonl` has a denominator of **148** — 127 of
+  these 128 pages (one carries no narrative) plus 21 Bunge-branded pages from
+  `bunge-news-api` below. `receivals_weekly.parquet` is a third, narrower set again: 127
+  source files, of which 117 are Wayback and 10 are `bunge-live`. Quote whichever count you
+  mean, with the command that prints it; a "1 of 128" written against the notes corpus was
+  found and corrected on 2026-08-31 (see `cungena-status-contradiction`).
+- **Reproduce the notes-corpus denominator**:
+  `PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import json;rows=[json.loads(l) for l in open('data/processed/receivals_notes.jsonl',encoding='utf-8')];print(len(rows),len({r['source_file'] for r in rows}))"`
+  → `148 148`
 - **Local cache**: `data/raw/viterra_reports/`
 
 ## bunge-news-api
 - **What**: post-migration news/report listing + 26 report article pages (2025/26 weekly
   reports under Bunge branding, monthly receivals reports with shipping statements).
 - **URL**: `https://www.bunge.com.au/sitecore/api/ssc/Controllers/Search/1/getarticles?...`
-  + article pages. **Retrieved**: 2026-08-19 · **Licence**: publisher content, cited.
+  + article pages. **Retrieved**: 2026-08-19; **re-checked 2026-08-31 — the live listing
+  is item-for-item identical to the cached `getarticles_p01.json` (40 items, newest
+  2026-08-18 "New bunge.com.au website is now live"), so no receivals report has been
+  published since the 2026-08-04 monthly** · **Licence**: publisher content, cited.
 - **Format**: JSON + HTML. **Cadence**: monthly (weekly in harvest).
 - **Local cache**: `data/raw/bunge_news/`
 
@@ -66,7 +79,9 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
 ## amsa-cts-aodn-parquet
 - **What**: AMSA Craft Tracking System vessel positions (speed, course, draught, type,
   length, anonymised per-vessel `craftID`), monthly files, Oct 2023 – May 2026 (32
-  months; Jun/Jul 2026 not yet published upstream).
+  months; Jun/Jul 2026 not yet published upstream). **Re-checked 2026-08-31: the S3
+  partition listing still ends at May 2026 — Jun, Jul and Aug 2026 are all absent, so the
+  three-month publication lag is the upstream cadence, not a fetch gap.**
 - **URL**: `https://aodn-cloud-optimised.s3.ap-southeast-2.amazonaws.com/aggregated_amsa_nonqc.parquet/`
   ("Australian SAR Region Vessel Tracking — Aggregated data product", NESP MaC 5.9 /
   IMOS / AODN; metadata uuid 2a5739e7-0cb8-444a-b83b-b2bc841b0c).
@@ -78,7 +93,9 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   `vessel_calls.parquet`.
 - **Restrictions/notes**: vessel identities (MMSI/IMO/name/callsign) deleted at source;
   positions thinned to ≥60 min/vessel; **Feb–Apr 2024 files cover only ~half of each UTC
-  day** (documented in CALIBRATION.md); May 2024 file has a case-variant name.
+  day** (documented in CALIBRATION.md); May 2024 file has a case-variant name. The
+  **May 2026 file is 29.3 MB against a ~46 MB monthly norm** — treat it as partial until
+  a later republication is checked.
 - **Local cache**: `data/raw/amsa_cts/`
 
 ## bunge-shipping-stem (current + Wayback history)
@@ -90,11 +107,22 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   `.../loading-statement.ashx` (stable). History: Wayback snapshots of two Viterra DAM
   UUIDs (`375b51d1…` Nov 2021–Oct 2024, `ec53083b…` Oct 2024–present) — 53 unique PDFs,
   ≈ monthly granularity.
-- **Retrieved**: 2026-08-19 · **Licence**: published by Bunge Operations "in accordance
-  with the Port Terminal Access (Bulk Wheat) Code of Conduct"; public disclosure docs.
+- **Retrieved**: 2026-08-19 (17 Aug stem); **refreshed 2026-08-31** (31 Aug stem +
+  31 Aug loading statement, cached as `260831-*`; the landing page now links the stem at
+  a version-less `shipping-stem.ashx`) · **Licence**: published by Bunge Operations "in
+  accordance with the Port Terminal Access (Bulk Wheat) Code of Conduct"; public
+  disclosure docs.
 - **Format**: PDF (text-extractable; parse in Phase 2). **Cadence**: each business day.
 - **Notes**: `delivery.bunge.com` serves 403 to non-browser TLS fingerprints; fetched
   via curl with a desktop UA (no robots.txt exists on either bunge host).
+- **Operational facts on the 31 Aug 2026 stem** (verbatim notices): "THE TERMINAL WILL BE
+  CLOSED FOR SHIPPING DUE TO MAINTENANCE BETWEEN 1 - 30 SEPTEMBER 2026" (**Port Lincoln**;
+  Outer Harbor carries the same notice for 1–15 September), plus loading closures at Port
+  Lincoln on **24 November 2026**, **28 February 2027** and **21 March 2027** for cruise-ship
+  arrivals. The Port Lincoln section carries **no vessel rows** on that stem — the 18 Aug
+  line-up (PORT VERA CRUZ, 55,000 t wheat for Brahman Commodities) had sailed. This is why
+  `stem_entries.parquet` is unchanged at 428 rows over 42 snapshots after the refresh: an
+  empty section, not a parse failure.
 - **Local cache**: `data/raw/stems/wayback/`, `data/raw/stems/current/`
 
 ## tports-shipping-stem
@@ -105,12 +133,92 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   (+ Wayback). **Retrieved**: 2026-08-19 · **Licence**: public disclosure documents.
 - **Local cache**: `data/raw/stems/tports/`
 
+## tports-site-status
+- **What**: T-Ports harvest page — per-site operating status for the 2025/26 season. Carries
+  **`<p>Site closed for 25/26 season</p>` under the `LOCK` heading and again under the
+  `KIMBA` heading**; `LUCKY BAY` and `WALLAROO` carry no such notice. The site-to-notice
+  association was established from the archived HTML's document order, not inferred.
+  This is the sole evidence for the closed 2025/26 state of both inland bunkers, and every
+  2025/26 finding in `docs/r0_choice_geometry.md` rests on it.
+- **URL**: `https://tports.com/harvest/` · **Retrieved**: 2026-08-31 (earlier read
+  2026-08-19) · **Licence**: operator public disclosure.
+- **IN-SEASON CORROBORATION (added 2026-08-31)**: the Internet Archive holds 46 snapshots of
+  this page, and the one taken **14 January 2026 12:54:03 UTC — mid-harvest, inside the
+  2025/26 season** — carries `Site closed for 25/26 season` under **both** `LOCK` and
+  `KIMBA`, while `LUCKY BAY` and `WALLAROO` carry `By Appt.` hours **and live segregation
+  lists** (`WH - H1, H2, APW…`, `BA - MALT1, BAR1…`, `LE - NIPT1, HAL1…`). Two sites
+  advertising segregations beside two sites carrying a closure line, in season, is
+  positive evidence rather than the absence of evidence an off-season read gives.
+  `https://web.archive.org/web/20260114125403/https://tports.com/harvest/`
+  → `data/raw/press/tports_harvest__wayback20260114125403.html`.
+- **The off-season failure mode, demonstrated**: the snapshot of **16 September 2025** shows
+  **all four** sites — Lucky Bay and Wallaroo included — as `Closed` with no segregations.
+  That is the same page state `docs/roster_audit_2026-08.md` §1 diagnoses on the incumbent's
+  side, now observable on this operator's page too: an off-season read cannot distinguish a
+  closed site from a dormant one.
+  `https://web.archive.org/web/20250916225530/https://tports.com/harvest/`
+  → `data/raw/press/tports_harvest__wayback20250916225530.html`.
+- **Local cache**: `data/raw/press/tports_harvest__20260831.html`,
+  `tports_harvest__wayback20260114125403.html`, `tports_harvest__wayback20250916225530.html`
+- **Caveat**: the two 2026-08 reads are **off-season live-page reads**, and as at 2026-08-31
+  the live page has **not rolled to 26/27** — both bunkers still read `Site closed for 25/26
+  season` and all four sites show off-season hours. The January snapshot is what carries the
+  2025/26 claim; the live reads only show it has not since changed. Still worth putting to
+  T-Ports directly in the reply round. A fresh Wayback capture of the current page has not
+  been submitted (the archive was returning 429/offline for most of 2026-08-31).
+
+## tports-site-capacities
+- **What**: T-Ports Lucky Bay page — source for the capacity figures used in
+  `pipeline/manual_sites.json`: Lucky Bay 384,000 t, Kimba bunker 150,000 t
+  ("150,000 tonnes in four bunkers"), Lock bunker 140,000 t.
+- **URL**: `https://tports.com/lucky-bay/` · **Retrieved**: 2026-08-31 ·
+  **Licence**: operator public disclosure.
+- **Local cache**: `data/raw/press/tports_luckybay__20260831.html`
+
+## arowana-luckybay-freight-claim
+- **What**: Arowana's 2 September 2021 release on the early settlement of its secured
+  infrastructure debt facility for Lucky Bay Port. Source of two claims used in this
+  project, both verbatim from the cached page:
+  - "The Lucky Bay Port generates road freight savings for grain growers from the Eyre
+    Peninsula of **up to $15 per tonne** and 4,600 tonnes of CO2 emission savings annually."
+  - "This has enabled co-investors with Arowana to realise a return in excess of the
+    **target IRR of 15%**."
+- **URL**: `https://arowanaco.com/2021/09/02/arowanas-private-credit-investment-in-lucky-bay-port-yields-strong-returns/`
+  · **Retrieved**: 2026-08-31 · **Licence**: company media release, quoted with attribution.
+- **Local cache**: `data/raw/press/arowana_luckybay_returns_20210902__20260831.html`
+- **Status**: a **promotional claim by an investor in the asset**, not an independent study.
+  No working, no method, no rate and no base year are published for the $15/t figure, and
+  "up to" is a maximum. Tested in `pipeline/r10_arowana_claim.py`; the test is currently
+  NOT publishable for the reasons in `docs/r9_cartage_findings.md`.
+- ⚠ **Provenance failure worth recording.** This claim was used in a workflow prompt on
+  2026-08-31 before it was ever sourced into the repo — it came from a web-search summary
+  that was never fetched or cached. An adversarial pass caught it: the quoted words existed
+  nowhere in the repo except in the scripts written to test them. The claim turned out to be
+  real and is now registered here. The same channel had already produced two claims in this
+  project that were **false** (that T-Ports was hiring for Lock and Kimba in 2025/26, and
+  that Grain Producers SA opposed the 2024 Grainflow acquisition). A search summary is not
+  a source.
+
+## bunge-surplus-site-tender-2026
+- **What**: Bunge's public tender of six surplus SA bulk-handling sites via Elders —
+  Bordertown (36,200 t), Tintinara (13,000 t), Coomandook (23,000 t), Geranium (20,100 t),
+  Wunkar (6,600 t) and **Murdinga, Eyre Peninsula (23,400 t, 2.24 ha)**. Binding offers due
+  2026-08-21. Bunge: "While these sites are no longer part of our operational network, we
+  recognise they may present opportunities for others"; Murdinga described as a "past site"
+  offering "flexibility for industrial or alternative rural development". Murdinga has zero
+  mentions across all ten seasons of `receivals_notes.jsonl`. Tender outcome unpublished as
+  at 2026-08-31.
+- **URL**: `https://www.graincentral.com/news/bunge-to-sell-six-surplus-sa-bulk-handling-sites/`
+  (Grain Central, 2026-07-07) · **Retrieved**: 2026-08-31.
+
 ## flinders-port-statistics
 - **What**: Flinders Port Holdings monthly statistics workbooks 2022–2026 (55 monthly +
   8 annual archives): per-port bulk cargo tonnes by commodity (incl. Grain
   wheat/barley/etc.) and per-port monthly vessel calls by class.
 - **URL**: `https://www.flindersportholdings.com.au/port-statistics/` →
-  `/wp-content/uploads/...xlsx`. **Retrieved**: 2026-08-19 · **Licence**: publicly
+  `/wp-content/uploads/...xlsx`. **Retrieved**: 2026-08-19; **re-checked 2026-08-31 —
+  the listing page still ends at `07-Statistics-July-26.xlsx`, so July 2026 is the latest
+  published month and the August workbook is not yet out** · **Licence**: publicly
   published statistics; attribution. robots.txt allows all with `Crawl-delay: 10`
   (honoured; curl with desktop UA — site WAF rejects non-browser TLS).
 - **Format**: XLSX (3 layout generations, all handled) →
@@ -158,13 +266,20 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
 
 ## open-meteo-climate
 - **What**: daily rain, tmax/tmin, RH mean/min, wind/gusts, ET0 for 8 EP district points,
-  2020-09-01 → 2026-02-28 (ERA5-family reanalysis).
+  2020-09-01 → **2026-08-27** (ERA5-family reanalysis).
 - **URL**: `https://archive-api.open-meteo.com/v1/archive?...` · **Retrieved**: 2026-08-19
+  (window to 2026-02-28); **extended to 2026-08-27 on 2026-08-31**
   · **Licence**: CC BY 4.0 (open-meteo.com; underlying Copernicus ERA5 — attribution:
   "Contains modified Copernicus Climate Change Service information").
 - **Format**: JSON → `data/processed/climate_daily.parquet`.
 - **Notes**: used instead of SILO point data (SILO API requires an identifying email —
-  see ASSUMPTIONS A6 for the deviation + upgrade path).
+  see ASSUMPTIONS A6 for the deviation + upgrade path). Each fetched window is cached
+  under its own filename (`openmeteo_{station}__to{END}.json`) so raw files are never
+  overwritten; `r5_parse_climate.py` keeps the latest window per station.
+  ⚠ **The 2026-08-31 refresh revised `et0_mm` on 15,514 of 16,056 pre-existing rows**
+  (order 0.01–0.1 mm; an upstream model revision). `rain_mm`, `tmax_c`, `tmin_c`, wind,
+  gusts and both humidity columns are **bit-identical** over the whole overlap, so no
+  input the engine reads moved — `et0_mm` is carried in the parquet and consumed nowhere.
 - **Local cache**: `data/raw/climate/`
 
 ## reference-documents
@@ -175,6 +290,340 @@ Historical pages are only on the Wayback Machine. Checked 2026-08-19.
   2025/26, ESCOSA bulk grain supply chain inquiry final report (2019).
 - **Licences**: publicly released regulatory/industry documents; cited.
 - **Local cache**: `data/raw/reference/` (7 PDFs)
+- ⚠ The ESCOSA report is **also registered separately below** as
+  `escosa-marginal-trucking-rate-2019`, because it carries a published $/t-km
+  freight schedule that A18 depends on and that needs its own basis and caveats.
+
+## escosa-marginal-trucking-rate-2019 — the published $/t-km schedule
+- **What**: the only public marginal road-cartage schedule for South Australian grain
+  found in this project — **A$0.12 per tonne-km up to 50 km, A$0.11 per tonne-km for
+  50–250 km**, in **2018–19 A$, nominal and undeflated**. Verbatim: "Only the marginal
+  freight cost has been used, $0.12 ($/tonne-km) for up to 50 kilometres and $0.11
+  ($/tonne-km) for 50 to 250 kilometres."
+- **Where**: Essential Services Commission of South Australia, *Inquiry into the South
+  Australian bulk grain export supply chain costs — Final Report*, **29 January 2019**,
+  Box 5.2 "Cost Shifting Case Study — Assumptions and detailed calculations", p. 91
+  (extracted-text lines 5405–5412 under `pdftotext -layout`).
+- **URL**: `https://www.escosa.sa.gov.au/ArticleDocuments/1076/20190129-Inquiry-BulkGrainExportSupplyChainCosts-FinalReport.pdf.aspx`
+  (linked from `https://www.escosa.sa.gov.au/projects-and-publications/projects/inquiries/inquiry-into-the-south-australian-bulk-grain-supply-chain-costs`).
+- **Retrieved**: PDF cached **2026-08-19**; schedule read, verified and registered
+  **2026-08-31**. · **Licence**: publicly released regulatory report; cited with
+  attribution.
+- **Local cache**: `data/raw/reference/escosa_grain_supply_chain_2019.pdf`
+  (sha256 `f901b52cba57cddac955a3448767c3ebe1e99656a11775ffd0bc348bf027354c`;
+  PDF ModDate 2019-01-29, matching the publication date. Not listed in
+  `data/raw/MANIFEST.sha256`.)
+- **Upstream provenance, and it is not uniform across the two bands**: ESCOSA states the
+  estimates "were based on data provided by AEGIC, verified against published Viterra
+  freight rates". Its footnote 289 attributes the **≤50 km** rate to AEGIC, *Australia's
+  grain supply chains: Costs, Risks and Opportunities*, October 2018, **Note 2c to Figure 4,
+  p. 18**, and the **50–250 km** rate to "**AEGIC advice**" — i.e. unpublished advice to the
+  Commission. Only the first of the two traces to a public document. The AEGIC report
+  itself is **not** cached in this repo.
+- **What it actually says — the basis, which matters more than the rates**:
+  - **Marginal, not average**: "once the grower's truck is on the road, then only the
+    additional (marginal) cost involved in travelling further to the next available site is
+    relevant." Truck ownership, loading and the trip that would have happened anyway are
+    outside it.
+  - **Applied to one-way loaded kilometres, band selected by the whole distance, no
+    cumulative tiering, empty return leg not added.** ESCOSA does not say this in prose; it
+    is recovered from the four case results it publishes against the four Google Maps
+    distances it used (Caltowie 16.3 km → $1.96/t, Yongala 53.0 km → $5.83/t, Gulnare
+    31.7 km → $3.80/t, Jamestown 28.5 km → $3.42/t). One-way flat-band reproduces all four;
+    round-trip reproduces none; cumulative tiering fails on Yongala, the only case crossing
+    the 50 km edge ($6.33 computed vs $5.83 published).
+  - **Time is excluded, and the report says so**: "This case study has not addressed all
+    potential costs, such as if the additional travel time resulted in the need for a
+    grower to employ an additional truck." Site turnaround is likewise set aside.
+  - **Nominal and deliberately not deflated**: "The marginal trucking cost rates have not
+    been deflated because it is not known how well the resulting deflated costs would
+    reflect the actual costs of the time."
+- **What it does NOT say**: it is **South Australia-wide, not Eyre Peninsula-specific** —
+  the case study behind it is the upper Central region (Gladstone catchment, 16–53 km
+  hauls). It publishes **no band above 250 km**. It is **silent on whether AEGIC's
+  underlying cost line embeds an empty return leg, loading or waiting**; the full report
+  text contains no "return leg", "backload", "round trip" or "empty run". That silence is
+  worth a factor of two and must be reported as silence, not resolved by assumption.
+  It is a **cost rate and not a distance threshold** — it does not designate any cart
+  range, and must not be used to justify one (see `docs/r0_choice_geometry.md:48`).
+- **Reproduce**:
+  `pdftotext -layout data/raw/reference/escosa_grain_supply_chain_2019.pdf - | sed -n '5405,5412p'`
+  and, for the application rule and the transcription check,
+  `.venv/Scripts/python.exe pipeline/r9_escosa_rate_check.py` (prints `VERDICT: PASS`).
+- **Used in**: `data/ASSUMPTIONS.md` A18; the Tier-2 cartage-dollars output. Never in the
+  simulation.
+- **No successor found.** Searched 2026-08-31 for any published $/t-km grain road-freight
+  schedule postdating January 2019: ESCOSA's inquiry page shows no successor inquiry or
+  update; AEGIC has published no edition of *Australia's grain supply chains* later than
+  October 2018 (the 2024 wp-content URLs are re-uploads of the 2018 report; aegic.org.au
+  refuses automated fetches, so this rests on search results rather than a document read);
+  ACCC bulk grain ports monitoring covers ports and capacity only and does not collect
+  overland grain movements; ABS road freight publishes no grain-specific $/t-km. The two
+  more recent published rate documents that do exist are registered below, and neither is a
+  replacement.
+
+## ach-recommended-cartage-rates-2026 (comparator — not a substitute)
+- **What**: Australian Custom Harvesters' "Recommended Cartage Rates" — "up to 10 km –
+  $16.50 per tonne (excl GST)/$18.15 (incl GST)", then "add $0.10 (excl GST) /$0.11 (incl
+  GST) per tonne" for each further kilometre. "These rates include demurrage." "These rates
+  are a guide only. Growers and contractors should negotiate rates based on individual
+  circumstances." Valid as at **1 February 2026**.
+- **URL**: `https://customharvesters.org.au/harvest-rates/` · **Retrieved**: 2026-08-31 ·
+  **Licence**: industry-association published guidance; cited with attribution.
+- **Why registered**: it is the most recent published *marginal* distance increment found,
+  and it bounds the inflation question — $0.10/t-km excl GST in 2026 sits **below** ESCOSA's
+  $0.11–0.12 in 2018–19 A$, which is why A18 publishes in base-year dollars rather than
+  indexing forward.
+- **Why it is not a substitute**: national rather than SA or EP; contractor guidance rather
+  than a regulator's finding; and a **full** charge with a large fixed component
+  ($16.50 for the first 10 km) rather than a pure marginal line. Not cached locally.
+
+## sagit-farm-gross-margin-guide-2026 (comparator — not a substitute)
+- **What**: SAGIT / Ag Excellence Alliance / GRDC, *2026 Farm Gross Margin and Enterprise
+  Planning Guide for South Australia*. "Freight Costs (as included in Gross Margins)":
+  cereal grains **$35.00/tonne**, canola $35.00, lentils $38.00, other legume grains
+  $35.00, triticale $28.00, fertiliser $35.00, oaten hay $35.00. Commodity prices in the
+  guide are "on delivered end-user basis e.g. Grain is delivered port basis".
+- **URL**: `https://sagit.com.au/wp-content/uploads/2026/02/ART-251201.07.01-SAGIT-Gross-Margins-Guide-2026_DIGITAL.pdf`
+  · **Retrieved**: 2026-08-31 · **Licence**: publicly released industry guide; cited.
+- **Why registered**: SA-specific and current, so it is the natural place a reader would
+  look for a 2026 SA cartage number.
+- **Why it is not a substitute**: it is a **flat $/tonne budgeting allowance with no
+  distance term at all**, so it cannot produce a per-district or per-kilometre figure. Used
+  only as an upper bracket: at EP's ~144 km average site→port haul the three sources read
+  ESCOSA $15.84/t (marginal, 2018–19 A$) < ACH $29.90/t (full, 2026) < SAGIT $35.00/t
+  (budgeted, 2026). The gap is the fixed and time cost the marginal rate excludes by design.
+  Not cached locally.
+
+## wheat-port-code-2026 — the regulation the piece is published into
+
+- **What**: the *Port Terminal Access (Bulk Wheat) Code of Conduct* ("Wheat Port Code"),
+  the mandatory code prescribed under the *Competition and Consumer Act 2010* that governs
+  access to bulk wheat export port terminals — the regime Bunge's Port Lincoln loading
+  protocols are published under (see `bunge-shipping-stem`).
+- **Status as at 2026-08-31, verbatim from the ACCC page**: "The expiry date for the wheat
+  port code has been deferred until 1 October 2026. The code will remain in operation
+  until 1 October 2026, unless the Australian Government makes a decision to either remake
+  or repeal the code at an earlier date." **No remake or repeal decision is published as at
+  this retrieval.**
+- **Draft remake out for consultation**: the federal government released a draft
+  streamlined remake in **July 2026**, intended to run **three years** while industry
+  develops a self-regulatory framework, consulted for three weeks through the
+  Department of Agriculture, Fisheries and Forestry's Have Your Say platform. GrainGrowers
+  and Grain Producers Australia both oppose full deregulation and are split on the model.
+  The article records the ACCC noting "the number of port operator competitors to the three
+  major port export operators, with smaller enterprises setting up lower cost operations,
+  utilising equipment such as mobile ship loaders" — the same class of operator this piece
+  is about.
+- **URLs**: `https://www.accc.gov.au/business/industry-codes/wheat-port-code-of-conduct`;
+  `https://www.theland.com.au/story/9306486/federal-government-wheat-port-code-draft-splits-grower-groups/`
+  (The Land, 8–9 July 2026); `https://www.graincentral.com/news/wheat-port-code-extended-by-up-to-two-years/`
+  · **Retrieved**: 2026-08-31 · **Licence**: government page + publisher content, quoted
+  with attribution.
+- **Local cache**: `data/raw/press/accc_wheat_port_code_20260831.html`,
+  `data/raw/press/theland_9306486_wheat-port-code-draft_20260831.html`,
+  `data/raw/press/graincentral_wheat-port-code-extended_20260831.html`
+- **Why it is load-bearing**: `docs/prepublication_review.md` §5 flags that the piece may
+  publish in the last weeks before the 1 October 2026 sunset. The re-check changes the
+  framing available: it is **not** a bare sunset — a three-year remake is drafted and
+  consulted on, and the decision is still open. Re-check again immediately before
+  publication; a decision landing between now and 1 October would date the piece on its
+  first read.
+
+## published-claims — press and government reporting (verification pass 2026-08-31)
+
+Sources for the *narrative* claims the piece opens on, as distinct from the datasets above.
+Verified 2026-08-31 by fetching and reading each item in full. Cached under
+`data/raw/press/` — **note: these files post-date `data/raw/MANIFEST.sha256` and are not in
+it.** Each entry records what the source does *and does not* support.
+
+### ep-freight-study-2018 (primary — the road claim)
+- **Claim it supports**: the roads named as carrying the additional grain freight once EP
+  rail closed — **Tod Highway, Lincoln Highway (Arno Bay–Port Lincoln), Balumbah-Kinnaird
+  Road, Wharminda Road, Western Approach Road**.
+- **What**: *Eyre Peninsula Freight Study*, SMEC internal ref. 3005591, Revision 0 – Final,
+  **dated 26 Sept 2018**, prepared by Tim Warren for **the Department of Planning, Transport
+  and Infrastructure and Genesee and Wyoming Australia**; publicly released by the SA
+  Government early April 2019.
+- **URL**: `https://www.dit.sa.gov.au/__data/assets/pdf_file/0008/540872/Eyre_Peninsula_Freight_Study.pdf`
+  — **now 404 on the live host**. Retrieved from
+  `https://web.archive.org/web/20240329115459id_/<that URL>`.
+- **Retrieved**: 2026-08-31 · **Licence**: publicly released government/consultant study;
+  cited with attribution.
+- **What it actually says**: the five roads appear in the study's *impacted network* route
+  tables (extracted-text lines 1064–1072, 2123–2141) for the **Base Case** — defined at §8.2
+  as the transition of all EP grain to road. §8.2.1 scopes "curve widening, shoulder sealing,
+  median treatments and minor intersection upgrades", overtaking lanes, rest areas, "Road
+  rehabilitation works … to achieve a Pavement Health Index rating of `Fair'", sealing of
+  impacted Council unsealed roads, and "safety improvements within the City" of Port Lincoln.
+  Freight vehicles are converted at "an average payload of 70tonnes/vehicle".
+- **What it does NOT say**: it is a **forecast**, finalised eight months before grain rail
+  ceased. It contains no observation of realised post-closure traffic on any named road. Its
+  Table 4 cost columns do not survive text extraction cleanly, so the $95.5 m / $50.7 m
+  totals below are cited to the Port Lincoln Times, not re-derived here.
+- **Reproduce**: `pdftotext data/raw/press/dit_eyre_peninsula_freight_study_smec_2018_wayback20240329.pdf - | grep -n "Wharminda"`
+- **Local cache**: `data/raw/press/dit_eyre_peninsula_freight_study_smec_2018_wayback20240329.pdf`
+
+### port-lincoln-times-ep-freight-study-2019 (the quotable sentence)
+- **What**: "Eyre Peninsula freight study highlights costs" (sub-headline "Grain shift to
+  cost millions"), **by Jarrad Delaney, Port Lincoln Times, first published 10 April 2019
+  9:31am, updated 10 April 2019 5:28pm**.
+- **URL**: `https://www.portlincolntimes.com.au/story/6012789/grain-shift-to-cost-millions/`
+  — the live host (rebuilt by SA Today Pty Ltd) now serves its homepage at this path.
+  Retrieved from `https://web.archive.org/web/20230324165622id_/<that URL>`.
+- **Retrieved**: 2026-08-31 · **Licence**: publisher content; short quotation with
+  attribution for research/reporting.
+- **The sentence** (verbatim): "The report shows roads affected by the closure of rail will
+  include the Tod Highway and Lincoln Highway between Arno Bay and Port Lincoln, as well as
+  Balumbah-Kinnaird, Wharminda and Western Approach roads."
+- **Also verified in this article** (verbatim): "So far about $25 million has been announced
+  by the federal government to upgrade the road network to cater for increased truck
+  movements." / "The report shows the base case option would require about $95.5 million in
+  road infrastructure investment with about $50.7 million in road maintenance costs." /
+  Transport Minister Stephan Knoll, "about 60 to 70 per cent of grain was hauled by road on
+  Eyre Peninsula".
+- ⚠ **Tense.** The verb is "**will include**", published **10 April 2019 — seven weeks before
+  the last grain train (31 May 2019)** — reporting a study dated 26 Sept 2018. This source
+  establishes that the roads were **named in advance as the ones that would carry the extra
+  freight**. It does **not** establish that they *absorbed* it. Wording in the piece must
+  match the tense of the source.
+- **Local cache**: `data/raw/press/portlincolntimes_6012789_ep-freight-study_wayback20230324.html`
+
+### raa-ep-road-assessment-2024 (the only post-hoc road evidence found)
+- **What**: "RAA calls for review of Eyre Peninsula road network", RAA (Royal Automobile
+  Association of South Australia) media release, **2 August 2024**, releasing RAA's Eyre
+  Peninsula regional road assessment.
+- **URL**: `https://daily.raa.com.au/media-resources/raa-calls-for-review-of-eyre-peninsula-road-network/`
+  (report index: `https://www.raa.com.au/roadassessments`) · **Retrieved**: 2026-08-31 ·
+  **Licence**: publisher media release; cited with attribution.
+- **Verbatim**: "a survey of more than 1,300 Eyre Peninsula road users found road maintenance
+  was the biggest concern among locals – with the issue raised by 76% of respondents."
+- Also names "Cowell-Kimba Road, Balumbah-Kinnard Road and Bratten Way" as heavy-vehicle
+  affected corridors, and "Lincoln Highway, Tod Highway and Iron Knob Road" as having major
+  road-safety issues. Secondary reporting of the same release attributes an **87 %** figure
+  for respondents observing increased truck movements after the 2019 rail closure; that
+  percentage was **not** found in the release text itself and is **not** treated as verified.
+- ⚠ **This is the closest thing to a post-closure observation, and it does not name Wharminda
+  Road.** It supports Balumbah-Kinnaird, Lincoln Hwy and Tod Hwy after the fact. Wharminda
+  Road is supported **only prospectively**, by the 2018 study and the 2019 Port Lincoln Times
+  report of it.
+
+### ep-rail-closure-truck-figures-2019 (context figures — mixed reliability)
+- **ABC Rural, "A 'sad day' for the Eyre Peninsula as locals say goodbye to rail transport",
+  Brooke Neindorf, Emma Pedler and Patrick Martin, 31 May 2019** —
+  `https://www.abc.net.au/news/rural/2019-05-31/eyre-peninsula-farewells-grain-train/11159354`.
+  Verbatim: "Around 30,000 extra truck movements will take the place of the current rail
+  grain haulage on the Eyre Peninsula." Confirms the last grain train ran 31 May 2019.
+- **Grain Central, "Sun sets on Eyre Peninsula rail as Viterra moves to road", 27 Feb 2019** —
+  `https://www.graincentral.com/news/sun-sets-on-eyre-peninsula-rail-as-viterra-moves-to-road/`.
+  Verbatim: "The decision is expected to create up to 50 extra truck movements per day within
+  the town of Port Lincoln."
+- **RTBU SA/NT (Darren Phillips), "Ramsay must step in to save Eyre Peninsula Rail Line",
+  undated, internally dated to early May 2019 ("the Federal election just a fortnight away")** —
+  `https://www.rtbu.org.au/ramsay_must_step_in_to_save_eyre_peninsula_rail_line`.
+  Verbatim: "It will take 40 to 50 one-way truck movements to replace one train." and
+  "64,000 60-tonne trucks barreling through Port Lincoln every year".
+  ⚠ **This is a union media release campaigning in a federal election, not reporting.** The
+  64,000 figure is also the **total**, not the increment: at 60 t counting both directions it
+  implies ≈1.9 Mt through Port Lincoln, matching the freight study's "Of the 1.9 million
+  tonnes delivered to Port Lincoln in 2017", while the ~30,000 above is the rail-replacement
+  increment (816,000 t went by rail in 2017 per the same study). If either is used, attribute
+  it to the RTBU and say which quantity it is.
+- **Retrieved**: 2026-08-31 · **Licence**: publisher / organisation content; quoted with
+  attribution.
+
+### aurizon-viterra-rail-proposal-2023
+- **What**: the Aurizon + Viterra application for federal funding to reopen the EP grain lines.
+- **ABC Rural, 9 March 2023** (Bethanie Alderson, Brooke Neindorf, Bernadette Clarke, Narelle
+  Graham) — `https://www.abc.net.au/news/rural/2023-03-09/push-to-see-sa-rail-freight-return-with-federal-support/102073432`.
+  Verbatim: "Aurizon and Viterra submitted a formal application for federal government funding
+  of **$220 million** to upgrade and reopen the rail network between Port Lincoln and Cummins,
+  as well as the lines to Wudinna and Kimba." Also: "Viterra made the decision to no longer
+  use rail to transport grain on the Eye Peninsula in 2019 due to the condition of the line
+  and the restrictions it placed on operations." [sic — "Eye"]
+- **Grain Central, "Viterra, Aurizon seek Eyre Peninsula rail reboot", 3 March 2023** —
+  `https://www.graincentral.com/news/viterra-aurizon-seek-eyre-peninsula-rail-reboot/`:
+  "the removal of approximately **42,000** truck movements between up-country sites and Port
+  Lincoln annually"; the parties commit to moving "at least 1.3Mt of grain on the rail network
+  each year".
+- **Retrieved**: 2026-08-31 · **Licence**: publisher content; quoted with attribution.
+- ⚠ Note the tension the piece should not paper over: the operator's own 2023 number for truck
+  movements attributable to rail's absence is **42,000**, against ABC's 30,000 (2019) and the
+  RTBU's 64,000 (a total, 2019). Cite one, name its source and its basis.
+
+### viterra-2019-site-closures (the `closed_2019` tags in `pipeline/manual_sites.json`)
+- **What**: Viterra's June 2019 closure of 17 up-country sites, six of them on Eyre Peninsula.
+- **Stock Journal, "SILO SLASH: 17 Viterra grain sites to close", by Alisha Fogden, first
+  published 6 June 2019 6:00am, updated 7 June 2019 4:21pm** —
+  `https://www.stockjournal.com.au/story/6202314/freight-redirection-behind-viterras-17-silo-closures/`
+  (syndicated to Farm Online 7 June 2019 10:00am at
+  `https://www.farmonline.com.au/story/6204914/freight-redirection-behind-viterras-17-silo-closures/`,
+  which states "This story first appeared on Stock Journal").
+- **Stock Journal, "Croppers angry as upper EP silos take a hit" (standfirst: "Northern EP to
+  lose six silos"), by Alisha Fogden, first published 6 June 2019 1:00pm, updated 24 August
+  2023 10:51pm** — `https://www.stockjournal.com.au/story/6202864/northern-ep-to-lose-six-silos/`.
+- **Retrieved**: 2026-08-31 · **Licence**: publisher content; quoted with attribution.
+- **Counts and sites — VERIFIED.** "close 17 of its upcountry sites"; "six sites open last
+  year at **Minnipa, Kyancutta**, Brinkworth, Paskeville, Millicent and Walpeup in Vic would
+  not 'play a future role in the Viterra network'"; "A further 11 sites that were not open the
+  year prior at **Cungena, Waddikee, Kielpa, Wharminda**, Orroroo, Redhill, Robertstown, Long
+  Plains, Stockwell, Wunkar and Alawoona would also be closed permanently." The second story:
+  "The sites of Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda have been closed."
+  **17 statewide, 6 on EP — exactly the six `closed_2019` entries in `manual_sites.json`.**
+- ⚠ **The freight/rail attribution is NOT in either source.** "Freight redirection behind
+  Viterra's 17 silo closures" survives only as a **URL slug**; the article's headline is "SILO
+  SLASH: 17 Viterra grain sites to close" and the phrase "freight redirection" appears nowhere
+  in the body. Viterra's stated reasons, verbatim from operations manager Michael Hill:
+  "changing delivery patterns of growers and the changing environment"; "Since 2010, the
+  average truck size has increased by 30 per cent and those bigger trucks are delivering to our
+  bigger sites"; "Other reasons include a need for better quality management and food safety
+  requirements"; "The sites that were closed represented less than 2pc of total receivals
+  (based on a five-year average)". Rail is mentioned **once**, by a grower, about a *different*
+  and earlier closure: Minnipa cropper Matt Cook — "Most of the little sites around here have
+  not been kept up as well as they should have been, particularly since the rail closed to here
+  a few years ago." **No published source found attributes the 2019 closures to the May 2019
+  rail shutdown.** The `notes` field in `manual_sites.json` ("Closed in Viterra's 2019 network
+  rationalisation after EP rail shutdown") is an inference by this project, not a source claim.
+- ⚠ **Four of the six were already dormant.** Cungena, Waddikee, Kielpa and Wharminda are in
+  the "not open the year prior" group — they did not operate in 2018/19. Any "pre-2019" network
+  state that counts all six as open overstates the 2018/19 network by four points.
+- **Local cache**: `data/raw/press/stockjournal_6202314_17-silo-closures_20260831.html`,
+  `data/raw/press/farmonline_6204914_17-silo-closures_20260831.html`,
+  `data/raw/press/stockjournal_6202864_upper-ep-silos_20260831.html`
+
+### cungena-status-contradiction
+- **Two published sources conflict and neither is retracted.**
+  1. Stock Journal, 6 June 2019 (above): Cungena is in the group of 11 that "would also be
+     closed permanently", and was "not open the year prior".
+  2. **Viterra's own weekly harvest report, week ending Sunday 13 November 2022** (registered
+     above under `wayback-viterra-weekly-reports`; `data/processed/receivals_notes.jsonl`,
+     `week_ending: 2022-11-13`): "In Viterra's Central region, Ardrossan, Balaklava, Bowmans,
+     Crystal Brook, Port Giles and Snowtown received their first new season deliveries, **as
+     well as Cungena**, Elliston, Port Neill, Nunjikompita, Penong, Tumby Bay, Warramboo,
+     Witera and Wirrulla in the Western region."
+- **Searched and not found**: any published Viterra/Bunge announcement reopening Cungena, and
+  any correction to the 2019 closure list. Cungena appears in **1 of 148** parsed operator
+  harvest reports across ten seasons (2016/17–2025/26), is **absent** from the Aug-2026 Bunge
+  Western roster (23 sites, `operator-sites-api`) and **absent** from the 2025/26 segregations
+  table in `pipeline/manual_sites.json`.
+- ⚠ **Corrected 2026-08-31: this line read "1 of 128".** 128 is the size of a *different*
+  corpus — the `wayback-viterra-weekly-reports` cache above. The denominator for a search over
+  `receivals_notes.jsonl` is **148**: 127 of those 128 Wayback Viterra pages (one yields no
+  narrative) plus 21 Bunge-branded pages from `bunge-news-api`, of which 137 are weekly reports
+  and 11 monthly. `docs/r5_validation.md:121` already said 148. Do not quote a corpus count on
+  this page without the command below, which prints its own denominator.
+- **Reproduce the denominator and the hit together** (prints `148 148 ['2022-11-13']` —
+  records, distinct source files, and the weeks naming Cungena):
+
+  ```
+  PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import json;rows=[json.loads(l) for l in open('data/processed/receivals_notes.jsonl',encoding='utf-8')];print(len(rows),len({r['source_file'] for r in rows}),[r['week_ending'] for r in rows if 'Cungena' in json.dumps(r)])"
+  ```
+- **What the sources support**: Cungena was closed in June 2019 and described as permanent; it
+  nonetheless took first new-season deliveries in 2022/23; there is no published evidence of it
+  operating in any other season, and none that it is open now. The `closed permanently 2019`
+  note is therefore wrong as written, and no single tag is defensible — the season range is.
+- **Reproduce**: the command given above, which prints the denominator with the hit so the
+  count cannot go stale again.
 
 ## not-used / rejected sources
 - **MarineTraffic / VesselFinder**: ToS prohibit automated collection; not scraped.

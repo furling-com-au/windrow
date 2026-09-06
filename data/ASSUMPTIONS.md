@@ -419,16 +419,58 @@ harvest curve.
 ## A11 — T-Ports inland site coordinates
 - **Value**: town coordinates (Lock, Kimba); exact pads unpublished (Kimba pad is "east
   of the township").
-- **Sensitivity**: ≤ 5 km error on two closed-in-2025/26 sites; negligible for v1.
+- **Sensitivity**: ≤ 5 km error on two closed-in-2025/26 sites; negligible **for the
+  simulation**, where these are two of 25 sites and the error is small against a cart leg.
+- **NOT negligible for the ownership-gap geometry (`pipeline/r8_choice_geometry.py`).**
+  Lock and Kimba are the only independent *inland* receival points that have ever existed
+  on EP, so in the 2023/24 network state they alone set the "nearest independent point"
+  distance for much of the peninsula. A displacement of 5 km — inside this assumption's own
+  stated tolerance — moves the 2023/24 headline from 20.3 % to 24.6 % and cuts the
+  2023/24 → 2025/26 multiple from 3.3× to 2.72×. The error is asymmetric in **size**, not
+  in sign: the swept envelope runs 19.94–24.58 % against a published 20.3 %, so roughly
+  +4.3 pp of upside against −0.3 pp of downside, about 13:1. (An earlier version of this
+  entry claimed the error "can only ever make the baseline worse, never better"; the sweep
+  finds a 19.9 % configuration, so that was too strong.)
+- **Upgrade path**: the actual bunker pad coordinates, or an explicit sweep published
+  alongside the headline. Until one exists, any figure quoting the 2023/24 level or the
+  multiple must carry this range. The 2025/26 level (66.8 %) does not depend on it —
+  both bunkers are closed in that state.
 
 ## A12 — season site sets
-- **Value**: baseline network = the 18 active 2025/26 Bunge sites + 3 T-Ports sites;
-  earlier seasons re-enable dormant sites (Penong, Nunjikompita, Darke Peak, Buckleboo,
-  Elliston) when named in that season's reports (site-mention extraction from report
-  narratives), else keep 2025/26 set.
+- **Value**: baseline network = the **22** active 2025/26 Bunge sites + 3 T-Ports sites.
+  Every site carries `operating_seasons`, the set of seasons in which the operator's own
+  weekly report names it receiving grain (`pipeline/r1_build_sites.py`,
+  `annotate_operating_seasons`, from `data/processed/receivals_notes.jsonl`).
 - **Reasoning**: per-season official site lists aren't archived in machine-readable
   form; ACCC records 21 EP upcountry sites in 2020-21, 25 in 2019-20.
-- **Sensitivity**: small re-routing effects in early seasons.
+- **Positive evidence only.** A mention establishes that a site OPERATED that season. The
+  absence of a mention establishes nothing: reports name a site at its first receival and
+  when it is notable, not every week. `operating_seasons` is a lower bound and must never
+  be read as a roster. Sentences are required to carry a receival verb, and a name behind
+  a locational preposition is rejected — "east of Kyancutta" locates a grower's paddock,
+  it is not a receival at Kyancutta.
+- **Corrected 2026-08-31 (was wrong in both directions).** This entry previously described
+  per-season re-enabling that *no code implemented* — nothing in the pipeline or the engine
+  varied the site set by season — and it listed Penong, Darke Peak, Buckleboo and Elliston
+  as dormant. They are not: `segregations_2025_26` was read from the live Bunge table on
+  2026-08-19, **off-season**, and a site between harvests correctly lists no segregations.
+  `r1_build_sites.py` read that emptiness as "dormant" and closed four sites that Bunge's
+  own reports name taking 2025/26 deliveries ("Harvest kicked off at our Buckleboo,
+  Elliston, Penong, Poochera and Warramboo sites", week ending 2025-11-16; Darke Peak,
+  week ending 2025-11-23). This is the same off-season trap already recorded for the cash-
+  price board, which lists zero EP sites outside harvest. Only Nunjikompita remains
+  dormant, on weak evidence: last named 2023/24, no mention since.
+- **Sensitivity**: measured, not asserted. Re-running the v1 scenario set on the corrected
+  roster moves every headline by <1 % except two queue figures (road closure +5.3 %, Lucky
+  Bay −2.4 %); every ranking and direction of effect is unchanged, so the fitted parameter
+  vector was NOT refitted. Operable 2025/26 storage rises ~0.48 Mt (1.99 → 2.46 Mt),
+  which the network barely notices at baseline because it is not storage-constrained
+  there. Site capacities themselves are unchanged: the A4 pool always included the
+  dormant sites.
+- **Known open**: `pipeline/r8_choice_geometry.py` still builds its historical network
+  states from the single `status` field rather than from `operating_seasons`, so its
+  2023/24 column omits Nunjikompita, which was named that season. See
+  `docs/roster_audit_2026-08.md`.
 
 ## A14 — PIRSA district boundaries approximated by LGA composition
 - **Value**: WEP = Ceduna + Streaky Bay + Elliston + Wudinna (+ unincorporated far-west
@@ -533,13 +575,148 @@ harvest curve.
   gates actually hold.
 
 ## A18 — road grain freight rate (economics layer, indicative)
-- **Value**: A$0.10 per tonne-km (range 0.07–0.13).
-- **Used in**: app takeaways panel only (freight $ deltas). Never in the sim itself.
-- **Reasoning**: consistency-checked against published anchors: ~144 km average
-  site→port haul ⇒ ≈A$14/t cartage, sitting sensibly inside the published $60–75/t
-  whole-of-chain cost at 200 km (AEGIC via ESCOSA 2019) and EP-vs-eastern-SA relative
-  cost statements. No single public EP $/t-km schedule exists.
-- **Sensitivity**: linear on displayed freight dollars; labelled "indicative" in-app.
+- **PUBLISHED SCHEDULE (corrected 2026-08-31 — this, not the app lever, is what may be
+  published).** ESCOSA publishes a marginal road-cartage schedule for grain in South
+  Australia. Verbatim: *"Only the marginal freight cost has been used, $0.12 ($/tonne-km)
+  for up to 50 kilometres and $0.11 ($/tonne-km) for 50 to 250 kilometres."* — Essential
+  Services Commission of South Australia, *Inquiry into the South Australian bulk grain
+  export supply chain costs — Final Report*, 29 January 2019, Box 5.2 (p. 91). ESCOSA
+  sources it to AEGIC, "verified against published Viterra freight rates"; its footnote 289
+  attributes the ≤50 km figure to AEGIC, *Australia's grain supply chains: Costs, Risks and
+  Opportunities*, October 2018, Note 2c to Figure 4, p. 18, and the 50–250 km figure to
+  unpublished **"AEGIC advice"** — so only the first of the two rates traces to a public
+  document. Registered as `escosa-marginal-trucking-rate-2019` in `data/SOURCES.md`.
+  - **Reproduce**:
+    `pdftotext -layout data/raw/reference/escosa_grain_supply_chain_2019.pdf - | sed -n '5405,5412p'`
+- **What the rate covers. This is the part that most changes the answer, and it is read off
+  the source rather than inferred.**
+  - **Marginal, not average.** ESCOSA: *"This is on the basis that once the grower's truck
+    is on the road, then only the additional (marginal) cost involved in travelling further
+    to the next available site is relevant."* Everything that does not vary with the extra
+    kilometres — truck ownership, loading, the trip that would have been made anyway — is
+    outside it. It is a rate on the *extra* distance, which is exactly this project's
+    question ("what does the missing alternative cost me"). It is **not** a full cartage
+    price and must never be presented as one.
+  - **One-way loaded kilometres; the empty return leg is not added.** ESCOSA measures "the
+    distance between the `closure site' and Gladstone" from Google Maps and multiplies it
+    once. All four of its own published results reproduce exactly on that reading and on no
+    other: Caltowie 16.3 km → $1.96/t, Yongala 53.0 km → $5.83/t, Gulnare 31.7 km →
+    $3.80/t, Jamestown 28.5 km → $3.42/t.
+  - **The bands are flat, not tiered.** The rate is selected by the *whole* distance and
+    applied to all of it. Yongala at 53.0 km is priced 53.0 × $0.11 = $5.83, not
+    50 × $0.12 + 3 × $0.11 = $6.33. Do not build a cumulative tier.
+  - **Reproduce both of the above**:
+    `.venv/Scripts/python.exe pipeline/r9_escosa_rate_check.py`
+  - **Time is excluded, and ESCOSA says so.** *"This case study has not addressed all
+    potential costs, such as if the additional travel time resulted in the need for a
+    grower to employ an additional truck."* It likewise sets aside site-side turnaround
+    ("improving elevator speeds to enable faster truck turnaround"). Queueing, waiting and
+    driver time are outside the rate.
+  - **The source is SILENT on whether the empty return, loading or waiting sit INSIDE the
+    underlying AEGIC cost line.** Searching the full report text for "return leg",
+    "backload", "round trip", "one-way" and "empty" returns nothing on point. What is
+    established is only that ESCOSA *applies* the rate to a one-way distance. Whether
+    AEGIC built the cost line on a round-trip cycle is not stated in any document in this
+    repo, and it is worth a factor of two. Report it as an open question; do not resolve it
+    by assumption, and do not double the distance to "account for" the return.
+- **Base year: 2018 dollars, nominal, and explicitly NOT deflated.** ESCOSA: *"The marginal
+  trucking cost rates have not been deflated because it is not known how well the resulting
+  deflated costs would reflect the actual costs of the time."* The rate therefore sits at
+  the cost level of its AEGIC source (October 2018) as published in January 2019, and
+  ESCOSA applies it unchanged to decisions dating back to 2010-11. Call it **2018–19 A$**.
+  It is a point figure: no published range, no confidence interval, no per-configuration
+  breakdown.
+- **Seven years of inflation: publish in the source's own dollars and say so.** No
+  indexation is applied here, for three reasons. (1) Escalating a marginal cost line by CPI
+  or a road-freight PPI produces a number no publication supports — precisely the
+  substitution this project has already had to withdraw twice. (2) The choice of index is
+  load-bearing and unjustifiable from anything in this repo; fuel, wages and equipment have
+  not moved together since 2018. (3) The one *more recent* published marginal increment
+  that exists points the other way, not upward: the Australian Custom Harvesters
+  recommended rate card, valid as at 1 February 2026, adds **$0.10/t excl GST per kilometre
+  beyond the first 10 km** — below ESCOSA's 2018 $0.11–0.12 on a comparable marginal basis.
+  Any indexed figure must be labelled a derived estimate, carry its index and its command,
+  and never be the headline. **The headline number is 2018–19 A$/t-km.**
+- **No band above 250 km.** The schedule stops there. Legs beyond 250 km — anything routed
+  off the peninsula — fall outside it; applying $0.11 above 250 km is an extrapolation, not
+  a citation, and must be labelled as one.
+- **Used in**: from 2026-08-31, the Tier-2 cartage-dollars output
+  `pipeline/r9_cartage.py` (writes `docs/r9_cartage.md` and `docs/r9_cartage.json`),
+  which cites the ESCOSA schedule directly and imports its bands from
+  `pipeline/r9_escosa_rate_check.py` rather than retyping them. The app takeaways panel still uses the flat working value below.
+  **Never in the sim itself**; it carries no fitted parameter.
+- **App lever (unchanged by this correction, and NOT a citation)**: A$0.10 per tonne-km
+  (range 0.07–0.13), used for the app's indicative freight $ deltas and inside A23's
+  premium translation. That is this project's own working value. It happens to sit just
+  under the published schedule, which is worth stating as a coincidence rather than as
+  evidence. Re-pointing the app at the published bands is a code change with its own
+  verification and was not made in this pass. Anything quoted from the app stays
+  "indicative"; anything published quotes ESCOSA.
+- **What was wrong here, precisely.** This entry previously ended: "No single public EP
+  $/t-km schedule exists." Split it in two.
+  - **"a public $/t-km schedule ... exists" — WRONG.** One does; it is a regulator's final
+    report; it was already cached in this repo at
+    `data/raw/reference/escosa_grain_supply_chain_2019.pdf`; and this entry cited that very
+    document for a different figure while denying the schedule inside it. Two withdrawn
+    claims (`docs/r0_choice_geometry.md:48`, `:284`) quote the sentence as written, and
+    their withdrawal does not depend on it — see the note below.
+  - **"EP" — RIGHT, and it is the whole of what survives.** The schedule is **South
+    Australia-wide**, and the case study behind it is the upper Central region (Gladstone
+    catchment, ~16–53 km hauls), not the Eyre Peninsula. No EP-specific $/t-km schedule was
+    found. EP differs in both directions — better road-train access (A1) argues for a lower
+    marginal $/t-km, remoteness and the post-2019 all-road task for a higher one — and
+    ESCOSA disaggregates neither. The accurate statement is now: *a public SA-wide marginal
+    $/t-km schedule exists and is used here; no EP-specific one was found.*
+  - **This does NOT reopen the 90-minute threshold.** `docs/r0_choice_geometry.md` withdrew
+    the cartage ground for designating 90 minutes on two grounds, and only the weaker of
+    them was "A18 is not published". The stronger one stands untouched: **a cost rate
+    cannot justify a distance threshold**, whoever published it. The schedule is used here
+    as what it is — a cost rate applied to distances that are chosen elsewhere.
+- **Newer schedule: searched, none found.** Searched 2026-08-31 for any published $/t-km
+  grain road-freight schedule postdating January 2019, SA or national. Checked: ESCOSA's
+  inquiry page (no successor inquiry or update since the 29 Jan 2019 final report); AEGIC's
+  publication listing and the *Australia's grain supply chains* report family (no edition
+  later than October 2018 — the 2024 URLs are re-uploads of the 2018 report; aegic.org.au
+  refuses automated fetches, so that is a search result, not a document read); ACCC bulk
+  grain ports monitoring (ports and capacity only — the ACCC does not collect overland
+  grain movements); ABS road freight. Two *more recent* published rate documents exist and
+  neither replaces the schedule:
+  - **Australian Custom Harvesters**, recommended cartage rates, valid 1 February 2026 —
+    "up to 10 km – $16.50 per tonne (excl GST)", then "add $0.10 (excl GST) ... per tonne"
+    per further kilometre; "These rates include demurrage"; "These rates are a guide only."
+    National, contractor guidance, and a *full* charge with a large fixed component, not a
+    regulator's marginal line.
+  - **SAGIT / Ag Excellence Alliance, *2026 Farm Gross Margin and Enterprise Planning Guide
+    for South Australia*** — "Freight Costs (as included in Gross Margins)": cereal grains
+    **$35.00/tonne**, canola $35.00, lentils $38.00, triticale $28.00, on a delivered-port
+    price basis. SA and current, but a single flat $/t with **no distance term at all**, so
+    it cannot produce a per-district cartage figure.
+
+  Used as a bracket at EP's ~144 km average site→port haul, the three show what the
+  marginal rate leaves out: ESCOSA 144 × $0.11 = **$15.84/t** marginal; ACH $16.50 +
+  134 × $0.10 = **$29.90/t** full commercial; SAGIT **$35.00/t** budgeted. The marginal
+  rate is roughly half a delivered cartage price. That gap is the fixed and time cost the
+  marginal rate deliberately excludes — it is not an error in it.
+- **Cartage is only half a delivery decision.** Growers deliver where price *minus* cartage
+  is best, and this project has no price data (13 days of off-season cash bids; see
+  `operator-cash-prices-api` in `data/SOURCES.md`). Every figure derived from this rate must
+  say so, and must never be presented as a total grower benefit or loss.
+- **Sensitivity**: linear on displayed freight dollars. Between the two published bands the
+  spread is 9 % ($0.11 vs $0.12); against the app's working 0.07–0.13 band it is a factor
+  of 1.9. Distances are routed (A5), so a road-speed error does not move these dollars —
+  only a distance error does.
+- **Superseded reasoning (kept so the change is auditable).** This entry previously rested
+  on a consistency check — "~144 km average site→port haul ⇒ ≈A$14/t cartage, sitting
+  sensibly inside the published $60–75/t whole-of-chain cost at 200 km (AEGIC via ESCOSA
+  2019)". The 144 km and 200 km distances are in the ESCOSA text and check out; the
+  $60–75/t whole-of-chain figure **could not be re-verified** from the cached PDF, whose
+  cost comparisons (Figures 4.3–4.5) are images that carry no extractable text. It is no
+  longer load-bearing — the schedule above replaces it — and it should not be requoted
+  until someone reads it off the AEGIC report itself.
+- **Upgrade path**: an EP-specific or post-2019 published $/t-km schedule; the AEGIC
+  October 2018 report itself (Note 2c to Figure 4, p. 18), which would settle whether the
+  underlying cost line is one-way or round-trip; and any published EP farm-gate price
+  series, without which a cartage figure stays one side of the ledger.
 
 ## A19 — vessel waiting cost (economics layer, indicative)
 - **Value**: A$30,000 per vessel-day at anchor (≈US$15–25k/day demurrage-equivalent

@@ -1,0 +1,2510 @@
+{
+  "generated": "r10_arowana_claim.py",
+  "claim": "Arowana, September 2021: Lucky Bay 'generates road freight savings for grain growers from the Eyre Peninsula of up to $15 per tonne'.",
+  "claim_aud_per_t": 15.0,
+  "breakeven_one_way_km_for_15_aud": {
+    "escosa_oneway": 136.4,
+    "escosa_return": 68.2,
+    "ach2026_marginal": 150.0
+  },
+  "published_least_time_routing": {
+    "R1_vs_nearest_bunge_upcountry": {
+      "description": "Grower switches from the nearest Bunge upcountry silo to Lucky Bay. Saving = cartage(nearest Bunge upcountry) - cartage(Lucky Bay). This is the negative of R9's primary measure M2, restricted to upcountry silos.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -16.3,
+            "tonne_weighted_mean_saved_km": -149.7,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0452,
+            "share_saving_le_0": 0.9548
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -29.36,
+            "tonne_weighted_mean_saved_km": -268.7,
+            "max_aud_per_t": -8.98,
+            "max_saved_km": -84.8,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.84,
+            "tonne_weighted_mean_saved_km": -63.3,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.1379,
+            "share_saving_le_0": 0.8621
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -14.65,
+            "tonne_weighted_mean_saved_km": -134.7,
+            "max_aud_per_t": -6.42,
+            "max_saved_km": -59.7,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -32.75,
+            "tonne_weighted_mean_saved_km": -149.7,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0012,
+            "share_saving_ge_5": 0.0338,
+            "share_saving_gt_0": 0.0452,
+            "share_saving_le_0": 0.9548
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -58.96,
+            "tonne_weighted_mean_saved_km": -268.7,
+            "max_aud_per_t": -18.65,
+            "max_saved_km": -84.8,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -13.75,
+            "tonne_weighted_mean_saved_km": -63.3,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0037,
+            "share_saving_ge_5": 0.1032,
+            "share_saving_gt_0": 0.1379,
+            "share_saving_le_0": 0.8621
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -29.41,
+            "tonne_weighted_mean_saved_km": -134.7,
+            "max_aud_per_t": -12.84,
+            "max_saved_km": -59.7,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -14.97,
+            "tonne_weighted_mean_saved_km": -149.7,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0452,
+            "share_saving_le_0": 0.9548
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -26.87,
+            "tonne_weighted_mean_saved_km": -268.7,
+            "max_aud_per_t": -8.48,
+            "max_saved_km": -84.8,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.33,
+            "tonne_weighted_mean_saved_km": -63.3,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.1379,
+            "share_saving_le_0": 0.8621
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -13.47,
+            "tonne_weighted_mean_saved_km": -134.7,
+            "max_aud_per_t": -5.97,
+            "max_saved_km": -59.7,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        }
+      }
+    },
+    "R1b_vs_nearest_bunge_any": {
+      "description": "Grower switches from the nearest Bunge receival point of any role (silo or port) to Lucky Bay. Exactly the negative of R9's M2 at state A.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -16.48,
+            "tonne_weighted_mean_saved_km": -151.4,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0452,
+            "share_saving_le_0": 0.9548
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -29.89,
+            "tonne_weighted_mean_saved_km": -273.8,
+            "max_aud_per_t": -8.98,
+            "max_saved_km": -84.8,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.84,
+            "tonne_weighted_mean_saved_km": -63.3,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.1379,
+            "share_saving_le_0": 0.8621
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -14.72,
+            "tonne_weighted_mean_saved_km": -135.3,
+            "max_aud_per_t": -6.42,
+            "max_saved_km": -59.7,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -33.11,
+            "tonne_weighted_mean_saved_km": -151.4,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0012,
+            "share_saving_ge_5": 0.0338,
+            "share_saving_gt_0": 0.0452,
+            "share_saving_le_0": 0.9548
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -60.08,
+            "tonne_weighted_mean_saved_km": -273.8,
+            "max_aud_per_t": -18.65,
+            "max_saved_km": -84.8,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -13.75,
+            "tonne_weighted_mean_saved_km": -63.3,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0037,
+            "share_saving_ge_5": 0.1032,
+            "share_saving_gt_0": 0.1379,
+            "share_saving_le_0": 0.8621
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -29.53,
+            "tonne_weighted_mean_saved_km": -135.3,
+            "max_aud_per_t": -12.84,
+            "max_saved_km": -59.7,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -15.14,
+            "tonne_weighted_mean_saved_km": -151.4,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0452,
+            "share_saving_le_0": 0.9548
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -27.38,
+            "tonne_weighted_mean_saved_km": -273.8,
+            "max_aud_per_t": -8.48,
+            "max_saved_km": -84.8,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.33,
+            "tonne_weighted_mean_saved_km": -63.3,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.1379,
+            "share_saving_le_0": 0.8621
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -13.53,
+            "tonne_weighted_mean_saved_km": -135.3,
+            "max_aud_per_t": -5.97,
+            "max_saved_km": -59.7,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        }
+      }
+    },
+    "R2_vs_port_lincoln": {
+      "description": "Grower who would otherwise cart farm-direct to Port Lincoln instead carts farm-direct to Lucky Bay.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -0.06,
+            "tonne_weighted_mean_saved_km": -0.6,
+            "max_aud_per_t": 19.45,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0495,
+            "share_saving_ge_10": 0.1666,
+            "share_saving_ge_5": 0.2911,
+            "share_saving_gt_0": 0.5121,
+            "share_saving_le_0": 0.4879
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.35,
+            "tonne_weighted_mean_saved_km": 3.2,
+            "max_aud_per_t": 7.41,
+            "max_saved_km": 67.3,
+            "max_cell": "WEP cell lon 135.851 lat -33.153",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0172,
+            "share_saving_gt_0": 0.5956,
+            "share_saving_le_0": 0.4044
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 9.85,
+            "tonne_weighted_mean_saved_km": 90.1,
+            "max_aud_per_t": 19.45,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.1511,
+            "share_saving_ge_10": 0.5083,
+            "share_saving_ge_5": 0.8729,
+            "share_saving_gt_0": 0.9969,
+            "share_saving_le_0": 0.0031
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -8.79,
+            "tonne_weighted_mean_saved_km": -80.6,
+            "max_aud_per_t": 4.09,
+            "max_saved_km": 37.2,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -0.14,
+            "tonne_weighted_mean_saved_km": -0.6,
+            "max_aud_per_t": 38.9,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.2148,
+            "share_saving_ge_10": 0.2911,
+            "share_saving_ge_5": 0.3318,
+            "share_saving_gt_0": 0.5121,
+            "share_saving_le_0": 0.4879
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.7,
+            "tonne_weighted_mean_saved_km": 3.2,
+            "max_aud_per_t": 14.82,
+            "max_saved_km": 67.3,
+            "max_cell": "WEP cell lon 135.851 lat -33.153",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0172,
+            "share_saving_ge_5": 0.051,
+            "share_saving_gt_0": 0.5956,
+            "share_saving_le_0": 0.4044
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 19.81,
+            "tonne_weighted_mean_saved_km": 90.1,
+            "max_aud_per_t": 38.9,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.6554,
+            "share_saving_ge_10": 0.8729,
+            "share_saving_ge_5": 0.9627,
+            "share_saving_gt_0": 0.9969,
+            "share_saving_le_0": 0.0031
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -17.71,
+            "tonne_weighted_mean_saved_km": -80.6,
+            "max_aud_per_t": 8.18,
+            "max_saved_km": 37.2,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -0.06,
+            "tonne_weighted_mean_saved_km": -0.6,
+            "max_aud_per_t": 17.69,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0266,
+            "share_saving_ge_10": 0.151,
+            "share_saving_ge_5": 0.2749,
+            "share_saving_gt_0": 0.5121,
+            "share_saving_le_0": 0.4879
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.32,
+            "tonne_weighted_mean_saved_km": 3.2,
+            "max_aud_per_t": 6.73,
+            "max_saved_km": 67.3,
+            "max_cell": "WEP cell lon 135.851 lat -33.153",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0134,
+            "share_saving_gt_0": 0.5956,
+            "share_saving_le_0": 0.4044
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 9.01,
+            "tonne_weighted_mean_saved_km": 90.1,
+            "max_aud_per_t": 17.69,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0812,
+            "share_saving_ge_10": 0.4605,
+            "share_saving_ge_5": 0.827,
+            "share_saving_gt_0": 0.9969,
+            "share_saving_le_0": 0.0031
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -8.06,
+            "tonne_weighted_mean_saved_km": -80.6,
+            "max_aud_per_t": 3.72,
+            "max_saved_km": 37.2,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        }
+      }
+    },
+    "R3_vs_thevenard": {
+      "description": "Grower who would otherwise cart farm-direct to Thevenard instead carts farm-direct to Lucky Bay.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 13.17,
+            "tonne_weighted_mean_saved_km": 119.8,
+            "max_aud_per_t": 45.37,
+            "max_saved_km": 412.5,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.7157,
+            "share_saving_ge_10": 0.7478,
+            "share_saving_ge_5": 0.7682,
+            "share_saving_gt_0": 0.7918,
+            "share_saving_le_0": 0.2082
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -16.68,
+            "tonne_weighted_mean_saved_km": -152.1,
+            "max_aud_per_t": 21.68,
+            "max_saved_km": 197.1,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0801,
+            "share_saving_ge_10": 0.1239,
+            "share_saving_ge_5": 0.1911,
+            "share_saving_gt_0": 0.2735,
+            "share_saving_le_0": 0.7265
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 27.18,
+            "tonne_weighted_mean_saved_km": 247.6,
+            "max_aud_per_t": 45.37,
+            "max_saved_km": 412.5,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.9759,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 23.45,
+            "tonne_weighted_mean_saved_km": 213.2,
+            "max_aud_per_t": 33.5,
+            "max_saved_km": 304.6,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.9668,
+            "share_saving_ge_10": 0.9971,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 26.35,
+            "tonne_weighted_mean_saved_km": 119.8,
+            "max_aud_per_t": 90.74,
+            "max_saved_km": 412.5,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.7587,
+            "share_saving_ge_10": 0.7682,
+            "share_saving_ge_5": 0.7743,
+            "share_saving_gt_0": 0.7918,
+            "share_saving_le_0": 0.2082
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -33.45,
+            "tonne_weighted_mean_saved_km": -152.1,
+            "max_aud_per_t": 43.36,
+            "max_saved_km": 197.1,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.1581,
+            "share_saving_ge_10": 0.1911,
+            "share_saving_ge_5": 0.2126,
+            "share_saving_gt_0": 0.2735,
+            "share_saving_le_0": 0.7265
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 54.46,
+            "tonne_weighted_mean_saved_km": 247.6,
+            "max_aud_per_t": 90.74,
+            "max_saved_km": 412.5,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 1.0,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 46.9,
+            "tonne_weighted_mean_saved_km": 213.2,
+            "max_aud_per_t": 67.01,
+            "max_saved_km": 304.6,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 1.0,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 11.98,
+            "tonne_weighted_mean_saved_km": 119.8,
+            "max_aud_per_t": 41.25,
+            "max_saved_km": 412.5,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.6765,
+            "share_saving_ge_10": 0.7429,
+            "share_saving_ge_5": 0.7671,
+            "share_saving_gt_0": 0.7918,
+            "share_saving_le_0": 0.2082
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -15.21,
+            "tonne_weighted_mean_saved_km": -152.1,
+            "max_aud_per_t": 19.71,
+            "max_saved_km": 197.1,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0697,
+            "share_saving_ge_10": 0.1093,
+            "share_saving_ge_5": 0.1874,
+            "share_saving_gt_0": 0.2735,
+            "share_saving_le_0": 0.7265
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 24.76,
+            "tonne_weighted_mean_saved_km": 247.6,
+            "max_aud_per_t": 41.25,
+            "max_saved_km": 412.5,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.9498,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 21.32,
+            "tonne_weighted_mean_saved_km": 213.2,
+            "max_aud_per_t": 30.46,
+            "max_saved_km": 304.6,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.895,
+            "share_saving_ge_10": 0.9952,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          }
+        }
+      }
+    },
+    "R4_vs_nearest_bunge_port": {
+      "description": "Grower who carts farm-direct to an export port: nearest Bunge port (Port Lincoln or Thevenard) vs Lucky Bay. This is R9's M4, C -> A.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 3.38,
+            "tonne_weighted_mean_saved_km": 30.9,
+            "max_aud_per_t": 19.45,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0495,
+            "share_saving_ge_10": 0.1666,
+            "share_saving_ge_5": 0.2911,
+            "share_saving_gt_0": 0.4048,
+            "share_saving_le_0": 0.5952
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.46,
+            "tonne_weighted_mean_saved_km": 4.2,
+            "max_aud_per_t": 7.41,
+            "max_saved_km": 67.3,
+            "max_cell": "WEP cell lon 135.851 lat -33.153",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0172,
+            "share_saving_gt_0": 0.2213,
+            "share_saving_le_0": 0.7787
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 9.85,
+            "tonne_weighted_mean_saved_km": 90.1,
+            "max_aud_per_t": 19.45,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.1511,
+            "share_saving_ge_10": 0.5083,
+            "share_saving_ge_5": 0.8729,
+            "share_saving_gt_0": 0.9969,
+            "share_saving_le_0": 0.0031
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 0.05,
+            "tonne_weighted_mean_saved_km": 0.4,
+            "max_aud_per_t": 4.09,
+            "max_saved_km": 37.2,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 6.79,
+            "tonne_weighted_mean_saved_km": 30.9,
+            "max_aud_per_t": 38.9,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.2148,
+            "share_saving_ge_10": 0.2911,
+            "share_saving_ge_5": 0.3318,
+            "share_saving_gt_0": 0.4048,
+            "share_saving_le_0": 0.5952
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.92,
+            "tonne_weighted_mean_saved_km": 4.2,
+            "max_aud_per_t": 14.82,
+            "max_saved_km": 67.3,
+            "max_cell": "WEP cell lon 135.851 lat -33.153",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0172,
+            "share_saving_ge_5": 0.051,
+            "share_saving_gt_0": 0.2213,
+            "share_saving_le_0": 0.7787
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 19.81,
+            "tonne_weighted_mean_saved_km": 90.1,
+            "max_aud_per_t": 38.9,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.6554,
+            "share_saving_ge_10": 0.8729,
+            "share_saving_ge_5": 0.9627,
+            "share_saving_gt_0": 0.9969,
+            "share_saving_le_0": 0.0031
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 0.1,
+            "tonne_weighted_mean_saved_km": 0.4,
+            "max_aud_per_t": 8.18,
+            "max_saved_km": 37.2,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 3.09,
+            "tonne_weighted_mean_saved_km": 30.9,
+            "max_aud_per_t": 17.69,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0266,
+            "share_saving_ge_10": 0.151,
+            "share_saving_ge_5": 0.2749,
+            "share_saving_gt_0": 0.4048,
+            "share_saving_le_0": 0.5952
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.42,
+            "tonne_weighted_mean_saved_km": 4.2,
+            "max_aud_per_t": 6.73,
+            "max_saved_km": 67.3,
+            "max_cell": "WEP cell lon 135.851 lat -33.153",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0134,
+            "share_saving_gt_0": 0.2213,
+            "share_saving_le_0": 0.7787
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 9.01,
+            "tonne_weighted_mean_saved_km": 90.1,
+            "max_aud_per_t": 17.69,
+            "max_saved_km": 176.9,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0812,
+            "share_saving_ge_10": 0.4605,
+            "share_saving_ge_5": 0.827,
+            "share_saving_gt_0": 0.9969,
+            "share_saving_le_0": 0.0031
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 0.04,
+            "tonne_weighted_mean_saved_km": 0.4,
+            "max_aud_per_t": 3.72,
+            "max_saved_km": 37.2,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        }
+      }
+    },
+    "R5_stateB_vs_nearest_bunge_any": {
+      "description": "SEPTEMBER-2021 NETWORK (state B: Lucky Bay + Lock + Kimba bunkers). Grower switches from the nearest Bunge point to the nearest T-Ports point. Negative of R9's M2 at state B. This is the state that actually existed on the date of the claim.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -8.36,
+            "tonne_weighted_mean_saved_km": -77.0,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.1044,
+            "share_saving_le_0": 0.8956
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -15.75,
+            "tonne_weighted_mean_saved_km": -144.9,
+            "max_aud_per_t": 0.1,
+            "max_saved_km": 0.9,
+            "max_cell": "WEP cell lon 135.675 lat -33.538",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0289,
+            "share_saving_le_0": 0.9711
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -1.6,
+            "tonne_weighted_mean_saved_km": -14.3,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.2931,
+            "share_saving_le_0": 0.7069
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -8.61,
+            "tonne_weighted_mean_saved_km": -79.7,
+            "max_aud_per_t": -2.02,
+            "max_saved_km": -16.9,
+            "max_cell": "LEP cell lon 135.797 lat -33.916",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -16.76,
+            "tonne_weighted_mean_saved_km": -77.0,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0012,
+            "share_saving_ge_5": 0.0338,
+            "share_saving_gt_0": 0.1047,
+            "share_saving_le_0": 0.8953
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -31.74,
+            "tonne_weighted_mean_saved_km": -144.9,
+            "max_aud_per_t": 0.48,
+            "max_saved_km": -0.1,
+            "max_cell": "WEP cell lon 135.628 lat -33.741",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0297,
+            "share_saving_le_0": 0.9703
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -3.02,
+            "tonne_weighted_mean_saved_km": -14.3,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0037,
+            "share_saving_ge_5": 0.1032,
+            "share_saving_gt_0": 0.2936,
+            "share_saving_le_0": 0.7064
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -17.31,
+            "tonne_weighted_mean_saved_km": -79.7,
+            "max_aud_per_t": -3.71,
+            "max_saved_km": -16.9,
+            "max_cell": "LEP cell lon 135.797 lat -33.916",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -7.7,
+            "tonne_weighted_mean_saved_km": -77.0,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.1053,
+            "share_saving_le_0": 0.8947
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -14.49,
+            "tonne_weighted_mean_saved_km": -144.9,
+            "max_aud_per_t": 0.09,
+            "max_saved_km": 0.9,
+            "max_cell": "WEP cell lon 135.675 lat -33.538",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0289,
+            "share_saving_le_0": 0.9711
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -1.43,
+            "tonne_weighted_mean_saved_km": -14.3,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.296,
+            "share_saving_le_0": 0.704
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -7.97,
+            "tonne_weighted_mean_saved_km": -79.7,
+            "max_aud_per_t": -1.69,
+            "max_saved_km": -16.9,
+            "max_cell": "LEP cell lon 135.797 lat -33.916",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        }
+      }
+    },
+    "R6_whole_road_chain_to_port": {
+      "description": "WHOLE ROAD FREIGHT TASK, not the grower's leg alone. Without Lucky Bay: farm -> nearest Bunge point (grower, road) PLUS that site -> Port Lincoln or Thevenard (operator, road; EP grain rail ceased May 2019). With Lucky Bay: farm -> Lucky Bay (grower, road) and nothing further, because the grain is already at an export position. This is the most claimant-favourable arithmetic on this page and it is NOT a grower saving - most of the removed distance is the operator's.",
+      "whose_saving": "chain (grower + operator)",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -4.08,
+            "tonne_weighted_mean_saved_km": -37.1,
+            "max_aud_per_t": 25.68,
+            "max_saved_km": 237.6,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.0765,
+            "share_saving_ge_10": 0.1902,
+            "share_saving_ge_5": 0.3312,
+            "share_saving_gt_0": 0.4429,
+            "share_saving_le_0": 0.5571
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -17.03,
+            "tonne_weighted_mean_saved_km": -155.2,
+            "max_aud_per_t": 14.74,
+            "max_saved_km": 134.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0004,
+            "share_saving_ge_5": 0.0387,
+            "share_saving_gt_0": 0.3262,
+            "share_saving_le_0": 0.6738
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 11.44,
+            "tonne_weighted_mean_saved_km": 104.6,
+            "max_aud_per_t": 25.68,
+            "max_saved_km": 237.6,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.2333,
+            "share_saving_ge_10": 0.5799,
+            "share_saving_ge_5": 0.9716,
+            "share_saving_gt_0": 0.9995,
+            "share_saving_le_0": 0.0005
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -7.66,
+            "tonne_weighted_mean_saved_km": -69.7,
+            "max_aud_per_t": 6.33,
+            "max_saved_km": 57.6,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0565,
+            "share_saving_le_0": 0.9435
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -8.16,
+            "tonne_weighted_mean_saved_km": -37.1,
+            "max_aud_per_t": 52.27,
+            "max_saved_km": 237.6,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.2394,
+            "share_saving_ge_10": 0.3312,
+            "share_saving_ge_5": 0.3623,
+            "share_saving_gt_0": 0.4429,
+            "share_saving_le_0": 0.5571
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -34.13,
+            "tonne_weighted_mean_saved_km": -155.2,
+            "max_aud_per_t": 29.49,
+            "max_saved_km": 134.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0037,
+            "share_saving_ge_10": 0.0387,
+            "share_saving_ge_5": 0.1376,
+            "share_saving_gt_0": 0.3262,
+            "share_saving_le_0": 0.6738
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 23.0,
+            "tonne_weighted_mean_saved_km": 104.6,
+            "max_aud_per_t": 52.27,
+            "max_saved_km": 237.6,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.7272,
+            "share_saving_ge_10": 0.9716,
+            "share_saving_ge_5": 0.9801,
+            "share_saving_gt_0": 0.9995,
+            "share_saving_le_0": 0.0005
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -15.33,
+            "tonne_weighted_mean_saved_km": -69.7,
+            "max_aud_per_t": 12.67,
+            "max_saved_km": 57.6,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0042,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0565,
+            "share_saving_le_0": 0.9435
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -3.71,
+            "tonne_weighted_mean_saved_km": -37.1,
+            "max_aud_per_t": 23.76,
+            "max_saved_km": 237.6,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.0521,
+            "share_saving_ge_10": 0.1795,
+            "share_saving_ge_5": 0.3254,
+            "share_saving_gt_0": 0.4429,
+            "share_saving_le_0": 0.5571
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -15.52,
+            "tonne_weighted_mean_saved_km": -155.2,
+            "max_aud_per_t": 13.4,
+            "max_saved_km": 134.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0004,
+            "share_saving_ge_5": 0.0264,
+            "share_saving_gt_0": 0.3262,
+            "share_saving_le_0": 0.6738
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 10.46,
+            "tonne_weighted_mean_saved_km": 104.6,
+            "max_aud_per_t": 23.76,
+            "max_saved_km": 237.6,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.1589,
+            "share_saving_ge_10": 0.5473,
+            "share_saving_ge_5": 0.9647,
+            "share_saving_gt_0": 0.9995,
+            "share_saving_le_0": 0.0005
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -6.97,
+            "tonne_weighted_mean_saved_km": -69.7,
+            "max_aud_per_t": 5.76,
+            "max_saved_km": 57.6,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0565,
+            "share_saving_le_0": 0.9435
+          }
+        }
+      }
+    },
+    "R7_operator_linehaul_only": {
+      "description": "The operator's upcountry-silo -> port line haul alone, which Lucky Bay removes for any load tipped at the port. Not a grower saving under any reading of the words 'for grain growers' unless it is passed through, which this project cannot observe.",
+      "whose_saving": "operator",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 12.63,
+            "tonne_weighted_mean_saved_km": 114.3,
+            "max_aud_per_t": 27.04,
+            "max_saved_km": 245.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.3885,
+            "share_saving_ge_10": 0.5768,
+            "share_saving_ge_5": 0.9413,
+            "share_saving_gt_0": 0.9413,
+            "share_saving_le_0": 0.0587
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 13.05,
+            "tonne_weighted_mean_saved_km": 118.6,
+            "max_aud_per_t": 27.04,
+            "max_saved_km": 245.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.502,
+            "share_saving_ge_10": 0.7337,
+            "share_saving_ge_5": 0.8464,
+            "share_saving_gt_0": 0.8464,
+            "share_saving_le_0": 0.1536
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 18.46,
+            "tonne_weighted_mean_saved_km": 167.9,
+            "max_aud_per_t": 27.04,
+            "max_saved_km": 245.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.7462,
+            "share_saving_ge_10": 0.9801,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 7.37,
+            "tonne_weighted_mean_saved_km": 65.6,
+            "max_aud_per_t": 12.9,
+            "max_saved_km": 117.2,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.1174,
+            "share_saving_ge_5": 0.9621,
+            "share_saving_gt_0": 0.9621,
+            "share_saving_le_0": 0.0379
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 25.15,
+            "tonne_weighted_mean_saved_km": 114.3,
+            "max_aud_per_t": 54.07,
+            "max_saved_km": 245.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.7592,
+            "share_saving_ge_10": 0.9413,
+            "share_saving_ge_5": 0.9413,
+            "share_saving_gt_0": 0.9413,
+            "share_saving_le_0": 0.0587
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 26.1,
+            "tonne_weighted_mean_saved_km": 118.6,
+            "max_aud_per_t": 54.07,
+            "max_saved_km": 245.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.8464,
+            "share_saving_ge_10": 0.8464,
+            "share_saving_ge_5": 0.8464,
+            "share_saving_gt_0": 0.8464,
+            "share_saving_le_0": 0.1536
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 36.93,
+            "tonne_weighted_mean_saved_km": 167.9,
+            "max_aud_per_t": 54.07,
+            "max_saved_km": 245.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 1.0,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 14.42,
+            "tonne_weighted_mean_saved_km": 65.6,
+            "max_aud_per_t": 25.79,
+            "max_saved_km": 117.2,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.4897,
+            "share_saving_ge_10": 0.9621,
+            "share_saving_ge_5": 0.9621,
+            "share_saving_gt_0": 0.9621,
+            "share_saving_le_0": 0.0379
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 11.43,
+            "tonne_weighted_mean_saved_km": 114.3,
+            "max_aud_per_t": 24.58,
+            "max_saved_km": 245.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.2702,
+            "share_saving_ge_10": 0.4805,
+            "share_saving_ge_5": 0.8151,
+            "share_saving_gt_0": 0.9413,
+            "share_saving_le_0": 0.0587
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 11.86,
+            "tonne_weighted_mean_saved_km": 118.6,
+            "max_aud_per_t": 24.58,
+            "max_saved_km": 245.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.3019,
+            "share_saving_ge_10": 0.55,
+            "share_saving_ge_5": 0.8464,
+            "share_saving_gt_0": 0.8464,
+            "share_saving_le_0": 0.1536
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 16.79,
+            "tonne_weighted_mean_saved_km": 167.9,
+            "max_aud_per_t": 24.58,
+            "max_saved_km": 245.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.5604,
+            "share_saving_ge_10": 0.9801,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 6.56,
+            "tonne_weighted_mean_saved_km": 65.6,
+            "max_aud_per_t": 11.72,
+            "max_saved_km": 117.2,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0042,
+            "share_saving_ge_5": 0.6346,
+            "share_saving_gt_0": 0.9621,
+            "share_saving_le_0": 0.0379
+          }
+        }
+      }
+    }
+  },
+  "sensitivity_least_distance_routing": {
+    "R1_vs_nearest_bunge_upcountry": {
+      "description": "Grower switches from the nearest Bunge upcountry silo to Lucky Bay. Saving = cartage(nearest Bunge upcountry) - cartage(Lucky Bay). This is the negative of R9's primary measure M2, restricted to upcountry silos.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -15.7,
+            "tonne_weighted_mean_saved_km": -144.2,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0446,
+            "share_saving_le_0": 0.9554
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -28.11,
+            "tonne_weighted_mean_saved_km": -257.3,
+            "max_aud_per_t": -9.53,
+            "max_saved_km": -89.3,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.54,
+            "tonne_weighted_mean_saved_km": -60.6,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.136,
+            "share_saving_le_0": 0.864
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -14.28,
+            "tonne_weighted_mean_saved_km": -131.3,
+            "max_aud_per_t": -6.4,
+            "max_saved_km": -59.5,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -31.55,
+            "tonne_weighted_mean_saved_km": -144.2,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0012,
+            "share_saving_ge_5": 0.0306,
+            "share_saving_gt_0": 0.0446,
+            "share_saving_le_0": 0.9554
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -56.45,
+            "tonne_weighted_mean_saved_km": -257.3,
+            "max_aud_per_t": -19.65,
+            "max_saved_km": -89.3,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -13.16,
+            "tonne_weighted_mean_saved_km": -60.6,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0037,
+            "share_saving_ge_5": 0.0934,
+            "share_saving_gt_0": 0.136,
+            "share_saving_le_0": 0.864
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -28.67,
+            "tonne_weighted_mean_saved_km": -131.3,
+            "max_aud_per_t": -12.8,
+            "max_saved_km": -59.5,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -14.42,
+            "tonne_weighted_mean_saved_km": -144.2,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0446,
+            "share_saving_le_0": 0.9554
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -25.73,
+            "tonne_weighted_mean_saved_km": -257.3,
+            "max_aud_per_t": -8.93,
+            "max_saved_km": -89.3,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.06,
+            "tonne_weighted_mean_saved_km": -60.6,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.136,
+            "share_saving_le_0": 0.864
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -13.13,
+            "tonne_weighted_mean_saved_km": -131.3,
+            "max_aud_per_t": -5.95,
+            "max_saved_km": -59.5,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        }
+      }
+    },
+    "R1b_vs_nearest_bunge_any": {
+      "description": "Grower switches from the nearest Bunge receival point of any role (silo or port) to Lucky Bay. Exactly the negative of R9's M2 at state A.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -15.88,
+            "tonne_weighted_mean_saved_km": -145.9,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0446,
+            "share_saving_le_0": 0.9554
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -28.61,
+            "tonne_weighted_mean_saved_km": -262.2,
+            "max_aud_per_t": -9.53,
+            "max_saved_km": -89.3,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.54,
+            "tonne_weighted_mean_saved_km": -60.6,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.136,
+            "share_saving_le_0": 0.864
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -14.35,
+            "tonne_weighted_mean_saved_km": -131.9,
+            "max_aud_per_t": -6.4,
+            "max_saved_km": -59.5,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -31.9,
+            "tonne_weighted_mean_saved_km": -145.9,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0012,
+            "share_saving_ge_5": 0.0306,
+            "share_saving_gt_0": 0.0446,
+            "share_saving_le_0": 0.9554
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -57.52,
+            "tonne_weighted_mean_saved_km": -262.2,
+            "max_aud_per_t": -19.65,
+            "max_saved_km": -89.3,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -13.16,
+            "tonne_weighted_mean_saved_km": -60.6,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0037,
+            "share_saving_ge_5": 0.0934,
+            "share_saving_gt_0": 0.136,
+            "share_saving_le_0": 0.864
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -28.79,
+            "tonne_weighted_mean_saved_km": -131.9,
+            "max_aud_per_t": -12.8,
+            "max_saved_km": -59.5,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -14.59,
+            "tonne_weighted_mean_saved_km": -145.9,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.0446,
+            "share_saving_le_0": 0.9554
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -26.22,
+            "tonne_weighted_mean_saved_km": -262.2,
+            "max_aud_per_t": -8.93,
+            "max_saved_km": -89.3,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -6.06,
+            "tonne_weighted_mean_saved_km": -60.6,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.136,
+            "share_saving_le_0": 0.864
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -13.19,
+            "tonne_weighted_mean_saved_km": -131.9,
+            "max_aud_per_t": -5.95,
+            "max_saved_km": -59.5,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        }
+      }
+    },
+    "R2_vs_port_lincoln": {
+      "description": "Grower who would otherwise cart farm-direct to Port Lincoln instead carts farm-direct to Lucky Bay.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 0.19,
+            "tonne_weighted_mean_saved_km": 1.6,
+            "max_aud_per_t": 19.43,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0349,
+            "share_saving_ge_10": 0.1672,
+            "share_saving_ge_5": 0.2924,
+            "share_saving_gt_0": 0.5809,
+            "share_saving_le_0": 0.4191
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 1.13,
+            "tonne_weighted_mean_saved_km": 10.3,
+            "max_aud_per_t": 7.16,
+            "max_saved_km": 65.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0227,
+            "share_saving_gt_0": 0.8337,
+            "share_saving_le_0": 0.1663
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 9.74,
+            "tonne_weighted_mean_saved_km": 89.1,
+            "max_aud_per_t": 19.43,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.1066,
+            "share_saving_ge_10": 0.5102,
+            "share_saving_ge_5": 0.8721,
+            "share_saving_gt_0": 0.9987,
+            "share_saving_le_0": 0.0013
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -8.62,
+            "tonne_weighted_mean_saved_km": -79.1,
+            "max_aud_per_t": 4.11,
+            "max_saved_km": 37.3,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 0.36,
+            "tonne_weighted_mean_saved_km": 1.6,
+            "max_aud_per_t": 38.86,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.2235,
+            "share_saving_ge_10": 0.2924,
+            "share_saving_ge_5": 0.3497,
+            "share_saving_gt_0": 0.5809,
+            "share_saving_le_0": 0.4191
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 2.26,
+            "tonne_weighted_mean_saved_km": 10.3,
+            "max_aud_per_t": 14.31,
+            "max_saved_km": 65.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0227,
+            "share_saving_ge_5": 0.1084,
+            "share_saving_gt_0": 0.8337,
+            "share_saving_le_0": 0.1663
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 19.59,
+            "tonne_weighted_mean_saved_km": 89.1,
+            "max_aud_per_t": 38.86,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.6819,
+            "share_saving_ge_10": 0.8721,
+            "share_saving_ge_5": 0.9672,
+            "share_saving_gt_0": 0.9987,
+            "share_saving_le_0": 0.0013
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -17.4,
+            "tonne_weighted_mean_saved_km": -79.1,
+            "max_aud_per_t": 8.21,
+            "max_saved_km": 37.3,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 0.16,
+            "tonne_weighted_mean_saved_km": 1.6,
+            "max_aud_per_t": 17.67,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0269,
+            "share_saving_ge_10": 0.1332,
+            "share_saving_ge_5": 0.2772,
+            "share_saving_gt_0": 0.5809,
+            "share_saving_le_0": 0.4191
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 1.03,
+            "tonne_weighted_mean_saved_km": 10.3,
+            "max_aud_per_t": 6.5,
+            "max_saved_km": 65.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0124,
+            "share_saving_gt_0": 0.8337,
+            "share_saving_le_0": 0.1663
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 8.91,
+            "tonne_weighted_mean_saved_km": 89.1,
+            "max_aud_per_t": 17.67,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0821,
+            "share_saving_ge_10": 0.4065,
+            "share_saving_ge_5": 0.8347,
+            "share_saving_gt_0": 0.9987,
+            "share_saving_le_0": 0.0013
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -7.91,
+            "tonne_weighted_mean_saved_km": -79.1,
+            "max_aud_per_t": 3.73,
+            "max_saved_km": 37.3,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        }
+      }
+    },
+    "R3_vs_thevenard": {
+      "description": "Grower who would otherwise cart farm-direct to Thevenard instead carts farm-direct to Lucky Bay.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 13.21,
+            "tonne_weighted_mean_saved_km": 120.1,
+            "max_aud_per_t": 43.73,
+            "max_saved_km": 397.6,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.7177,
+            "share_saving_ge_10": 0.7509,
+            "share_saving_ge_5": 0.772,
+            "share_saving_gt_0": 0.7931,
+            "share_saving_le_0": 0.2069
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -15.68,
+            "tonne_weighted_mean_saved_km": -143.1,
+            "max_aud_per_t": 20.91,
+            "max_saved_km": 190.0,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0765,
+            "share_saving_ge_10": 0.1333,
+            "share_saving_ge_5": 0.2043,
+            "share_saving_gt_0": 0.278,
+            "share_saving_le_0": 0.722
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 26.75,
+            "tonne_weighted_mean_saved_km": 243.7,
+            "max_aud_per_t": 43.73,
+            "max_saved_km": 397.6,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.9851,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 23.16,
+            "tonne_weighted_mean_saved_km": 210.6,
+            "max_aud_per_t": 32.85,
+            "max_saved_km": 298.6,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.9668,
+            "share_saving_ge_10": 0.9981,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 26.42,
+            "tonne_weighted_mean_saved_km": 120.1,
+            "max_aud_per_t": 87.45,
+            "max_saved_km": 397.6,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.7628,
+            "share_saving_ge_10": 0.772,
+            "share_saving_ge_5": 0.7797,
+            "share_saving_gt_0": 0.7931,
+            "share_saving_le_0": 0.2069
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -31.46,
+            "tonne_weighted_mean_saved_km": -143.1,
+            "max_aud_per_t": 41.81,
+            "max_saved_km": 190.0,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.1725,
+            "share_saving_ge_10": 0.2043,
+            "share_saving_ge_5": 0.2315,
+            "share_saving_gt_0": 0.278,
+            "share_saving_le_0": 0.722
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 53.61,
+            "tonne_weighted_mean_saved_km": 243.7,
+            "max_aud_per_t": 87.45,
+            "max_saved_km": 397.6,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 1.0,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 46.33,
+            "tonne_weighted_mean_saved_km": 210.6,
+            "max_aud_per_t": 65.69,
+            "max_saved_km": 298.6,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 1.0,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 12.01,
+            "tonne_weighted_mean_saved_km": 120.1,
+            "max_aud_per_t": 39.76,
+            "max_saved_km": 397.6,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.6778,
+            "share_saving_ge_10": 0.7457,
+            "share_saving_ge_5": 0.7687,
+            "share_saving_gt_0": 0.7931,
+            "share_saving_le_0": 0.2069
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -14.31,
+            "tonne_weighted_mean_saved_km": -143.1,
+            "max_aud_per_t": 19.0,
+            "max_saved_km": 190.0,
+            "max_cell": "WEP cell lon 135.898 lat -33.690",
+            "share_saving_ge_15": 0.0553,
+            "share_saving_ge_10": 0.1192,
+            "share_saving_ge_5": 0.1928,
+            "share_saving_gt_0": 0.278,
+            "share_saving_le_0": 0.722
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 24.37,
+            "tonne_weighted_mean_saved_km": 243.7,
+            "max_aud_per_t": 39.76,
+            "max_saved_km": 397.6,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.9291,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 21.06,
+            "tonne_weighted_mean_saved_km": 210.6,
+            "max_aud_per_t": 29.86,
+            "max_saved_km": 298.6,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.9267,
+            "share_saving_ge_10": 0.9952,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          }
+        }
+      }
+    },
+    "R4_vs_nearest_bunge_port": {
+      "description": "Grower who carts farm-direct to an export port: nearest Bunge port (Port Lincoln or Thevenard) vs Lucky Bay. This is R9's M4, C -> A.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 3.37,
+            "tonne_weighted_mean_saved_km": 30.8,
+            "max_aud_per_t": 19.43,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0349,
+            "share_saving_ge_10": 0.1672,
+            "share_saving_ge_5": 0.2924,
+            "share_saving_gt_0": 0.4077,
+            "share_saving_le_0": 0.5923
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.54,
+            "tonne_weighted_mean_saved_km": 4.9,
+            "max_aud_per_t": 7.16,
+            "max_saved_km": 65.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0227,
+            "share_saving_gt_0": 0.2296,
+            "share_saving_le_0": 0.7704
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 9.74,
+            "tonne_weighted_mean_saved_km": 89.1,
+            "max_aud_per_t": 19.43,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.1066,
+            "share_saving_ge_10": 0.5102,
+            "share_saving_ge_5": 0.8721,
+            "share_saving_gt_0": 0.9987,
+            "share_saving_le_0": 0.0013
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 0.05,
+            "tonne_weighted_mean_saved_km": 0.4,
+            "max_aud_per_t": 4.11,
+            "max_saved_km": 37.3,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 6.77,
+            "tonne_weighted_mean_saved_km": 30.8,
+            "max_aud_per_t": 38.86,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.2235,
+            "share_saving_ge_10": 0.2924,
+            "share_saving_ge_5": 0.341,
+            "share_saving_gt_0": 0.4077,
+            "share_saving_le_0": 0.5923
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 1.08,
+            "tonne_weighted_mean_saved_km": 4.9,
+            "max_aud_per_t": 14.31,
+            "max_saved_km": 65.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0227,
+            "share_saving_ge_5": 0.078,
+            "share_saving_gt_0": 0.2296,
+            "share_saving_le_0": 0.7704
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 19.59,
+            "tonne_weighted_mean_saved_km": 89.1,
+            "max_aud_per_t": 38.86,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.6819,
+            "share_saving_ge_10": 0.8721,
+            "share_saving_ge_5": 0.9672,
+            "share_saving_gt_0": 0.9987,
+            "share_saving_le_0": 0.0013
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 0.09,
+            "tonne_weighted_mean_saved_km": 0.4,
+            "max_aud_per_t": 8.21,
+            "max_saved_km": 37.3,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 3.08,
+            "tonne_weighted_mean_saved_km": 30.8,
+            "max_aud_per_t": 17.67,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0269,
+            "share_saving_ge_10": 0.1332,
+            "share_saving_ge_5": 0.2772,
+            "share_saving_gt_0": 0.4077,
+            "share_saving_le_0": 0.5923
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 0.49,
+            "tonne_weighted_mean_saved_km": 4.9,
+            "max_aud_per_t": 6.5,
+            "max_saved_km": 65.0,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0124,
+            "share_saving_gt_0": 0.2296,
+            "share_saving_le_0": 0.7704
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 8.91,
+            "tonne_weighted_mean_saved_km": 89.1,
+            "max_aud_per_t": 17.67,
+            "max_saved_km": 176.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0821,
+            "share_saving_ge_10": 0.4065,
+            "share_saving_ge_5": 0.8347,
+            "share_saving_gt_0": 0.9987,
+            "share_saving_le_0": 0.0013
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 0.04,
+            "tonne_weighted_mean_saved_km": 0.4,
+            "max_aud_per_t": 3.73,
+            "max_saved_km": 37.3,
+            "max_cell": "LEP cell lon 136.480 lat -33.988",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0378,
+            "share_saving_le_0": 0.9622
+          }
+        }
+      }
+    },
+    "R5_stateB_vs_nearest_bunge_any": {
+      "description": "SEPTEMBER-2021 NETWORK (state B: Lucky Bay + Lock + Kimba bunkers). Grower switches from the nearest Bunge point to the nearest T-Ports point. Negative of R9's M2 at state B. This is the state that actually existed on the date of the claim.",
+      "whose_saving": "grower",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -8.18,
+            "tonne_weighted_mean_saved_km": -75.3,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.1165,
+            "share_saving_le_0": 0.8835
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -15.57,
+            "tonne_weighted_mean_saved_km": -143.2,
+            "max_aud_per_t": 0.1,
+            "max_saved_km": 0.8,
+            "max_cell": "WEP cell lon 135.730 lat -33.559",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0405,
+            "share_saving_le_0": 0.9595
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -1.55,
+            "tonne_weighted_mean_saved_km": -13.7,
+            "max_aud_per_t": 6.56,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.3201,
+            "share_saving_le_0": 0.6799
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -8.33,
+            "tonne_weighted_mean_saved_km": -77.2,
+            "max_aud_per_t": -1.98,
+            "max_saved_km": -16.5,
+            "max_cell": "LEP cell lon 135.797 lat -33.916",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -16.4,
+            "tonne_weighted_mean_saved_km": -75.3,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0012,
+            "share_saving_ge_5": 0.0306,
+            "share_saving_gt_0": 0.117,
+            "share_saving_le_0": 0.883
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -31.37,
+            "tonne_weighted_mean_saved_km": -143.2,
+            "max_aud_per_t": 0.2,
+            "max_saved_km": 0.8,
+            "max_cell": "WEP cell lon 135.730 lat -33.559",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0405,
+            "share_saving_le_0": 0.9595
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -2.91,
+            "tonne_weighted_mean_saved_km": -13.7,
+            "max_aud_per_t": 13.11,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0037,
+            "share_saving_ge_5": 0.0934,
+            "share_saving_gt_0": 0.3215,
+            "share_saving_le_0": 0.6785
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -16.74,
+            "tonne_weighted_mean_saved_km": -77.2,
+            "max_aud_per_t": -3.62,
+            "max_saved_km": -16.5,
+            "max_cell": "LEP cell lon 135.797 lat -33.916",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -7.53,
+            "tonne_weighted_mean_saved_km": -75.3,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0012,
+            "share_saving_gt_0": 0.1172,
+            "share_saving_le_0": 0.8828
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -14.32,
+            "tonne_weighted_mean_saved_km": -143.2,
+            "max_aud_per_t": 0.08,
+            "max_saved_km": 0.8,
+            "max_cell": "WEP cell lon 135.730 lat -33.559",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0405,
+            "share_saving_le_0": 0.9595
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": -1.37,
+            "tonne_weighted_mean_saved_km": -13.7,
+            "max_aud_per_t": 5.97,
+            "max_saved_km": 59.7,
+            "max_cell": "EEP cell lon 137.091 lat -33.677",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0037,
+            "share_saving_gt_0": 0.3222,
+            "share_saving_le_0": 0.6778
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -7.72,
+            "tonne_weighted_mean_saved_km": -77.2,
+            "max_aud_per_t": -1.65,
+            "max_saved_km": -16.5,
+            "max_cell": "LEP cell lon 135.797 lat -33.916",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0,
+            "share_saving_gt_0": 0.0,
+            "share_saving_le_0": 1.0
+          }
+        }
+      }
+    },
+    "R6_whole_road_chain_to_port": {
+      "description": "WHOLE ROAD FREIGHT TASK, not the grower's leg alone. Without Lucky Bay: farm -> nearest Bunge point (grower, road) PLUS that site -> Port Lincoln or Thevenard (operator, road; EP grain rail ceased May 2019). With Lucky Bay: farm -> Lucky Bay (grower, road) and nothing further, because the grain is already at an export position. This is the most claimant-favourable arithmetic on this page and it is NOT a grower saving - most of the removed distance is the operator's.",
+      "whose_saving": "chain (grower + operator)",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -3.69,
+            "tonne_weighted_mean_saved_km": -33.5,
+            "max_aud_per_t": 25.87,
+            "max_saved_km": 239.0,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.0673,
+            "share_saving_ge_10": 0.1919,
+            "share_saving_ge_5": 0.3327,
+            "share_saving_gt_0": 0.4434,
+            "share_saving_le_0": 0.5566
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -16.0,
+            "tonne_weighted_mean_saved_km": -145.9,
+            "max_aud_per_t": 14.5,
+            "max_saved_km": 131.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0004,
+            "share_saving_ge_5": 0.0441,
+            "share_saving_gt_0": 0.3279,
+            "share_saving_le_0": 0.6721
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 11.44,
+            "tonne_weighted_mean_saved_km": 104.5,
+            "max_aud_per_t": 25.87,
+            "max_saved_km": 239.0,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.2052,
+            "share_saving_ge_10": 0.5852,
+            "share_saving_ge_5": 0.9716,
+            "share_saving_gt_0": 0.9995,
+            "share_saving_le_0": 0.0005
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -7.4,
+            "tonne_weighted_mean_saved_km": -67.3,
+            "max_aud_per_t": 6.35,
+            "max_saved_km": 57.8,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0565,
+            "share_saving_le_0": 0.9435
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -7.37,
+            "tonne_weighted_mean_saved_km": -33.5,
+            "max_aud_per_t": 52.57,
+            "max_saved_km": 239.0,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.2541,
+            "share_saving_ge_10": 0.3327,
+            "share_saving_ge_5": 0.3828,
+            "share_saving_gt_0": 0.4434,
+            "share_saving_le_0": 0.5566
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -32.08,
+            "tonne_weighted_mean_saved_km": -145.9,
+            "max_aud_per_t": 29.01,
+            "max_saved_km": 131.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0108,
+            "share_saving_ge_10": 0.0441,
+            "share_saving_ge_5": 0.209,
+            "share_saving_gt_0": 0.3279,
+            "share_saving_le_0": 0.6721
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 22.98,
+            "tonne_weighted_mean_saved_km": 104.5,
+            "max_aud_per_t": 52.57,
+            "max_saved_km": 239.0,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.7657,
+            "share_saving_ge_10": 0.9716,
+            "share_saving_ge_5": 0.9801,
+            "share_saving_gt_0": 0.9995,
+            "share_saving_le_0": 0.0005
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -14.79,
+            "tonne_weighted_mean_saved_km": -67.3,
+            "max_aud_per_t": 12.71,
+            "max_saved_km": 57.8,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0042,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0565,
+            "share_saving_le_0": 0.9435
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": -3.35,
+            "tonne_weighted_mean_saved_km": -33.5,
+            "max_aud_per_t": 23.9,
+            "max_saved_km": 239.0,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.0507,
+            "share_saving_ge_10": 0.1816,
+            "share_saving_ge_5": 0.329,
+            "share_saving_gt_0": 0.4434,
+            "share_saving_le_0": 0.5566
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": -14.59,
+            "tonne_weighted_mean_saved_km": -145.9,
+            "max_aud_per_t": 13.18,
+            "max_saved_km": 131.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0004,
+            "share_saving_ge_5": 0.039,
+            "share_saving_gt_0": 0.3279,
+            "share_saving_le_0": 0.6721
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 10.45,
+            "tonne_weighted_mean_saved_km": 104.5,
+            "max_aud_per_t": 23.9,
+            "max_saved_km": 239.0,
+            "max_cell": "EEP cell lon 136.916 lat -33.414",
+            "share_saving_ge_15": 0.1547,
+            "share_saving_ge_10": 0.5536,
+            "share_saving_ge_5": 0.9647,
+            "share_saving_gt_0": 0.9995,
+            "share_saving_le_0": 0.0005
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": -6.73,
+            "tonne_weighted_mean_saved_km": -67.3,
+            "max_aud_per_t": 5.78,
+            "max_saved_km": 57.8,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0,
+            "share_saving_ge_5": 0.0042,
+            "share_saving_gt_0": 0.0565,
+            "share_saving_le_0": 0.9435
+          }
+        }
+      }
+    },
+    "R7_operator_linehaul_only": {
+      "description": "The operator's upcountry-silo -> port line haul alone, which Lucky Bay removes for any load tipped at the port. Not a grower saving under any reading of the words 'for grain growers' unless it is passed through, which this project cannot observe.",
+      "whose_saving": "operator",
+      "by_rate": {
+        "escosa_oneway": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 12.42,
+            "tonne_weighted_mean_saved_km": 112.4,
+            "max_aud_per_t": 26.05,
+            "max_saved_km": 236.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.3385,
+            "share_saving_ge_10": 0.5342,
+            "share_saving_ge_5": 0.9424,
+            "share_saving_gt_0": 0.9424,
+            "share_saving_le_0": 0.0576
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 12.79,
+            "tonne_weighted_mean_saved_km": 116.3,
+            "max_aud_per_t": 26.05,
+            "max_saved_km": 236.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.5037,
+            "share_saving_ge_10": 0.7373,
+            "share_saving_ge_5": 0.8486,
+            "share_saving_gt_0": 0.8486,
+            "share_saving_le_0": 0.1514
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 18.16,
+            "tonne_weighted_mean_saved_km": 165.1,
+            "max_aud_per_t": 26.05,
+            "max_saved_km": 236.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.5921,
+            "share_saving_ge_10": 0.9801,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 7.27,
+            "tonne_weighted_mean_saved_km": 64.6,
+            "max_aud_per_t": 12.9,
+            "max_saved_km": 117.2,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0042,
+            "share_saving_ge_5": 0.9631,
+            "share_saving_gt_0": 0.9631,
+            "share_saving_le_0": 0.0369
+          }
+        },
+        "escosa_return": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 24.72,
+            "tonne_weighted_mean_saved_km": 112.4,
+            "max_aud_per_t": 52.1,
+            "max_saved_km": 236.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.7621,
+            "share_saving_ge_10": 0.9424,
+            "share_saving_ge_5": 0.9424,
+            "share_saving_gt_0": 0.9424,
+            "share_saving_le_0": 0.0576
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 25.59,
+            "tonne_weighted_mean_saved_km": 116.3,
+            "max_aud_per_t": 52.1,
+            "max_saved_km": 236.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.8486,
+            "share_saving_ge_10": 0.8486,
+            "share_saving_ge_5": 0.8486,
+            "share_saving_gt_0": 0.8486,
+            "share_saving_le_0": 0.1514
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 36.32,
+            "tonne_weighted_mean_saved_km": 165.1,
+            "max_aud_per_t": 52.1,
+            "max_saved_km": 236.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 1.0,
+            "share_saving_ge_10": 1.0,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 14.21,
+            "tonne_weighted_mean_saved_km": 64.6,
+            "max_aud_per_t": 25.79,
+            "max_saved_km": 117.2,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.4957,
+            "share_saving_ge_10": 0.9631,
+            "share_saving_ge_5": 0.9631,
+            "share_saving_gt_0": 0.9631,
+            "share_saving_le_0": 0.0369
+          }
+        },
+        "ach2026_marginal": {
+          "EP": {
+            "tonne_weighted_mean_aud_per_t": 11.24,
+            "tonne_weighted_mean_saved_km": 112.4,
+            "max_aud_per_t": 23.68,
+            "max_saved_km": 236.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.2708,
+            "share_saving_ge_10": 0.481,
+            "share_saving_ge_5": 0.8141,
+            "share_saving_gt_0": 0.9424,
+            "share_saving_le_0": 0.0576
+          },
+          "WEP": {
+            "tonne_weighted_mean_aud_per_t": 11.63,
+            "tonne_weighted_mean_saved_km": 116.3,
+            "max_aud_per_t": 23.68,
+            "max_saved_km": 236.8,
+            "max_cell": "WEP cell lon 135.959 lat -33.150",
+            "share_saving_ge_15": 0.3019,
+            "share_saving_ge_10": 0.5517,
+            "share_saving_ge_5": 0.8486,
+            "share_saving_gt_0": 0.8486,
+            "share_saving_le_0": 0.1514
+          },
+          "EEP": {
+            "tonne_weighted_mean_aud_per_t": 16.51,
+            "tonne_weighted_mean_saved_km": 165.1,
+            "max_aud_per_t": 23.68,
+            "max_saved_km": 236.8,
+            "max_cell": "EEP cell lon 136.270 lat -32.828",
+            "share_saving_ge_15": 0.5621,
+            "share_saving_ge_10": 0.9801,
+            "share_saving_ge_5": 1.0,
+            "share_saving_gt_0": 1.0,
+            "share_saving_le_0": 0.0
+          },
+          "LEP": {
+            "tonne_weighted_mean_aud_per_t": 6.46,
+            "tonne_weighted_mean_saved_km": 64.6,
+            "max_aud_per_t": 11.72,
+            "max_saved_km": 117.2,
+            "max_cell": "LEP cell lon 136.426 lat -33.989",
+            "share_saving_ge_15": 0.0,
+            "share_saving_ge_10": 0.0042,
+            "share_saving_ge_5": 0.6304,
+            "share_saving_gt_0": 0.9631,
+            "share_saving_le_0": 0.0369
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,519 @@
+<title>One Gateway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --ground: #F6F8F7;
+    --raised: #FFFFFF;
+    --ink: #111A1D;
+    --ink-soft: #47555A;
+    --ink-faint: #77868B;
+    --rule: #D9E0DE;
+    --rule-strong: #B6C2BF;
+    --independent: #12695F;
+    --incumbent: #8A6A18;
+    --withdrawn: #8C3A2B;
+    --chip-bg: #E7EDEB;
+
+    --display: "Spectral", Georgia, "Times New Roman", serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+    --measure: 68ch;
+    --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+    --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.08rem);
+    --step-1: clamp(1.2rem, 1.13rem + 0.35vw, 1.4rem);
+    --step-2: clamp(1.5rem, 1.36rem + 0.7vw, 1.95rem);
+    --step-3: clamp(1.95rem, 1.65rem + 1.45vw, 3rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0D1416;
+      --raised: #131D20;
+      --ink: #E8EFED;
+      --ink-soft: #A5B4B1;
+      --ink-faint: #7B8C89;
+      --rule: #26363A;
+      --rule-strong: #3A4E52;
+      --independent: #5FC9BB;
+      --incumbent: #D6A93C;
+      --withdrawn: #E08974;
+      --chip-bg: #1C292C;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0D1416;
+    --raised: #131D20;
+    --ink: #E8EFED;
+    --ink-soft: #A5B4B1;
+    --ink-faint: #7B8C89;
+    --rule: #26363A;
+    --rule-strong: #3A4E52;
+    --independent: #5FC9BB;
+    --incumbent: #D6A93C;
+    --withdrawn: #E08974;
+    --chip-bg: #1C292C;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: var(--step-0);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 5rem) clamp(1.1rem, 4vw, 3rem) 6rem;
+    display: grid;
+    grid-template-columns: minmax(0, var(--measure));
+    justify-content: center;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 1.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.1rem;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: var(--step-3);
+    line-height: 1.06;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+    margin: 0 0 1.2rem;
+  }
+
+  .standfirst {
+    font-family: var(--display);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 2.2rem;
+    text-wrap: pretty;
+  }
+
+  .byline {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.9rem 0;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  section { margin-bottom: 3.4rem; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: var(--step-2);
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+    margin: 0 0 1.1rem;
+    padding-top: 1.6rem;
+    border-top: 2px solid var(--ink);
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: var(--step-0);
+    margin: 2rem 0 0.6rem;
+  }
+
+  p { margin: 0 0 1.05rem; text-wrap: pretty; }
+  p:last-child { margin-bottom: 0; }
+
+  blockquote {
+    margin: 1.4rem 0;
+    padding: 0 0 0 1.2rem;
+    border-left: 2px solid var(--rule-strong);
+    font-family: var(--display);
+    font-size: var(--step-1);
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  blockquote cite {
+    display: block;
+    margin-top: 0.6rem;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    font-style: normal;
+    color: var(--ink-faint);
+  }
+
+  a { color: var(--independent); text-underline-offset: 0.18em; }
+  a:focus-visible { outline: 2px solid var(--independent); outline-offset: 3px; }
+
+  .tier {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.12em 0.5em;
+    border-radius: 2px;
+    background: var(--chip-bg);
+    color: var(--ink-soft);
+    border: 1px solid var(--rule-strong);
+    white-space: nowrap;
+    vertical-align: 0.12em;
+  }
+  .tier.t1 { color: var(--independent); border-color: var(--independent); }
+  .tier.t2 { color: var(--incumbent); border-color: var(--incumbent); }
+  .tier.cut { color: var(--withdrawn); border-color: var(--withdrawn); }
+
+  .finding {
+    background: var(--raised);
+    border: 1px solid var(--rule-strong);
+    border-left: 4px solid var(--independent);
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    margin: 0 0 1.6rem;
+  }
+  .finding p {
+    font-family: var(--display);
+    font-size: var(--step-1);
+    line-height: 1.45;
+    margin: 0 0 0.8rem;
+  }
+  .finding p:last-child { margin-bottom: 0; }
+  .finding .tier { margin-bottom: 0.9rem; display: inline-block; }
+
+  .counts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1px;
+    background: var(--rule-strong);
+    border: 1px solid var(--rule-strong);
+    margin: 1.8rem 0;
+  }
+  .count { background: var(--raised); padding: 1.1rem 1.2rem; }
+  .count .n {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .count .lbl {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    line-height: 1.4;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .count.ind .n { color: var(--independent); }
+  .count.inc .n { color: var(--incumbent); }
+
+  .scroll { overflow-x: auto; margin: 1.6rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+  }
+  caption {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--ink-faint);
+    padding-bottom: 0.7rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.55rem 0.9rem 0.55rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  thead th {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+  td.num, th.num { text-align: right; font-family: var(--mono); padding-right: 0; }
+  tr.hi td { background: var(--chip-bg); font-weight: 600; }
+  .owner-ind { color: var(--independent); font-weight: 500; }
+
+  .events { list-style: none; margin: 1.6rem 0 0; padding: 0; }
+  .events li {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    gap: 0 1.2rem;
+    padding: 0.95rem 0;
+    border-top: 1px solid var(--rule);
+  }
+  .events li:last-child { border-bottom: 1px solid var(--rule); }
+  .events .when {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    padding-top: 0.15em;
+  }
+  .events .what { margin: 0; }
+  @media (max-width: 34rem) {
+    .events li { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+
+  .limits {
+    background: var(--raised);
+    border: 1px solid var(--rule-strong);
+    border-left: 4px solid var(--withdrawn);
+    padding: clamp(1.3rem, 3vw, 2rem);
+  }
+  .limits h2 {
+    border-top: none;
+    padding-top: 0;
+    font-size: var(--step-1);
+    margin-bottom: 0.9rem;
+  }
+  .limits ul { margin: 0; padding-left: 1.1rem; }
+  .limits li { margin-bottom: 0.7rem; }
+  .limits li:last-child { margin-bottom: 0; }
+
+  .method { font-size: var(--step--1); color: var(--ink-soft); line-height: 1.6; }
+  .method h2 { font-size: var(--step-1); }
+  .method code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--chip-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+  }
+  .method ul { padding-left: 1.1rem; }
+  .method li { margin-bottom: 0.45rem; }
+
+  .note {
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.8rem;
+  }
+</style>
+
+<div class="wrap">
+  <main>
+    <p class="eyebrow"><span>Eyre Peninsula</span><span>Grain handling</span><span>Draft — not for publication</span></p>
+
+    <h1>The peninsula's one independent grain gateway is shut inland and up for sale</h1>
+
+    <p class="standfirst">Until 2019 an Eyre Peninsula grower had nowhere to deliver bulk grain outside one company's network. Then T-Ports opened Lucky Bay. Six years on, its two inland sites are closed for the season, its owner is running a sale process, and the regulator's finding that the incumbent "owns the vast majority of storage" upcountry has not been retested since.</p>
+
+    <p class="byline"><span>Draft of 31 August 2026</span><span>Published sources only</span><span>Right of reply not yet sought</span></p>
+
+    <section>
+      <div class="finding">
+        <span class="tier t1">Tier 1 · regulator's finding</span>
+        <blockquote>
+          Viterra has a dominant position upcountry on the Eyre Peninsula, where it owns the vast majority of storage.
+          <cite>ACCC, final determinations on Viterra's Bulk Wheat Code exemption applications, 2021</cite>
+        </blockquote>
+        <p>That was written when the peninsula had three independent receival points. It has one now.</p>
+      </div>
+
+      <p>The count behind that sentence is a floor, not a census. On the operator's own weekly harvest reports for 2025/26 we can evidence <strong>at least 22 Bunge receival points operating on the Eyre Peninsula, and one that is not Bunge's</strong> — T-Ports' Lucky Bay. We have not found another. We are not in a position to say there is no other: nothing in this work systematically audits non-Bunge receival capacity, and at least three sites the operator has itself named in earlier seasons are missing from our list.</p>
+
+      <div class="counts">
+        <div class="count inc"><span class="n">≥22</span><span class="lbl">Bunge receival points<br>evidenced 2025/26</span></div>
+        <div class="count ind"><span class="n">1</span><span class="lbl">Non-Bunge point<br>found, 2025/26</span></div>
+        <div class="count"><span class="n">1&nbsp;→&nbsp;2</span><span class="lbl">Distinct operators<br>pre-2019 → now</span></div>
+      </div>
+
+      <p>That last figure is the one the peninsula's growers would notice first, and it runs the other way. Before 2019 there was no independent option at all — not a diminished one, none. T-Ports' arrival is the only time competition has increased here, and it is still present.</p>
+    </section>
+
+    <section>
+      <h2>How far is the alternative</h2>
+
+      <p><span class="tier t2">Tier 2 · geometry</span> Measuring drive time from each production cell to the nearest independent receival point — road distances and site locations only, no simulation and no fitted parameter — about two-thirds of Eyre Peninsula grain production sits more than 90 minutes from a non-Bunge delivery point, against a <strong>median 16.5-minute run to the nearest Bunge site</strong> and a 99th percentile of 58.3 minutes.</p>
+
+      <p><strong>This is a distance to one port.</strong> Because Lucky Bay is now the only independent point, the figure is a pure function of how far each grower is from it. It would read exactly the same if Bunge operated three sites on the peninsula or two hundred, and it rose when the <em>entrant</em> closed sites, not because of anything the incumbent did. It should not be read as a measure of Bunge's reach.</p>
+
+      <div class="scroll">
+        <table>
+          <caption>Share of EP production beyond each drive time from a non-Bunge point, 2025/26</caption>
+          <thead>
+            <tr><th class="num">30 min</th><th class="num">45</th><th class="num">60</th><th class="num">75</th><th class="num">90</th><th class="num">105</th><th class="num">120</th></tr>
+          </thead>
+          <tbody>
+            <tr class="hi">
+              <td class="num">97.1%</td><td class="num">93.2%</td><td class="num">87.4%</td><td class="num">78.2%</td><td class="num">66.8%</td><td class="num">53.2%</td><td class="num">39.5%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>No threshold was designated in advance. Two earlier justifications for singling out 90 minutes were withdrawn on 31 August 2026 when neither survived checking, so the whole column is printed instead. The finding holds at every row: even at the most generous threshold tested, two hours' drive, 39.5% of production has no non-Bunge option.</p>
+
+      <p>Two sensitivities, both reproducible and neither cancelling: <strong>66.8%</strong> at the published coordinates; <strong>61.5–67.3%</strong> across the ±5 km tolerance on Lucky Bay's town-level coordinate; <strong>54.5–77.2%</strong> if the assumed road speeds are 15% out in either direction. A non-uniform speed error is not bounded by that band. In one sentence: about two-thirds on our published road speeds, and between roughly a half and three-quarters across the sensitivities we tested.</p>
+    </section>
+
+    <section>
+      <h2>What that distance is worth, in dollars</h2>
+
+      <p><span class="tier t2">Tier 2 · geometry + published rate</span> Distance only matters if it costs something. Pricing it at ESCOSA's published South Australian trucking schedule — about 12 cents per tonne-kilometre under 50 km, 11 cents from 50 to 250 km — turns the drive times into a number a grower can check against their own cartage bill.</p>
+
+      <div class="finding">
+        <span class="tier t2">Tier 2 · the toll</span>
+        <p>The nearest non-Bunge receival point is on average about <strong>$12 a tonne further</strong> to reach than the nearest Bunge one.</p>
+        <p style="font-size:var(--step-0);color:var(--ink-soft)">That is what a competing buyer would have to beat, before price, simply to pull a load past the grower's closest door.</p>
+      </div>
+
+      <p>Three things about that figure, all of which cut against making too much of it.</p>
+
+      <p><strong>It is a floor, and the range is wide.</strong> $11.97/t is measured over the production the published schedule can actually price. Extrapolating past the schedule's 250-kilometre ceiling — which 63% of western Eyre Peninsula production sits beyond — gives $16.48/t. And the schedule is a *marginal* rate: whether it already includes the empty return leg is unresolved in the source, and if it does not, both figures double. So: about twelve dollars, possibly sixteen, possibly double either.</p>
+
+      <p><strong>Reopening the bunkers would roughly halve it.</strong> With Lock and Kimba operating the toll falls to $8.36/t. That single operational decision moves this number more than any change of ownership would.</p>
+
+      <p><strong>And for most growers the gateway is worth almost nothing in cartage.</strong> The mean haul to the nearest receival point of any owner on the peninsula is 21 kilometres. Measured on the cartage a grower actually pays, having Lucky Bay there rather than not is worth about <strong>14 cents a tonne</strong> — and nothing at all in the west or the lower peninsula. The Bunge network is dense. Almost everyone is already close to a door.</p>
+
+      <p>Which points somewhere specific: <strong>competition here does not run through cartage.</strong> It runs through price. A second gateway can only win grain by paying enough to cover a roughly twelve-dollar toll — and whether it does is the one thing no published data can answer, because no history of South Australian cash bids is published by anyone.</p>
+    </section>
+
+    <section>
+      <h2>Competition arrived in 2019, and has thinned since</h2>
+
+      <div class="scroll">
+        <table>
+          <caption>Non-Viterra / non-Bunge receival points, Eyre Peninsula</caption>
+          <thead>
+            <tr><th>Site</th><th>Type</th><th class="num">Capacity&nbsp;(t)</th><th>Pre-2019</th><th>2023/24</th><th>2025/26</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="owner-ind">Lucky Bay</td><td>Transshipment port</td><td class="num">384,000</td>
+              <td>—</td><td>Operating</td><td>Operating</td>
+            </tr>
+            <tr>
+              <td class="owner-ind">Lock bunker</td><td>Inland bunker</td><td class="num">140,000</td>
+              <td>—</td><td>Unverified</td><td>Closed for season</td>
+            </tr>
+            <tr>
+              <td class="owner-ind">Kimba bunker</td><td>Inland bunker</td><td class="num">150,000</td>
+              <td>—</td><td>Unverified</td><td>Closed for season</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The 2025/26 closures are published: T-Ports' own harvest page carries "Site closed for 25/26 season" under both the Lock and the Kimba headings, with Lucky Bay and Wallaroo carrying no such notice. <strong>T-Ports closed its own sites</strong> — this was the independent operator's decision, not something done to it — and the notice is season-specific. Nothing here establishes that either bunker has left the market permanently.</p>
+
+      <p>The 2023/24 cells are marked unverified deliberately. T-Ports publishes no season-by-season intake, and the only per-season operating evidence this work holds is Viterra and Bunge's weekly harvest reports, which never name a competitor's sites. We know the bunkers existed with published capacities; we cannot show from any published source that they took grain that season.</p>
+
+      <p class="note">Independent capacity on the peninsula peaked in 2023/24. Any comparison drawn against that year is a comparison against the maximum, not against a long-run norm.</p>
+    </section>
+
+    <section>
+      <h2>The 2019 rationalisation, and what it was not</h2>
+
+      <p>In June 2019 Viterra announced the closure of 17 up-country sites statewide, six of them on the Eyre Peninsula: Minnipa, Kyancutta, Cungena, Waddikee, Kielpa and Wharminda. Two of the six — Minnipa and Kyancutta — had operated the previous season. The other four had not. Bunge acquired Viterra in July 2025 and had no part in these decisions.</p>
+
+      <p>Viterra's published explanation, from operations manager Michael Hill:</p>
+
+      <blockquote>
+        Since 2010, the average truck size has increased by 30 per cent and those bigger trucks are delivering to our bigger sites.
+        <cite>Stock Journal, Alisha Fogden, 6 June 2019</cite>
+      </blockquote>
+
+      <p>The company also cited changing delivery patterns and quality and food-safety requirements, and said the closed sites represented less than 2% of total receivals on a five-year average.</p>
+
+      <p>Grain trains ceased running on the peninsula in May 2019, the month before. <strong>No published source connects the two</strong>, and this analysis cannot separate them either: both events are Eyre Peninsula-only and fall in the same season, so they are perfectly collinear in the data. Nor is there a visible effect to attribute — the peninsula's share of network receivals shows no step across the 2019 boundary, averaging 37.3% before and 38.4% after.</p>
+
+      <p>One correction to the closure record, found in the operator's own later reports: <strong>Cungena took grain again in November 2022</strong>, three seasons after being listed as closed permanently.</p>
+    </section>
+
+    <section>
+      <h2>Why it matters this year</h2>
+
+      <ul class="events">
+        <li>
+          <span class="when">27 Apr 2021</span>
+          <p class="what">The ACCC exempts Viterra's two Port Adelaide terminals from Parts 3–6 of the Bulk Wheat Code and refuses exemption for Wallaroo and Port Giles.</p>
+        </li>
+        <li>
+          <span class="when">20 Jul 2021</span>
+          <p class="what">It refuses Port Lincoln and Thevenard, which remain subject to the full Code. On Port Lincoln the ACCC found Lucky Bay imposes "a material level of competitive constraint… in certain regions of its catchment area", while "the constraint imposed in other regions is likely limited, in particular most of the Lower Eyre Peninsula". It also noted that competition in SA had increased in recent seasons, and that distance "is only one factor".</p>
+        </li>
+        <li>
+          <span class="when">10 Oct – 17 Dec 2024</span>
+          <p class="what">The ACCC reviews Viterra's proposed purchase of five Grainflow sites and a mobile ship loader, and discontinues on 17 December after Viterra advised on 13 December that it would not proceed. No findings were announced. <strong>None of the five sites is on the Eyre Peninsula</strong>; peninsula parties engaged because of the acquirer's statewide position. T-Ports opposed. Grain Producers SA surveyed growers and put their concerns to the ACCC without taking a position.</p>
+        </li>
+        <li>
+          <span class="when">2 Jul 2025</span>
+          <p class="what">Bunge completes its merger with Viterra. The ACCC assessed and did not oppose the global transaction in December 2023. On 21 August 2025, Viterra Operations Pty Ltd is renamed Bunge Operations Pty Ltd.</p>
+        </li>
+        <li>
+          <span class="when">Jul – Dec 2025</span>
+          <p class="what">T-Ports goes to market through Nash Advisory. Media reports put the value at about $250m, unconfirmed by the vendor or its adviser; a separate report cites offers of more than $200m. From December it is offered as a package with Australian Grain Export and was, as at 3 December 2025, unsold, with the adviser reporting advanced discussions with a couple of unnamed parties.</p>
+        </li>
+        <li>
+          <span class="when">Sep – Nov 2024</span>
+          <p class="what">The Wheat Port Code's automatic sunset is deferred 24 months, to 1 October 2026, so the Code is in force today. The ACCC had submitted that it "should be allowed to sunset". The department's review found it no longer fit for purpose and recommended an industry-managed code developed by Grain Trade Australia; consultation opened 7 November 2024.</p>
+        </li>
+        <li>
+          <span class="when">Jul – Aug 2026</span>
+          <p class="what">Bunge puts six surplus SA sites to public tender through Elders, including Murdinga on the Eyre Peninsula — a "past site" with 23,400 t of storage that has not taken grain in any of the last ten seasons. Binding offers closed 21 August 2026; the outcome is unpublished.</p>
+        </li>
+      </ul>
+
+      <p style="margin-top:1.6rem">The question a regulator would have to answer, if the peninsula's one independent gateway changed hands, is narrower than any of this: for how much of the region's grain does a genuine alternative exist, and at what distance. That question is easier to answer than it was in 2021, because there is now only one alternative to measure.</p>
+    </section>
+
+    <section class="limits">
+      <h2>What this does not claim</h2>
+      <ul>
+        <li><strong>This counts delivery points, not buyers.</strong> It measures physical receival points and who operates them. Growers also sell to traders, mills, feedlots and container packers through warehoused and delivered-site contracts at Bunge sites, hold grain on farm, and sell into channels no receival point in this count represents. Handling concentration is not buyer concentration. <span class="tier cut">not measured</span></li>
+        <li><strong>No absence claims.</strong> "We have found one" is not "there is one". No systematic audit of non-Bunge receival capacity was performed, and the geometry is clipped to an Eyre Peninsula study area that excludes options beyond it — including T-Ports' own Wallaroo terminal — by construction rather than by assessment. An unlisted non-Bunge site would lower the 66.8% figure. <span class="tier cut">not measured</span></li>
+        <li><strong>No motive.</strong> Nothing here establishes why any site closed, and no inference of strategy should be drawn from the sequence of events. Where a company has published its own explanation, that explanation is quoted above.</li>
+        <li><strong>No queue or turnaround times.</strong> A simulation of the peninsula's grain logistics exists behind this work. Its operational outputs failed validation and are not used for any claim on this page. <span class="tier cut">excluded</span></li>
+        <li><strong>No price effect — and cartage is only half a delivery decision.</strong> A grower delivers where price *minus* cartage is best. This work measures the cartage half and nothing of the price half. No claim is made that concentration has moved farm-gate prices; testing that needs a cash-bid history that nobody publishes and that we have only begun to collect. The toll figure says what a competitor would have to overcome, not whether any competitor does. <span class="tier cut">excluded</span></li>
+        <li><strong>An incomplete roster.</strong> Tooligie, Cowell and Mangalo are named receiving grain in the operator's own reports and are absent from our site list; Murdinga is absent as a closed site; Cungena's closure record is contradicted; and Kapinnie sits inside the 22 on an off-season segregations read rather than on 2025/26 receival evidence. The counts are floors.</li>
+      </ul>
+    </section>
+
+    <section class="method">
+      <h2>Method and sources</h2>
+      <p>Every claim is one of two kinds, marked throughout:</p>
+      <ul>
+        <li><span class="tier t1">Tier 1</span> — published fact: regulatory determinations, company announcements, the operator's own weekly harvest reports, and the trade record. No modelling.</li>
+        <li><span class="tier t2">Tier 2</span> — geometry over road distances and site locations. No calibrated or fitted parameter.</li>
+      </ul>
+      <p>A third tier — simulated queues, truck movements and site stocks — was tested against two real network changes and <strong>failed validation</strong>: the peninsula's published receivals are reported as a single regional total, so no observed geography exists at a fine enough grain to check a redistribution against. Nothing from that tier appears here. The test and its failure are documented rather than omitted.</p>
+      <p><strong>Reproducibility.</strong> Every figure on this page was produced at commit <code>43d9541</code>. The 66.8% level comes from <code>pipeline/r8_choice_geometry.py</code>; the 61.5–67.3% coordinate envelope comes from <code>pipeline/r8a_coord_sensitivity.py</code>. These are different scripts and the distinction matters: r8's own coordinate sweep holds the 2025/26 independent set fixed and therefore cannot test the coordinate at all. Inputs are <code>data/processed/sites.geojson</code>, <code>data/processed/roads.graph.json</code>, <code>app/public/data/parcels.json</code> and the PIRSA district production behind the tonne weights.</p>
+      <p><strong>Principal sources.</strong> ACCC Bulk Wheat Code determinations (2021) and public informal merger reviews register; Viterra and Bunge weekly harvest reports, ten seasons; T-Ports harvest and site pages, archived 31 August 2026; Stock Journal and Grain Central reporting, cited by author and date above; Bunge Global SEC filings; Flinders Port Holdings monthly statistics; PIRSA district production; OpenStreetMap road network. Site operating status is derived from the operator's own weekly narratives on a positive-evidence rule: a site named as receiving grain operated that season, and the absence of a mention is never treated as closure.</p>
+      <p class="note">This draft has not been put to Bunge, T-Ports, Nash Advisory, Grain Producers SA, the South Australian Department for Infrastructure and Transport or the ACCC for comment. It should not be published until it has.</p>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,4251 @@
+{
+  "generated": "2026-08-31",
+  "reproduce": ".venv/Scripts/python.exe pipeline/r8_choice_geometry.py",
+  "tier": "Tier 2 (geometry): roads + site locations only. No simulation, no fitted parameter, no calibrated knob.",
+  "definitions": {
+    "independent": "a receival point NOT operated by the incumbent. Incumbent = 'Bunge (ex-Viterra)' and its pre-rename tag 'ex-Viterra' (Viterra Operations Pty Ltd -> Bunge Operations Pty Ltd, Aug 2025), treated as one owner throughout.",
+    "drive_time": "one-way minutes on the OSM road network, least-time path, A5 class speeds (trunk/primary 90, secondary 80, tertiary 70, unclassified 60, residential 40 km/h). Speeds are assumed (A5); everything else here is measured geometry.",
+    "production_cell": "2.5 km CLUM dryland-cropping cell with >40 ha cropping (app/public/data/parcels.json, built by pipeline/r4_build_demand.py).",
+    "tonne_weight": "district mean PIRSA production 2022/23-2025/26, allocated to cells in proportion to cropping_ha. Held FIXED across all three states so the trajectory measures network change only.",
+    "ladder_A_vs_B": "Ladder A counts receival points regardless of ownership and is defined at every state. Ladder B measures the incumbent-vs-independent gap and is UNDEFINED pre-2019, when one operator held the whole network. The two are never combined. Ladder A is NOT PUBLISHABLE - see ladder_a_validity."
+  },
+  "ladder_a_validity": {
+    "publishable": false,
+    "status": "NOT PUBLISHABLE. Every row on Ladder A is a count of receival points, and the site roster this count is taken from is known to be incomplete: Tooligie, Cowell and Mangalo are missing from sites.geojson altogether and Cungena's closed_2019 tag is contradicted by the operator's own weekly reports (docs/roster_audit_2026-08.md section 5). All four bear on at least one of the three states reported here: Cowell and Mangalo were receiving grain before 2019 and are absent from the pre-2019 state; Tooligie was receiving grain in 2023/24 and is absent from that state; Cungena's closed_2019 tag is contradicted by a 2022/23 receival, so it is wrongly excluded from the post-2019 states. The rows have been wrong twice already. They are retained in an appendix as the audit trail for the roster rebuild, under this caveat, and must not be quoted.",
+    "roster_defect_sites": {
+      "Tooligie": "operated 2022/23, 2023/24 and 2024/25 per the operator's weekly reports; absent from sites.geojson entirely",
+      "Cowell": "operated 2017/18 and 2018/19; absent from sites.geojson entirely",
+      "Mangalo": "opened for first receivals 2018/19; absent from sites.geojson entirely",
+      "Cungena": "tagged closed_2019 but named receiving grain in 2022/23; the tag is contradicted by the operator's own report"
+    },
+    "source": "docs/roster_audit_2026-08.md section 5",
+    "ladder_b_invariance": "The invariance holds for the THRESHOLD rows only, and is FALSE of the gap rows. All four roster-defect sites are INCUMBENT-operated (Tooligie, Cowell, Mangalo and Cungena are all ex-Viterra/Bunge). A THRESHOLD row ('no independent point within R minutes') is a function of the drive to the nearest INDEPENDENT point alone, so it cannot move when an incumbent site is added or removed: that is a structural invariance, not a coincidence, and it is why the headline survives a roster defect that destroys Ladder A. A GAP row ('nearest independent more than R minutes beyond nearest Bunge') is NOT protected that way. The gap is measured FROM the incumbent, so adding an incumbent site moves it - and this repo's own roster correction of 2026-08-31 did move it, from 74.4 % to 77.3 % at 2025/26 and from 32.9 % to 33.0 % at 2023/24 (docs/roster_audit_2026-08.md section 4, correction note). Every gap row on this page must therefore be quoted as 'on the roster as corrected 2026-08-31', and the piece's headline must be a threshold row.",
+    "also_open": "This script still builds its network states from the single `status` field rather than from `operating_seasons`, so the 2023/24 state omits Nunjikompita, which was named receiving that season. Ladder B is unaffected (Nunjikompita is Bunge)."
+  },
+  "headline": {
+    "state": "2025/26",
+    "threshold_min": 90,
+    "value": 0.6679,
+    "sentence": "share of EP grain production with no independent receival point within 90 minutes' drive, 2025/26: 66.8 %",
+    "why_this_one": "It is a THRESHOLD row, so it is invariant to the site-roster defect (see ladder_a_validity.ladder_b_invariance). It is A11-independent, because neither T-Ports bunker is a receival point in this state - demonstrated under every configuration of the A11 sweep, not asserted. And it has survived three adversarial verification rounds unchanged.",
+    "demoted": "The 2023/24 -> 2025/26 trajectory and the multiple between them are real and are retained in a supporting section, but they are no longer load-bearing: both depend on the 2023/24 column, which carries the A11 range, and the multiple additionally depends on the choice of threshold. Every supporting figure is published with its A11 range attached."
+  },
+  "threshold": {
+    "headline_min": 90,
+    "sweep_min": [
+      30,
+      45,
+      60,
+      75,
+      90,
+      105,
+      120
+    ],
+    "designation": "none - no threshold on this page is privileged",
+    "status": "NO THRESHOLD ON THIS PAGE IS DESIGNATED A PRIORI. Earlier drafts designated 90 minutes on two grounds; both have been withdrawn (see below) and nothing has replaced them. The full 30-120 minute sweep is published instead and no row in it is privileged: a reader who prefers 60 minutes, or 120, should read that row. The 90-minute row is the one the headline quotes because it is the middle of the published grid and gives one legible number, not because it was selected or justified.",
+    "withdrawn_grounds": [
+      "WITHDRAWN 2026-08-31, ground 1 (cartage cost). This ground read 90 minutes as 105-135 km at A5 speeds and priced it at A$7-18/t using what the page called A18's 'published range' of A$0.07-0.13/t-km. That description was false. A18 is an INDICATIVE REPO ASSUMPTION, not a published schedule: its own entry in data/ASSUMPTIONS.md states in terms, 'No single public EP $/t-km schedule exists', and the 0.07-0.13 band is this project's own tolerance around a A$0.10/t-km working value, consistency-checked against published anchors rather than read off a published rate card. A threshold cannot be designated a priori on a number this repo made up, however reasonable that number is.",
+      "WITHDRAWN 2026-08-31, ground 2 (a working day's round trip). This ground derived a four-loads-a-day cap from A2's 12 h farm-truck dispatch window (07:00-19:00, engine.ts sitesOpenNow). A2's bays and service times are FITTED simulation parameters, and this page's whole standing rests on depending on none of A1, A2, A9 or A24. Leaning the threshold on A2 would have made that independence claim false. The ground is withdrawn rather than the independence claim, because the independence claim is exactly true without it and is load-bearing for the tier structure of the piece."
+    ],
+    "search_for_a_published_basis": "Searched for a genuinely published basis for any cart-range threshold on EP, and none was found. data/ASSUMPTIONS.md A18 records that no public EP $/t-km schedule exists. The ACCC's 2021 Port Lincoln and Thevenard Final Determinations discuss grain catchments qualitatively and in port-to-port kilometres (Lucky Bay 177 km from Port Lincoln, 412 km from Thevenard) and state expressly that 'distance, while important, is only one factor'; they publish no grower cart-range threshold. The 2018 Eyre Peninsula Freight Study contains no cart-range figure either. Rather than stand a designation on an adjacent citation, the designation is dropped.",
+    "disclosure": "Disclosed against interest, and it no longer bites the headline: 90 min is where the 2025/26-to-2023/24 RATIO of this row peaks across the sweep, and the repo holds no record of the threshold being registered before the sweep was run. That objection is an objection to the MULTIPLE, which is no longer the headline - it has been demoted to the supporting section. The headline is a single 2025/26 LEVEL, and the whole 2025/26 sweep column is printed beside it so that no choice of threshold is being made on the reader's behalf: the 2025/26 level is 97.1 % at 30 min and still 39.5 % at the most generous 120-minute row. Separately, note the direction of generosity: a WIDER threshold is generous to the INDEPENDENT side of the comparison, because it counts a more distant alternative as a live option, so reading the 90-minute row rather than the 60-minute one understates the finding.",
+    "rule": "Never quote the multiple without the levels, this sweep and the A11 range beside it."
+  },
+  "a11_coordinate_sweep": {
+    "what": "A11 gives the Lock and Kimba T-Ports bunker coordinates a <=5 km tolerance (town centroids; exact pads unpublished). Both sites are displaced over that tolerance and every published row is recomputed.",
+    "method": "For each offset the site is moved to a new lon/lat, RE-SNAPPED to the nearest OSM node and RE-ROUTED with a fresh Dijkstra tree. Minutes are not scaled or interpolated. Lock and Kimba are displaced independently, so every combination of the two bearings is evaluated and the reported extremes are the true extremes over the grid.",
+    "offsets_km": [
+      0.0,
+      2.5,
+      5.0
+    ],
+    "bearings_deg": [
+      0,
+      45,
+      90,
+      135,
+      180,
+      225,
+      270,
+      315
+    ],
+    "sites": [
+      "Lock (T-Ports bunker)",
+      "Kimba (T-Ports bunker)"
+    ],
+    "favourable_means": "lower 2023/24 share (larger multiple against the fixed 2025/26 level)",
+    "n_configurations": 129,
+    "headline_state_is_a11_independent": {
+      "state": "2025/26",
+      "share_no_independent_within_90_at_every_configuration": [
+        0.6679
+      ],
+      "why": "Neither Lock nor Kimba is a receival point in this state - both bunkers are closed for 2025/26 (published, tports.com/harvest) - so no displacement of either can reach it. Computed under all 129 configurations rather than asserted."
+    },
+    "s2023_24_envelope_no_independent_within": {
+      "30": [
+        0.8318,
+        0.8598
+      ],
+      "45": [
+        0.6583,
+        0.7084
+      ],
+      "60": [
+        0.4996,
+        0.5612
+      ],
+      "75": [
+        0.3188,
+        0.3994
+      ],
+      "90": [
+        0.1994,
+        0.2458
+      ],
+      "105": [
+        0.1623,
+        0.1725
+      ],
+      "120": [
+        0.1367,
+        0.1544
+      ]
+    },
+    "s2023_24_envelope_gap_over_60": [
+      0.3278,
+      0.3844
+    ],
+    "extremes_are_selected_on": "the 90-minute threshold row. The gap column of an extreme row is that same configuration's gap value, NOT the extreme of the gap row - the gap row's own envelope is given separately as s2023_24_envelope_gap_over_60.",
+    "multiple_range_at_headline_min": [
+      2.72,
+      3.35
+    ],
+    "rows": [
+      {
+        "offset_km": 0.0,
+        "n_configurations": 1,
+        "most_favourable": {
+          "offset_km": 0.0,
+          "bearing_lock_deg": null,
+          "bearing_kimba_deg": null,
+          "s2023_24_no_independent_within": {
+            "30": 0.8358,
+            "45": 0.6631,
+            "60": 0.4996,
+            "75": 0.3286,
+            "90": 0.2028,
+            "105": 0.165,
+            "120": 0.1385
+          },
+          "s2023_24_gap_over_60": 0.3301,
+          "s2025_26_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          }
+        },
+        "least_favourable": {
+          "offset_km": 0.0,
+          "bearing_lock_deg": null,
+          "bearing_kimba_deg": null,
+          "s2023_24_no_independent_within": {
+            "30": 0.8358,
+            "45": 0.6631,
+            "60": 0.4996,
+            "75": 0.3286,
+            "90": 0.2028,
+            "105": 0.165,
+            "120": 0.1385
+          },
+          "s2023_24_gap_over_60": 0.3301,
+          "s2025_26_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          }
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "n_configurations": 64,
+        "most_favourable": {
+          "offset_km": 2.5,
+          "bearing_lock_deg": 180,
+          "bearing_kimba_deg": 0,
+          "s2023_24_no_independent_within": {
+            "30": 0.8388,
+            "45": 0.6671,
+            "60": 0.5004,
+            "75": 0.3188,
+            "90": 0.1994,
+            "105": 0.1663,
+            "120": 0.1394
+          },
+          "s2023_24_gap_over_60": 0.3278,
+          "s2025_26_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          }
+        },
+        "least_favourable": {
+          "offset_km": 2.5,
+          "bearing_lock_deg": 45,
+          "bearing_kimba_deg": 0,
+          "s2023_24_no_independent_within": {
+            "30": 0.8397,
+            "45": 0.6792,
+            "60": 0.5249,
+            "75": 0.3454,
+            "90": 0.2181,
+            "105": 0.1674,
+            "120": 0.1416
+          },
+          "s2023_24_gap_over_60": 0.3392,
+          "s2025_26_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          }
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "n_configurations": 64,
+        "most_favourable": {
+          "offset_km": 5.0,
+          "bearing_lock_deg": 180,
+          "bearing_kimba_deg": 0,
+          "s2023_24_no_independent_within": {
+            "30": 0.8432,
+            "45": 0.682,
+            "60": 0.51,
+            "75": 0.3331,
+            "90": 0.2052,
+            "105": 0.1717,
+            "120": 0.1516
+          },
+          "s2023_24_gap_over_60": 0.3347,
+          "s2025_26_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          }
+        },
+        "least_favourable": {
+          "offset_km": 5.0,
+          "bearing_lock_deg": 0,
+          "bearing_kimba_deg": 0,
+          "s2023_24_no_independent_within": {
+            "30": 0.8465,
+            "45": 0.6994,
+            "60": 0.5612,
+            "75": 0.3994,
+            "90": 0.2458,
+            "105": 0.1725,
+            "120": 0.1516
+          },
+          "s2023_24_gap_over_60": 0.3844,
+          "s2025_26_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          }
+        }
+      }
+    ],
+    "grid": [
+      {
+        "offset_km": 0.0,
+        "bearing_lock_deg": null,
+        "bearing_kimba_deg": null,
+        "s2023_24_no_independent_within": {
+          "30": 0.8358,
+          "45": 0.6631,
+          "60": 0.4996,
+          "75": 0.3286,
+          "90": 0.2028,
+          "105": 0.165,
+          "120": 0.1385
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8386,
+          "45": 0.6767,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8361,
+          "45": 0.675,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8356,
+          "45": 0.6727,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8349,
+          "45": 0.6727,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8368,
+          "45": 0.6693,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8335,
+          "45": 0.668,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8335,
+          "45": 0.668,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8369,
+          "45": 0.6751,
+          "60": 0.5049,
+          "75": 0.3341,
+          "90": 0.2061,
+          "105": 0.1636,
+          "120": 0.1373
+        },
+        "s2023_24_gap_over_60": 0.335,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8397,
+          "45": 0.6792,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8371,
+          "45": 0.6775,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8366,
+          "45": 0.6752,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8359,
+          "45": 0.6752,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8378,
+          "45": 0.6718,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6704,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6704,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8379,
+          "45": 0.6775,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8397,
+          "45": 0.6792,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8371,
+          "45": 0.6775,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8366,
+          "45": 0.6752,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8359,
+          "45": 0.6752,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8378,
+          "45": 0.6718,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6704,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6704,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8379,
+          "45": 0.6775,
+          "60": 0.5249,
+          "75": 0.3454,
+          "90": 0.2181,
+          "105": 0.1674,
+          "120": 0.1416
+        },
+        "s2023_24_gap_over_60": 0.3392,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.837,
+          "45": 0.674,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6723,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8339,
+          "45": 0.67,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8332,
+          "45": 0.6699,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8351,
+          "45": 0.6673,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8318,
+          "45": 0.666,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8318,
+          "45": 0.666,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8352,
+          "45": 0.6723,
+          "60": 0.5087,
+          "75": 0.3355,
+          "90": 0.2107,
+          "105": 0.1667,
+          "120": 0.1421
+        },
+        "s2023_24_gap_over_60": 0.3329,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8388,
+          "45": 0.6671,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8362,
+          "45": 0.6654,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8357,
+          "45": 0.6631,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.835,
+          "45": 0.663,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8369,
+          "45": 0.6596,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8336,
+          "45": 0.6583,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8336,
+          "45": 0.6583,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.837,
+          "45": 0.6654,
+          "60": 0.5004,
+          "75": 0.3188,
+          "90": 0.1994,
+          "105": 0.1663,
+          "120": 0.1394
+        },
+        "s2023_24_gap_over_60": 0.3278,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8397,
+          "45": 0.6774,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8372,
+          "45": 0.6757,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8366,
+          "45": 0.6734,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8359,
+          "45": 0.6733,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8378,
+          "45": 0.67,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6686,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6686,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8379,
+          "45": 0.6757,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8397,
+          "45": 0.6774,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8372,
+          "45": 0.6757,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8366,
+          "45": 0.6734,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8359,
+          "45": 0.6733,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8378,
+          "45": 0.67,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6686,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8345,
+          "45": 0.6686,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8379,
+          "45": 0.6757,
+          "60": 0.5021,
+          "75": 0.3292,
+          "90": 0.2045,
+          "105": 0.1658,
+          "120": 0.1389
+        },
+        "s2023_24_gap_over_60": 0.3301,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8408,
+          "45": 0.6808,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8382,
+          "45": 0.6791,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8377,
+          "45": 0.6768,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.837,
+          "45": 0.6767,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8389,
+          "45": 0.6733,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8356,
+          "45": 0.672,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8356,
+          "45": 0.672,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 2.5,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.839,
+          "45": 0.6791,
+          "60": 0.521,
+          "75": 0.3456,
+          "90": 0.2165,
+          "105": 0.1623,
+          "120": 0.1367
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8465,
+          "45": 0.6994,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8589,
+          "45": 0.7084,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8577,
+          "45": 0.7084,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8446,
+          "45": 0.692,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8446,
+          "45": 0.692,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8455,
+          "45": 0.6832,
+          "60": 0.5611,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8471,
+          "45": 0.7024,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 0,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8471,
+          "45": 0.7024,
+          "60": 0.5612,
+          "75": 0.3994,
+          "90": 0.2458,
+          "105": 0.1725,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3844,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8439,
+          "45": 0.6896,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8563,
+          "45": 0.6985,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8551,
+          "45": 0.6985,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.842,
+          "45": 0.6821,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.842,
+          "45": 0.6821,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8429,
+          "45": 0.6734,
+          "60": 0.5419,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8445,
+          "45": 0.6926,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 45,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8445,
+          "45": 0.6926,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8439,
+          "45": 0.6896,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8563,
+          "45": 0.6985,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8551,
+          "45": 0.6985,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.842,
+          "45": 0.6821,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.842,
+          "45": 0.6821,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8429,
+          "45": 0.6734,
+          "60": 0.5419,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8445,
+          "45": 0.6926,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 90,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8445,
+          "45": 0.6926,
+          "60": 0.542,
+          "75": 0.3776,
+          "90": 0.2346,
+          "105": 0.1702,
+          "120": 0.1472
+        },
+        "s2023_24_gap_over_60": 0.3516,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8457,
+          "45": 0.6939,
+          "60": 0.5248,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8581,
+          "45": 0.7029,
+          "60": 0.5248,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8569,
+          "45": 0.7029,
+          "60": 0.5248,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8438,
+          "45": 0.6864,
+          "60": 0.5243,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8438,
+          "45": 0.6864,
+          "60": 0.5243,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8447,
+          "45": 0.677,
+          "60": 0.5242,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8463,
+          "45": 0.6969,
+          "60": 0.5245,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 135,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8463,
+          "45": 0.6969,
+          "60": 0.5245,
+          "75": 0.3514,
+          "90": 0.2151,
+          "105": 0.1724,
+          "120": 0.1544
+        },
+        "s2023_24_gap_over_60": 0.3394,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8432,
+          "45": 0.682,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8556,
+          "45": 0.6909,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8544,
+          "45": 0.691,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8413,
+          "45": 0.6745,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8413,
+          "45": 0.6745,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8422,
+          "45": 0.6658,
+          "60": 0.5099,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8438,
+          "45": 0.685,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 180,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8438,
+          "45": 0.685,
+          "60": 0.51,
+          "75": 0.3331,
+          "90": 0.2052,
+          "105": 0.1717,
+          "120": 0.1516
+        },
+        "s2023_24_gap_over_60": 0.3347,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.847,
+          "45": 0.6867,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8594,
+          "45": 0.6957,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8582,
+          "45": 0.6957,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8451,
+          "45": 0.6793,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8451,
+          "45": 0.6793,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.846,
+          "45": 0.6698,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8476,
+          "45": 0.6897,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 225,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8476,
+          "45": 0.6897,
+          "60": 0.5091,
+          "75": 0.3388,
+          "90": 0.2072,
+          "105": 0.1673,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3336,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8467,
+          "45": 0.6869,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8591,
+          "45": 0.6959,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.858,
+          "45": 0.6959,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8449,
+          "45": 0.6795,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8449,
+          "45": 0.6795,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8458,
+          "45": 0.67,
+          "60": 0.5124,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.8473,
+          "45": 0.6899,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 270,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.8473,
+          "45": 0.6899,
+          "60": 0.5125,
+          "75": 0.3402,
+          "90": 0.2087,
+          "105": 0.1664,
+          "120": 0.1442
+        },
+        "s2023_24_gap_over_60": 0.3349,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 0,
+        "s2023_24_no_independent_within": {
+          "30": 0.8474,
+          "45": 0.696,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 45,
+        "s2023_24_no_independent_within": {
+          "30": 0.8598,
+          "45": 0.7049,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 90,
+        "s2023_24_no_independent_within": {
+          "30": 0.8587,
+          "45": 0.705,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 135,
+        "s2023_24_no_independent_within": {
+          "30": 0.8456,
+          "45": 0.6885,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 180,
+        "s2023_24_no_independent_within": {
+          "30": 0.8456,
+          "45": 0.6885,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 225,
+        "s2023_24_no_independent_within": {
+          "30": 0.8465,
+          "45": 0.6796,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 270,
+        "s2023_24_no_independent_within": {
+          "30": 0.848,
+          "45": 0.699,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      },
+      {
+        "offset_km": 5.0,
+        "bearing_lock_deg": 315,
+        "bearing_kimba_deg": 315,
+        "s2023_24_no_independent_within": {
+          "30": 0.848,
+          "45": 0.699,
+          "60": 0.5508,
+          "75": 0.3832,
+          "90": 0.2402,
+          "105": 0.1637,
+          "120": 0.1377
+        },
+        "s2023_24_gap_over_60": 0.3807,
+        "s2025_26_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        }
+      }
+    ],
+    "asymmetry_check": "A11's own entry claims the error 'can only ever make the 2023/24 baseline worse, never better'. This sweep is where that claim is tested rather than repeated."
+  },
+  "carried_assumptions": {
+    "A5": "road class speeds - the only assumed input to the routing, and THE LEVELS ON THIS PAGE ARE MATERIALLY SENSITIVE TO IT, because every published row is thresholded in absolute minutes. Swept at x0.85/x1.00/x1.15 as a standing row. A5 error does NOT cancel; earlier drafts of this page said it largely did, and that was wrong.",
+    "A11": "T-Ports Lock/Kimba coordinates are town centroids, not the exact pads (<=5 km tolerance). Both sites are in the 2023/24 state only. A11 as rewritten 2026-08-31 records that this error is NOT negligible for this page, and it is now SWEPT rather than argued about - see the A11 sweep table. Every 2023/24 figure and every multiple on this page carries that range. The 2025/26 headline does not: neither bunker is in that state, and the sweep demonstrates the level does not move.",
+    "A12": "season site sets. Load-bearing for Ladder A and the reason Ladder A is not publishable: the roster is an operator snapshot, not a per-season site list. The known defects are named in Appendix A. This script still builds its states from the single `status` field rather than from `operating_seasons`.",
+    "A14": "district boundaries approximated by LGA composition - used for the tonne weighting, not for routing.",
+    "A15": "is NOT used: the 2025/26 bunker closure is published (tports.com/harvest), and 2024/25 is not one of the three states.",
+    "A18": "road grain freight rate. NO LONGER USED FOR ANYTHING ON THIS PAGE. It formerly supplied the cost argument that designated the 90-minute threshold a priori; that ground is withdrawn, because A18 is an indicative repo assumption and not a published rate schedule - A18's own entry says 'No single public EP $/t-km schedule exists'. It enters no computed number here and no longer supports any designation.",
+    "A4": "capacities are not used at all. This analysis is geometry; no site's capacity enters any number on this page.",
+    "A2": "is NOT used, and must not be. An earlier draft leaned the threshold argument on A2's 12 h farm-truck dispatch window; that ground is withdrawn, so this page's independence from A1, A2, A9 and A24 is exact rather than approximate."
+  },
+  "speed_sensitivity": {
+    "factors": [
+      0.85,
+      1.0,
+      1.15
+    ],
+    "method": "A uniform scaling of every A5 class speed by f divides every routed minute by f and cannot change which path is least-time, so the scaled network is obtained exactly by scaling minutes rather than re-routing.",
+    "why_it_matters": "Both published Ladder B rows are thresholded in ABSOLUTE MINUTES, so a uniform error in A5 does NOT cancel out of them: it moves the threshold. Any claim that speed error cancels on Ladder B is false and must not be made. The direction of the finding survives x0.85-x1.15; the levels are materially A5-dependent.",
+    "per_state": {
+      "s2023_24": {
+        "0.85": {
+          "speed_factor": 0.85,
+          "share_no_independent_within": {
+            "30": 0.8743,
+            "45": 0.7435,
+            "60": 0.5976,
+            "75": 0.4678,
+            "90": 0.313,
+            "105": 0.2071,
+            "120": 0.1692
+          },
+          "share_gap_beyond_incl_none": {
+            "30": 0.7015,
+            "60": 0.4275,
+            "90": 0.1971
+          },
+          "wmean_nearest_incumbent_min": 22.0,
+          "wmean_nearest_independent_min": 83.9
+        },
+        "1.00": {
+          "speed_factor": 1.0,
+          "share_no_independent_within": {
+            "30": 0.8358,
+            "45": 0.6631,
+            "60": 0.4996,
+            "75": 0.3286,
+            "90": 0.2028,
+            "105": 0.165,
+            "120": 0.1385
+          },
+          "share_gap_beyond_incl_none": {
+            "30": 0.6588,
+            "60": 0.3301,
+            "90": 0.1659
+          },
+          "wmean_nearest_incumbent_min": 18.7,
+          "wmean_nearest_independent_min": 71.3
+        },
+        "1.15": {
+          "speed_factor": 1.15,
+          "share_no_independent_within": {
+            "30": 0.7866,
+            "45": 0.5914,
+            "60": 0.3938,
+            "75": 0.2307,
+            "90": 0.1667,
+            "105": 0.138,
+            "120": 0.1056
+          },
+          "share_gap_beyond_incl_none": {
+            "30": 0.6189,
+            "60": 0.2228,
+            "90": 0.1335
+          },
+          "wmean_nearest_incumbent_min": 16.3,
+          "wmean_nearest_independent_min": 62.0
+        }
+      },
+      "s2025_26": {
+        "0.85": {
+          "speed_factor": 0.85,
+          "share_no_independent_within": {
+            "30": 0.9822,
+            "45": 0.9498,
+            "60": 0.9138,
+            "75": 0.8566,
+            "90": 0.7717,
+            "105": 0.6726,
+            "120": 0.5573
+          },
+          "share_gap_beyond_incl_none": {
+            "30": 0.9227,
+            "60": 0.8451,
+            "90": 0.6326
+          },
+          "wmean_nearest_incumbent_min": 22.0,
+          "wmean_nearest_independent_min": 146.6
+        },
+        "1.00": {
+          "speed_factor": 1.0,
+          "share_no_independent_within": {
+            "30": 0.9708,
+            "45": 0.932,
+            "60": 0.8736,
+            "75": 0.7822,
+            "90": 0.6679,
+            "105": 0.5316,
+            "120": 0.3945
+          },
+          "share_gap_beyond_incl_none": {
+            "30": 0.9111,
+            "60": 0.773,
+            "90": 0.5137
+          },
+          "wmean_nearest_incumbent_min": 18.7,
+          "wmean_nearest_independent_min": 124.6
+        },
+        "1.15": {
+          "speed_factor": 1.15,
+          "share_no_independent_within": {
+            "30": 0.961,
+            "45": 0.9076,
+            "60": 0.8214,
+            "75": 0.6969,
+            "90": 0.545,
+            "105": 0.3885,
+            "120": 0.278
+          },
+          "share_gap_beyond_incl_none": {
+            "30": 0.9035,
+            "60": 0.6974,
+            "90": 0.435
+          },
+          "wmean_nearest_incumbent_min": 16.3,
+          "wmean_nearest_independent_min": 108.3
+        }
+      }
+    }
+  },
+  "inputs": {
+    "sites": "data/processed/sites.geojson",
+    "roads": "data/processed/roads.graph.json",
+    "production": "data/processed/production_districts.parquet",
+    "cells": "app/public/data/parcels.json"
+  },
+  "coverage": {
+    "n_production_cells": 5324,
+    "total_weighted_tonnes": 2883528,
+    "cropping_ha_by_district": {
+      "EEP": 695488,
+      "LEP": 367831,
+      "WEP": 1220418
+    },
+    "mean_production_t_by_district": {
+      "EEP": 945206,
+      "LEP": 1111912,
+      "WEP": 826409
+    },
+    "cells_with_no_reachable_site": 0,
+    "worst_site_snap_km": 0.65,
+    "worst_cell_snap_km": 9.47,
+    "road_snap": {
+      "wshare_cells_snapped_over_2km": 0.443,
+      "wshare_cells_snapped_over_5km": 0.0134,
+      "wmean_snap_km": 1.99,
+      "note": "A cell is routed from its nearest node on the OSM graph; the snap leg itself is not driven, so a large snap UNDERSTATES that cell's drive time to everything equally. It cannot manufacture an ownership GAP, because a gap row is a difference of two times that share the same snap. IT DOES BEAR ON THE THRESHOLD ROWS, exactly as a speed error does: 'no independent point within R minutes' is an absolute-minute test, so an understated drive time makes a cell more likely to pass it. The snap therefore FLATTERS the network on the headline row rather than the reverse - it works against the finding, not for it."
+    }
+  },
+  "states": {
+    "pre_2019": {
+      "label": "pre-2019",
+      "desc": "the 6 sites that closed in 2019 still open; the 22 currently-active Bunge sites plus the 1 now-dormant one(s) treated as open (A12); T-Ports does not yet exist",
+      "sensitivity": false,
+      "sites": [
+        "Warramboo",
+        "Wirrulla",
+        "Penong",
+        "Tumby Bay",
+        "Yeelanna",
+        "Kapinnie",
+        "Kimba",
+        "Darke Peak",
+        "Cummins",
+        "Edillilie",
+        "Poochera",
+        "Lock",
+        "Arno Bay",
+        "Witera",
+        "Port Neill",
+        "Buckleboo",
+        "Elliston",
+        "Wudinna",
+        "Thevenard",
+        "Rudall",
+        "Port Lincoln",
+        "Streaky Bay",
+        "Nunjikompita",
+        "Minnipa (closed)",
+        "Kyancutta (closed)",
+        "Cungena (closed)",
+        "Waddikee (closed)",
+        "Kielpa (closed)",
+        "Wharminda (closed)"
+      ],
+      "ladder_a_choice_count": {
+        "publishable": false,
+        "status": "NOT PUBLISHABLE. Every row on Ladder A is a count of receival points, and the site roster this count is taken from is known to be incomplete: Tooligie, Cowell and Mangalo are missing from sites.geojson altogether and Cungena's closed_2019 tag is contradicted by the operator's own weekly reports (docs/roster_audit_2026-08.md section 5). All four bear on at least one of the three states reported here: Cowell and Mangalo were receiving grain before 2019 and are absent from the pre-2019 state; Tooligie was receiving grain in 2023/24 and is absent from that state; Cungena's closed_2019 tag is contradicted by a 2022/23 receival, so it is wrongly excluded from the post-2019 states. The rows have been wrong twice already. They are retained in an appendix as the audit trail for the roster rebuild, under this caveat, and must not be quoted.",
+        "roster_defect_sites": [
+          "Cowell",
+          "Cungena",
+          "Mangalo",
+          "Tooligie"
+        ],
+        "n_receival_points": 29,
+        "n_owners": 1,
+        "wmean_nearest_min": 17.5,
+        "p50_nearest_min": 15.2,
+        "p90_nearest_min": 31.4,
+        "p99_nearest_min": 58.3,
+        "share_2nd_beyond": {
+          "30": 0.0435,
+          "60": 0.0,
+          "90": 0.0
+        },
+        "wmean_points_within": {
+          "30": 2.07,
+          "45": 4.06,
+          "60": 6.23
+        },
+        "share_with_only_one_point_within": {
+          "30": 0.3578,
+          "45": 0.0949,
+          "60": 0.0323
+        }
+      },
+      "ladder_b_ownership_gap": {
+        "defined": false,
+        "n_independent_points": 0,
+        "why": "Every receival point in this state is operated by the incumbent (ex-Viterra). There is no independent option anywhere, so the incumbent-vs-independent gap has no value - not a large one. Compare this state on Ladder A only."
+      },
+      "by_district": {
+        "WEP": {
+          "wmean_nearest_min": 18.4,
+          "share_only_one_within_45": 0.1508
+        },
+        "LEP": {
+          "wmean_nearest_min": 14.2,
+          "share_only_one_within_45": 0.0019
+        },
+        "EEP": {
+          "wmean_nearest_min": 20.7,
+          "share_only_one_within_45": 0.1554
+        }
+      }
+    },
+    "s2023_24": {
+      "label": "2023/24",
+      "desc": "current Bunge network (22 active) + T-Ports Lucky Bay + the Lock and Kimba bunkers, which ran that season",
+      "sensitivity": false,
+      "sites": [
+        "Warramboo",
+        "Wirrulla",
+        "Penong",
+        "Tumby Bay",
+        "Yeelanna",
+        "Kapinnie",
+        "Kimba",
+        "Darke Peak",
+        "Cummins",
+        "Edillilie",
+        "Poochera",
+        "Lock",
+        "Arno Bay",
+        "Witera",
+        "Port Neill",
+        "Buckleboo",
+        "Elliston",
+        "Wudinna",
+        "Thevenard",
+        "Rudall",
+        "Port Lincoln",
+        "Streaky Bay",
+        "Lucky Bay (T-Ports port)",
+        "Lock (T-Ports bunker)",
+        "Kimba (T-Ports bunker)"
+      ],
+      "ladder_a_choice_count": {
+        "publishable": false,
+        "status": "NOT PUBLISHABLE. Every row on Ladder A is a count of receival points, and the site roster this count is taken from is known to be incomplete: Tooligie, Cowell and Mangalo are missing from sites.geojson altogether and Cungena's closed_2019 tag is contradicted by the operator's own weekly reports (docs/roster_audit_2026-08.md section 5). All four bear on at least one of the three states reported here: Cowell and Mangalo were receiving grain before 2019 and are absent from the pre-2019 state; Tooligie was receiving grain in 2023/24 and is absent from that state; Cungena's closed_2019 tag is contradicted by a 2022/23 receival, so it is wrongly excluded from the post-2019 states. The rows have been wrong twice already. They are retained in an appendix as the audit trail for the roster rebuild, under this caveat, and must not be quoted.",
+        "roster_defect_sites": [
+          "Cowell",
+          "Cungena",
+          "Mangalo",
+          "Tooligie"
+        ],
+        "n_receival_points": 25,
+        "n_owners": 2,
+        "wmean_nearest_min": 17.8,
+        "p50_nearest_min": 16.3,
+        "p90_nearest_min": 31.5,
+        "p99_nearest_min": 43.8,
+        "share_2nd_beyond": {
+          "30": 0.0701,
+          "60": 0.0,
+          "90": 0.0
+        },
+        "wmean_points_within": {
+          "30": 1.83,
+          "45": 3.57,
+          "60": 5.48
+        },
+        "share_with_only_one_point_within": {
+          "30": 0.4178,
+          "45": 0.1053,
+          "60": 0.0238
+        }
+      },
+      "ladder_b_ownership_gap": {
+        "defined": true,
+        "publishable": true,
+        "roster_invariance": "The invariance holds for the THRESHOLD rows only, and is FALSE of the gap rows. All four roster-defect sites are INCUMBENT-operated (Tooligie, Cowell, Mangalo and Cungena are all ex-Viterra/Bunge). A THRESHOLD row ('no independent point within R minutes') is a function of the drive to the nearest INDEPENDENT point alone, so it cannot move when an incumbent site is added or removed: that is a structural invariance, not a coincidence, and it is why the headline survives a roster defect that destroys Ladder A. A GAP row ('nearest independent more than R minutes beyond nearest Bunge') is NOT protected that way. The gap is measured FROM the incumbent, so adding an incumbent site moves it - and this repo's own roster correction of 2026-08-31 did move it, from 74.4 % to 77.3 % at 2025/26 and from 32.9 % to 33.0 % at 2023/24 (docs/roster_audit_2026-08.md section 4, correction note). Every gap row on this page must therefore be quoted as 'on the roster as corrected 2026-08-31', and the piece's headline must be a threshold row.",
+        "headline_threshold_min": 90,
+        "speed_sensitivity": {
+          "0.85": {
+            "speed_factor": 0.85,
+            "share_no_independent_within": {
+              "30": 0.8743,
+              "45": 0.7435,
+              "60": 0.5976,
+              "75": 0.4678,
+              "90": 0.313,
+              "105": 0.2071,
+              "120": 0.1692
+            },
+            "share_gap_beyond_incl_none": {
+              "30": 0.7015,
+              "60": 0.4275,
+              "90": 0.1971
+            },
+            "wmean_nearest_incumbent_min": 22.0,
+            "wmean_nearest_independent_min": 83.9
+          },
+          "1.00": {
+            "speed_factor": 1.0,
+            "share_no_independent_within": {
+              "30": 0.8358,
+              "45": 0.6631,
+              "60": 0.4996,
+              "75": 0.3286,
+              "90": 0.2028,
+              "105": 0.165,
+              "120": 0.1385
+            },
+            "share_gap_beyond_incl_none": {
+              "30": 0.6588,
+              "60": 0.3301,
+              "90": 0.1659
+            },
+            "wmean_nearest_incumbent_min": 18.7,
+            "wmean_nearest_independent_min": 71.3
+          },
+          "1.15": {
+            "speed_factor": 1.15,
+            "share_no_independent_within": {
+              "30": 0.7866,
+              "45": 0.5914,
+              "60": 0.3938,
+              "75": 0.2307,
+              "90": 0.1667,
+              "105": 0.138,
+              "120": 0.1056
+            },
+            "share_gap_beyond_incl_none": {
+              "30": 0.6189,
+              "60": 0.2228,
+              "90": 0.1335
+            },
+            "wmean_nearest_incumbent_min": 16.3,
+            "wmean_nearest_independent_min": 62.0
+          }
+        },
+        "n_independent_points": 3,
+        "independent_operator": [
+          "T-Ports"
+        ],
+        "wmean_nearest_incumbent_min": 18.7,
+        "p50_nearest_incumbent_min": 16.5,
+        "p90_nearest_incumbent_min": 33.2,
+        "p99_nearest_incumbent_min": 58.3,
+        "wmean_nearest_independent_min": 71.3,
+        "p50_nearest_independent_min": 59.8,
+        "share_independent_nearer_than_incumbent": 0.1218,
+        "share_gap_beyond_incl_none": {
+          "30": 0.6588,
+          "60": 0.3301,
+          "90": 0.1659
+        },
+        "share_gap_beyond_excl_none": {
+          "30": 0.6588,
+          "60": 0.3301,
+          "90": 0.1659
+        },
+        "share_no_independent_within": {
+          "30": 0.8358,
+          "45": 0.6631,
+          "60": 0.4996,
+          "75": 0.3286,
+          "90": 0.2028,
+          "105": 0.165,
+          "120": 0.1385
+        },
+        "share_nearest_independent_is_a_port": 0.124,
+        "nearest_independent_mix": {
+          "Lock (T-Ports bunker)": 0.7022,
+          "Kimba (T-Ports bunker)": 0.1738,
+          "Lucky Bay (T-Ports port)": 0.124
+        }
+      },
+      "by_district": {
+        "WEP": {
+          "wmean_nearest_min": 20.9,
+          "share_only_one_within_45": 0.2637,
+          "wmean_nearest_independent_min": 118.5,
+          "share_no_independent_within_90": 0.6168,
+          "share_gap_over_60_incl_none": 0.6277
+        },
+        "LEP": {
+          "wmean_nearest_min": 14.4,
+          "share_only_one_within_45": 0.0019,
+          "wmean_nearest_independent_min": 69.3,
+          "share_no_independent_within_90": 0.0675,
+          "share_gap_over_60_incl_none": 0.3895
+        },
+        "EEP": {
+          "wmean_nearest_min": 19.0,
+          "share_only_one_within_45": 0.0886,
+          "wmean_nearest_independent_min": 32.4,
+          "share_no_independent_within_90": 0.0,
+          "share_gap_over_60_incl_none": 0.0
+        }
+      }
+    },
+    "s2025_26": {
+      "label": "2025/26",
+      "desc": "current Bunge network (22 active) + T-Ports Lucky Bay only; both inland bunkers closed for the season (published, tports.com/harvest)",
+      "sensitivity": false,
+      "sites": [
+        "Warramboo",
+        "Wirrulla",
+        "Penong",
+        "Tumby Bay",
+        "Yeelanna",
+        "Kapinnie",
+        "Kimba",
+        "Darke Peak",
+        "Cummins",
+        "Edillilie",
+        "Poochera",
+        "Lock",
+        "Arno Bay",
+        "Witera",
+        "Port Neill",
+        "Buckleboo",
+        "Elliston",
+        "Wudinna",
+        "Thevenard",
+        "Rudall",
+        "Port Lincoln",
+        "Streaky Bay",
+        "Lucky Bay (T-Ports port)"
+      ],
+      "ladder_a_choice_count": {
+        "publishable": false,
+        "status": "NOT PUBLISHABLE. Every row on Ladder A is a count of receival points, and the site roster this count is taken from is known to be incomplete: Tooligie, Cowell and Mangalo are missing from sites.geojson altogether and Cungena's closed_2019 tag is contradicted by the operator's own weekly reports (docs/roster_audit_2026-08.md section 5). All four bear on at least one of the three states reported here: Cowell and Mangalo were receiving grain before 2019 and are absent from the pre-2019 state; Tooligie was receiving grain in 2023/24 and is absent from that state; Cungena's closed_2019 tag is contradicted by a 2022/23 receival, so it is wrongly excluded from the post-2019 states. The rows have been wrong twice already. They are retained in an appendix as the audit trail for the roster rebuild, under this caveat, and must not be quoted.",
+        "roster_defect_sites": [
+          "Cowell",
+          "Cungena",
+          "Mangalo",
+          "Tooligie"
+        ],
+        "n_receival_points": 23,
+        "n_owners": 2,
+        "wmean_nearest_min": 17.9,
+        "p50_nearest_min": 16.5,
+        "p90_nearest_min": 31.7,
+        "p99_nearest_min": 43.8,
+        "share_2nd_beyond": {
+          "30": 0.0701,
+          "60": 0.0,
+          "90": 0.0
+        },
+        "wmean_points_within": {
+          "30": 1.7,
+          "45": 3.3,
+          "60": 4.99
+        },
+        "share_with_only_one_point_within": {
+          "30": 0.4826,
+          "45": 0.1203,
+          "60": 0.024
+        }
+      },
+      "ladder_b_ownership_gap": {
+        "defined": true,
+        "publishable": true,
+        "roster_invariance": "The invariance holds for the THRESHOLD rows only, and is FALSE of the gap rows. All four roster-defect sites are INCUMBENT-operated (Tooligie, Cowell, Mangalo and Cungena are all ex-Viterra/Bunge). A THRESHOLD row ('no independent point within R minutes') is a function of the drive to the nearest INDEPENDENT point alone, so it cannot move when an incumbent site is added or removed: that is a structural invariance, not a coincidence, and it is why the headline survives a roster defect that destroys Ladder A. A GAP row ('nearest independent more than R minutes beyond nearest Bunge') is NOT protected that way. The gap is measured FROM the incumbent, so adding an incumbent site moves it - and this repo's own roster correction of 2026-08-31 did move it, from 74.4 % to 77.3 % at 2025/26 and from 32.9 % to 33.0 % at 2023/24 (docs/roster_audit_2026-08.md section 4, correction note). Every gap row on this page must therefore be quoted as 'on the roster as corrected 2026-08-31', and the piece's headline must be a threshold row.",
+        "headline_threshold_min": 90,
+        "speed_sensitivity": {
+          "0.85": {
+            "speed_factor": 0.85,
+            "share_no_independent_within": {
+              "30": 0.9822,
+              "45": 0.9498,
+              "60": 0.9138,
+              "75": 0.8566,
+              "90": 0.7717,
+              "105": 0.6726,
+              "120": 0.5573
+            },
+            "share_gap_beyond_incl_none": {
+              "30": 0.9227,
+              "60": 0.8451,
+              "90": 0.6326
+            },
+            "wmean_nearest_incumbent_min": 22.0,
+            "wmean_nearest_independent_min": 146.6
+          },
+          "1.00": {
+            "speed_factor": 1.0,
+            "share_no_independent_within": {
+              "30": 0.9708,
+              "45": 0.932,
+              "60": 0.8736,
+              "75": 0.7822,
+              "90": 0.6679,
+              "105": 0.5316,
+              "120": 0.3945
+            },
+            "share_gap_beyond_incl_none": {
+              "30": 0.9111,
+              "60": 0.773,
+              "90": 0.5137
+            },
+            "wmean_nearest_incumbent_min": 18.7,
+            "wmean_nearest_independent_min": 124.6
+          },
+          "1.15": {
+            "speed_factor": 1.15,
+            "share_no_independent_within": {
+              "30": 0.961,
+              "45": 0.9076,
+              "60": 0.8214,
+              "75": 0.6969,
+              "90": 0.545,
+              "105": 0.3885,
+              "120": 0.278
+            },
+            "share_gap_beyond_incl_none": {
+              "30": 0.9035,
+              "60": 0.6974,
+              "90": 0.435
+            },
+            "wmean_nearest_incumbent_min": 16.3,
+            "wmean_nearest_independent_min": 108.3
+          }
+        },
+        "n_independent_points": 1,
+        "independent_operator": [
+          "T-Ports"
+        ],
+        "wmean_nearest_incumbent_min": 18.7,
+        "p50_nearest_incumbent_min": 16.5,
+        "p90_nearest_incumbent_min": 33.2,
+        "p99_nearest_incumbent_min": 58.3,
+        "wmean_nearest_independent_min": 124.6,
+        "p50_nearest_independent_min": 109.0,
+        "share_independent_nearer_than_incumbent": 0.0463,
+        "share_gap_beyond_incl_none": {
+          "30": 0.9111,
+          "60": 0.773,
+          "90": 0.5137
+        },
+        "share_gap_beyond_excl_none": {
+          "30": 0.9111,
+          "60": 0.773,
+          "90": 0.5137
+        },
+        "share_no_independent_within": {
+          "30": 0.9708,
+          "45": 0.932,
+          "60": 0.8736,
+          "75": 0.7822,
+          "90": 0.6679,
+          "105": 0.5316,
+          "120": 0.3945
+        },
+        "share_nearest_independent_is_a_port": 1.0,
+        "nearest_independent_mix": {
+          "Lucky Bay (T-Ports port)": 1.0
+        }
+      },
+      "by_district": {
+        "WEP": {
+          "wmean_nearest_min": 20.9,
+          "share_only_one_within_45": 0.2637,
+          "wmean_nearest_independent_min": 206.9,
+          "share_no_independent_within_90": 0.9861,
+          "share_gap_over_60_incl_none": 0.9986
+        },
+        "LEP": {
+          "wmean_nearest_min": 14.4,
+          "share_only_one_within_45": 0.0019,
+          "wmean_nearest_independent_min": 110.6,
+          "share_no_independent_within_90": 0.7971,
+          "share_gap_over_60_incl_none": 0.9185
+        },
+        "EEP": {
+          "wmean_nearest_min": 19.3,
+          "share_only_one_within_45": 0.1341,
+          "wmean_nearest_independent_min": 69.0,
+          "share_no_independent_within_90": 0.2379,
+          "share_gap_over_60_incl_none": 0.4044
+        }
+      }
+    },
+    "pre_2019_no_dormant": {
+      "label": "pre-2019 (sensitivity: dormant excluded)",
+      "desc": "as pre-2019 but without the 1 site(s) still tagged dormant, in case they were already idle before 2019",
+      "sensitivity": true,
+      "sites": [
+        "Warramboo",
+        "Wirrulla",
+        "Penong",
+        "Tumby Bay",
+        "Yeelanna",
+        "Kapinnie",
+        "Kimba",
+        "Darke Peak",
+        "Cummins",
+        "Edillilie",
+        "Poochera",
+        "Lock",
+        "Arno Bay",
+        "Witera",
+        "Port Neill",
+        "Buckleboo",
+        "Elliston",
+        "Wudinna",
+        "Thevenard",
+        "Rudall",
+        "Port Lincoln",
+        "Streaky Bay",
+        "Minnipa (closed)",
+        "Kyancutta (closed)",
+        "Cungena (closed)",
+        "Waddikee (closed)",
+        "Kielpa (closed)",
+        "Wharminda (closed)"
+      ],
+      "ladder_a_choice_count": {
+        "publishable": false,
+        "status": "NOT PUBLISHABLE. Every row on Ladder A is a count of receival points, and the site roster this count is taken from is known to be incomplete: Tooligie, Cowell and Mangalo are missing from sites.geojson altogether and Cungena's closed_2019 tag is contradicted by the operator's own weekly reports (docs/roster_audit_2026-08.md section 5). All four bear on at least one of the three states reported here: Cowell and Mangalo were receiving grain before 2019 and are absent from the pre-2019 state; Tooligie was receiving grain in 2023/24 and is absent from that state; Cungena's closed_2019 tag is contradicted by a 2022/23 receival, so it is wrongly excluded from the post-2019 states. The rows have been wrong twice already. They are retained in an appendix as the audit trail for the roster rebuild, under this caveat, and must not be quoted.",
+        "roster_defect_sites": [
+          "Cowell",
+          "Cungena",
+          "Mangalo",
+          "Tooligie"
+        ],
+        "n_receival_points": 28,
+        "n_owners": 1,
+        "wmean_nearest_min": 17.8,
+        "p50_nearest_min": 15.5,
+        "p90_nearest_min": 32.6,
+        "p99_nearest_min": 58.3,
+        "share_2nd_beyond": {
+          "30": 0.0484,
+          "60": 0.0,
+          "90": 0.0
+        },
+        "wmean_points_within": {
+          "30": 2.04,
+          "45": 3.99,
+          "60": 6.14
+        },
+        "share_with_only_one_point_within": {
+          "30": 0.3755,
+          "45": 0.1103,
+          "60": 0.0359
+        }
+      },
+      "ladder_b_ownership_gap": {
+        "defined": false,
+        "n_independent_points": 0,
+        "why": "Every receival point in this state is operated by the incumbent (ex-Viterra). There is no independent option anywhere, so the incumbent-vs-independent gap has no value - not a large one. Compare this state on Ladder A only."
+      },
+      "by_district": {
+        "WEP": {
+          "wmean_nearest_min": 19.4,
+          "share_only_one_within_45": 0.2047
+        },
+        "LEP": {
+          "wmean_nearest_min": 14.2,
+          "share_only_one_within_45": 0.0019
+        },
+        "EEP": {
+          "wmean_nearest_min": 20.7,
+          "share_only_one_within_45": 0.1554
+        }
+      }
+    }
+  },
+  "weighting_sensitivity": {
+    "s2023_24": {
+      "fixed_mean_2022-26": {
+        "gap_over_60": 0.3301,
+        "no_independent_within_90": 0.2028,
+        "only_one_point_within_45": 0.1053
+      },
+      "own_season_2023/24": {
+        "gap_over_60": 0.3399,
+        "no_independent_within_90": 0.2021,
+        "only_one_point_within_45": 0.1016
+      },
+      "unweighted_cells": {
+        "gap_over_60": 0.4262,
+        "no_independent_within_90": 0.3576,
+        "only_one_point_within_45": 0.192
+      }
+    },
+    "s2025_26": {
+      "fixed_mean_2022-26": {
+        "gap_over_60": 0.773,
+        "no_independent_within_90": 0.6679,
+        "only_one_point_within_45": 0.1203
+      },
+      "own_season_2025/26": {
+        "gap_over_60": 0.7567,
+        "no_independent_within_90": 0.6468,
+        "only_one_point_within_45": 0.1148
+      },
+      "unweighted_cells": {
+        "gap_over_60": 0.8073,
+        "no_independent_within_90": 0.7372,
+        "only_one_point_within_45": 0.2077
+      }
+    },
+    "pre_2019": {
+      "fixed_mean_2022-26": {
+        "only_one_point_within_45": 0.0949
+      },
+      "unweighted_cells": {
+        "only_one_point_within_45": 0.158
+      }
+    }
+  },
+  "wharminda_worked_example": {
+    "note": "drive minutes from the closed Wharminda site to the nearest four receival points at each state (the site itself is a candidate pre-2019, hence the 0.0).",
+    "removed_claim": "Removed 2026-08-31: this paragraph previously asserted that 'Wharminda Road is named in the reporting as one of the roads that absorbed the extra truck traffic' after grain rail ceased in May 2019. Reworded 2026-08-31 - the earlier reason given here, that no outlet, date or URL supported the sentence anywhere in this repo, is no longer true of its own tree: data/SOURCES.md now registers two, the Eyre Peninsula Freight Study (SMEC ref. 3005591 Rev 0 Final, 26 Sept 2018) and Jarrad Delaney's report of it in the Port Lincoln Times, 10 Apr 2019. THE DELETION STANDS, on a different and stronger ground: both sources are PROSPECTIVE. The study is a forecast finalised eight months before grain rail ceased, the newspaper's verb is 'will include', and it was published 10 Apr 2019, seven weeks before the last grain train on 31 May 2019. Neither observes what any road actually carried afterwards, and the only post-closure survey on record (RAA, 2 Aug 2024) names Balumbah-Kinnard Road, Lincoln Highway and Tod Highway but does NOT name Wharminda Road. So the roads were named in advance as the ones that WOULD carry the freight; that they DID absorb it is unsourced, and a prospective citation may not stand in for the post-hoc one the sentence needed. The geometry below stands on its own and needs no press citation.",
+    "by_state": {
+      "pre_2019": {
+        "nearest_four_any_owner": [
+          [
+            0.0,
+            "Wharminda (closed)",
+            "ex-Viterra"
+          ],
+          [
+            21.1,
+            "Port Neill",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            29.1,
+            "Rudall",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            32.5,
+            "Arno Bay",
+            "Bunge (ex-Viterra)"
+          ]
+        ],
+        "nearest_independent": null
+      },
+      "s2023_24": {
+        "nearest_four_any_owner": [
+          [
+            21.1,
+            "Port Neill",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            29.1,
+            "Rudall",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            32.5,
+            "Arno Bay",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            38.3,
+            "Tumby Bay",
+            "Bunge (ex-Viterra)"
+          ]
+        ],
+        "nearest_independent": [
+          59.4,
+          "Lock (T-Ports bunker)",
+          "T-Ports"
+        ]
+      },
+      "s2025_26": {
+        "nearest_four_any_owner": [
+          [
+            21.1,
+            "Port Neill",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            29.1,
+            "Rudall",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            32.5,
+            "Arno Bay",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            38.3,
+            "Tumby Bay",
+            "Bunge (ex-Viterra)"
+          ]
+        ],
+        "nearest_independent": [
+          74.6,
+          "Lucky Bay (T-Ports port)",
+          "T-Ports"
+        ]
+      },
+      "pre_2019_no_dormant": {
+        "nearest_four_any_owner": [
+          [
+            0.0,
+            "Wharminda (closed)",
+            "ex-Viterra"
+          ],
+          [
+            21.1,
+            "Port Neill",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            29.1,
+            "Rudall",
+            "Bunge (ex-Viterra)"
+          ],
+          [
+            32.5,
+            "Arno Bay",
+            "Bunge (ex-Viterra)"
+          ]
+        ],
+        "nearest_independent": null
+      }
+    }
+  }
+}

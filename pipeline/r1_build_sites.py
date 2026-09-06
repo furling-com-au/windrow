@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import polars as pl
@@ -47,6 +49,95 @@ LGA_DISTRICT = {
 }
 # A20's "long-run" window: the four seasons PIRSA district estimates cover.
 LONGRUN_SEASONS = ["2022/23", "2023/24", "2024/25", "2025/26"]
+
+# --- A12: per-season operating sets from the operator's own weekly narratives -----------
+# A sentence must carry a receival verb before a site name in it counts as evidence that
+# the site OPERATED that season. Absence of a mention is NOT evidence of closure: the
+# reports name a site at its first receival of the season and when it is notable, not
+# every week, so `operating_seasons` is a lower bound and must never be read as a roster.
+RECEIVAL_TRIGGER = re.compile(
+    r"receiv|deliver|kicked off|first load|taking grain|welcomed|opening for", re.I
+)
+# "...east of Kyancutta" locates a grower's paddock; it is not a receival at Kyancutta.
+LOCATIONAL_PREFIX = re.compile(r"\b(east|west|north|south|near|outside|via)\s+(of\s+)?$", re.I)
+
+
+def _named_as_site(sentence: str, name: str) -> bool:
+    for m in re.finditer(r"\b" + re.escape(name) + r"\b", sentence, re.I):
+        if LOCATIONAL_PREFIX.search(sentence[max(0, m.start() - 24) : m.start()]):
+            continue
+        return True
+    return False
+
+
+def annotate_operating_seasons(features: list[dict]) -> None:
+    """Attach `operating_seasons` (+ a quote) to every feature, and correct any Bunge site
+    tagged dormant that the operator's own 2025/26 reports show receiving grain.
+
+    This implements A12, which until now was documented but not built: nothing in the
+    pipeline or the engine varied the site set by season.
+    """
+    notes = PROCESSED / "receivals_notes.jsonl"
+    if not notes.exists():
+        print("WARNING: receivals_notes.jsonl absent - operating_seasons not derived")
+        return
+    # Match on the base name ("Cungena (closed)" -> "Cungena"), but skip T-Ports features:
+    # these are Bunge/Viterra's own reports, so a bare "Kimba" or "Lock" in them is the
+    # Bunge site, never the T-Ports bunker in the same town.
+    match_name = {
+        f["properties"]["name"]: re.sub(r"\s*\(.*\)", "", f["properties"]["name"]).strip()
+        for f in features
+        if f["properties"]["operator"] != "T-Ports"
+    }
+    per: dict[str, set[str]] = defaultdict(set)
+    evidence: dict[tuple[str, str], str] = {}
+    with notes.open(encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            r = json.loads(line)
+            season, week = r.get("season"), r.get("week_ending")
+            for sent in re.split(r"(?<=[.!?])\s+", " ".join(r.get("narrative") or [])):
+                if not RECEIVAL_TRIGGER.search(sent):
+                    continue
+                for full, base in match_name.items():
+                    if _named_as_site(sent, base):
+                        per[season].add(full)
+                        evidence.setdefault((full, season), f"[{week}] {sent.strip()[:180]}")
+
+    corrected = []
+    for f in features:
+        p = f["properties"]
+        seasons = sorted(s for s, st in per.items() if p["name"] in st)
+        p["operating_seasons"] = seasons
+        p["operating_seasons_source"] = (
+            "operator weekly harvest reports (data/processed/receivals_notes.jsonl); "
+            "positive evidence only - absence of a mention is NOT evidence of closure"
+        )
+        p["operating_evidence"] = evidence.get((p["name"], seasons[-1])) if seasons else None
+        # The segregations table was read off-season (2026-08-19), when a site between
+        # harvests correctly lists no segregations. Reading that emptiness as "dormant"
+        # closed five sites the operator's own reports show taking 2025/26 deliveries.
+        if p["status"] == "dormant" and "2025/26" in seasons:
+            p["status"] = "active_2025_26"
+            p["status_provenance"] = (
+                "corrected: off-season segregations read listed none, but the operator's "
+                f"own 2025/26 weekly report names it receiving - {p['operating_evidence']}"
+            )
+            corrected.append(p["name"])
+        elif p["status"] == "closed_2019" and any(s >= "2020/21" for s in seasons):
+            print(
+                f"WARNING: {p['name']} is tagged closed_2019 but is named receiving in "
+                f"{[s for s in seasons if s >= '2020/21']} - {p['operating_evidence']}"
+            )
+    if corrected:
+        print(f"\nA12 status corrections (dormant -> active_2025_26): {', '.join(corrected)}")
+    still = [
+        f["properties"]["name"] for f in features if f["properties"]["status"] == "dormant"
+    ]
+    if still:
+        print(f"  still dormant (no 2025/26 receival evidence): {', '.join(still)}")
 
 
 def dist_m(lat1, lon1, lat2, lon2):
@@ -218,6 +309,9 @@ def main():
             {"type": "Feature", "geometry": {"type": "Point", "coordinates": [s["lon"], s["lat"]]}, "properties": props}
         )
 
+    # A12 must run BEFORE capacity allocation: allocation reports the operated total,
+    # and four of the sites it would otherwise report as closed are in fact operating.
+    annotate_operating_seasons(features)
     allocate_capacities(features, load_district_polygons(), caps)
 
     gj = {
