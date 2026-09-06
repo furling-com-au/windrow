@@ -114,28 +114,38 @@ function runArm(season: string, state: "open" | "closed"): Arm {
   };
 }
 
+// The seasons in the grid, and what the record says the bunkers did in each. ONE table
+// drives both the printed note and the "state matches observed" test below; until
+// 2026-09-06 they were two independent encodings, so revising A15 in one would have left
+// the gate table attributing error to the wrong arm.
+const SEASONS = ["2022/23", "2023/24", "2024/25", "2025/26"] as const;
+const OBSERVED: Record<(typeof SEASONS)[number], { state: "open" | "closed"; note: string }> = {
+  "2022/23": { state: "open", note: "OPEN  (both, published)   " },
+  "2023/24": { state: "open", note: "OPEN  (both, published)   " },
+  "2024/25": { state: "closed", note: "closed (ASSUMED - A15)    " },
+  "2025/26": { state: "closed", note: "CLOSED (published)        " },
+};
+
 const grid: Arm[] = [];
-for (const season of ["2022/23", "2023/24", "2024/25", "2025/26"]) {
+for (const season of SEASONS) {
   for (const state of ["open", "closed"] as const) grid.push(runArm(season, state));
 }
 
 console.log("\nObserved (Tier 1, no model):\n");
 console.log("  season    bunkers (verified?)          EP prod Mt   obs Bunge Mt   obs Bunge/prod");
-const STATE_NOTE: Record<string, string> = {
-  "2022/23": "OPEN  (both, published)   ",
-  "2023/24": "OPEN  (both, published)   ",
-  "2024/25": "closed (ASSUMED - A15)    ",
-  "2025/26": "CLOSED (published)        ",
-};
-for (const season of ["2022/23", "2023/24", "2024/25", "2025/26"]) {
+for (const season of SEASONS) {
   const a = grid.find((g) => g.season === season)!;
-  console.log(`  ${season}  ${STATE_NOTE[season]}   ${mt(a.epProdT)}        ${mt(a.obsBungeT)}          ${pct(a.obsBungeT / a.epProdT)} %`);
+  console.log(`  ${season}  ${OBSERVED[season].note}   ${mt(a.epProdT)}        ${mt(a.obsBungeT)}          ${pct(a.obsBungeT / a.epProdT)} %`);
 }
 
 console.log("\nSimulated at the fitted vector, both bunker states forced explicitly:\n");
 console.log("  season    state    Bunge Mt   T-Ports Mt   Bunge/prod   err vs obs Bunge");
 for (const a of grid) {
-  const err = a.state === (a.season === "2023/24" || a.season === "2022/23" ? "open" : "closed")
+  // obsBungeT is the cumulative at the LAST PUBLISHED week, which ends on a different date
+  // each season (2023-12-31 for 2023/24, into January for the others); the sim total is the
+  // full 365 days. At the fitted vector the sim's harvest is over by every one of those
+  // dates, so the comparison is consistent, but it is a convention, not a like-for-like.
+  const err = a.state === OBSERVED[a.season as (typeof SEASONS)[number]].state
     ? `${(((a.bungeT - a.obsBungeT) / a.obsBungeT) * 100).toFixed(1)} % (state matches observed)`
     : "- (counterfactual arm)";
   console.log(`  ${a.season}  ${a.state.padEnd(7)}  ${mt(a.bungeT)}      ${mt(a.tportsT)}       ${pct(a.bungeT / a.epProdT)} %     ${err}`);
@@ -143,7 +153,7 @@ for (const a of grid) {
 
 console.log("\nThe model's own bunker effect (closed minus open), at frozen parameters:\n");
 console.log("  season    d Bunge kt   d T-Ports kt   d Bunge/prod pp");
-for (const season of ["2022/23", "2023/24", "2024/25", "2025/26"]) {
+for (const season of SEASONS) {
   const o = grid.find((g) => g.season === season && g.state === "open")!;
   const c = grid.find((g) => g.season === season && g.state === "closed")!;
   const dpp = ((c.bungeT - o.bungeT) / o.epProdT) * 100;

@@ -108,23 +108,30 @@ Writes docs/r9_cartage.md and docs/r9_cartage.json.
 """
 from __future__ import annotations
 
-import heapq
 import json
 import math
 import sys
-from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from wlib import PROCESSED  # noqa: E402
+from roads import (  # noqa: E402  - one router, shared with p2_build_matrix and r8/r10
+    SWEEP_BEARINGS_DEG,
+    SWEEP_OFFSET_KM,
+    build_graph,
+    dijkstra_km,
+    dijkstra_time_then_km,
+    displace,
+    make_snapper,
+    snap_parcels,
+    snap_sites,
+)
 from r8_choice_geometry import (  # noqa: E402
     APP_DATA,
     DOCS,
     INCUMBENT_OPERATORS,
-    build_graph,
-    make_snapper,
     network_states,
     parcel_weights,
     wmean,
@@ -245,12 +252,26 @@ MARGINAL_FLOOR = (
     "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the "
     "additional cost of travelling further once the truck is on the road. Truck ownership, "
     "loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA "
-    "says so. At EP's ~144 km average site-to-port haul the same rate gives $15.84/t "
-    "against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t "
-    "- the marginal rate is roughly half a delivered cartage price. A grower reading "
-    "'$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, "
-    "not the extra cost of running the extra trips."
+    "says so. The size of that gap depends on haul length, and this note must be read at "
+    "the haul length of the measure it governs. At EP's ~144 km site-to-port haul the same "
+    "rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA "
+    "budget guide's $35.00/t - about half a delivered price. But M1's mean haul is "
+    "**21.1 km, not 144 km**, and on a haul that short the excluded fixed costs dominate: "
+    "there the marginal rate understates a delivered price by roughly **7x, not 2x**. "
+    "Calibrating this note at 144 km against a 21 km measure understated the shortfall by "
+    "about 3.5x and has been corrected. A grower reading '$X/t more' here is reading the "
+    "extra fuel-and-running cost of the extra kilometres, not the extra cost of running "
+    "the extra trips."
 )
+# (The wording above, the M1 callout and the D->C bracket were first made as hand edits to
+# docs/r9_cartage.md on 2026-08-31 and not to this generator, so the next run silently
+# reverted them. They live here now; the .md is never edited by hand.)
+
+# The D->C delta is a BRACKET, not a bound: roster errors pull both ways. Figures from
+# docs/r9_cartage_findings.md (roster audit): the four 2019 sites the operator said were
+# 'not open the year prior' pull the EP figure down; restoring Cowell and Mangalo at town
+# coordinates (missing from sites.geojson) takes it to +$0.452/t.
+D_TO_C_BRACKET_EP = (0.12, 0.47)
 
 RETURN_LEG_OPEN = (
     "THE EMPTY RETURN LEG IS UNRESOLVED AND IS WORTH A FACTOR OF TWO. Established: ESCOSA "
@@ -361,58 +382,10 @@ DISTRICT_LONG = {"WEP": "Western Eyre Peninsula", "EEP": "Eastern Eyre Peninsula
                  "LEP": "Lower Eyre Peninsula"}
 NEAR_BANDS_AUD = (1.0, 2.0, 5.0)
 
-SWEEP_OFFSET_KM = (0.0, 2.5, 5.0)
-SWEEP_BEARINGS_DEG = (0, 45, 90, 135, 180, 225, 270, 315)
-
-
-# --------------------------------------------------------------------------- routing
-def dijkstra_time_then_km(adj, src: str) -> dict[str, float]:
-    """Least-TIME tree from src, returning the KILOMETRES driven along that least-time path.
-
-    This is the same construction pipeline/p2_build_matrix.py uses to fill matrix.json's
-    site_km: route on minutes, then carry the network distance of the chosen path out
-    beside it. A5's explicit instruction is that km must never be recovered as
-    minutes x speed. The truck takes the fast road and pays for the kilometres it drives
-    on it, which is why this and not least-distance is the primary.
-    """
-    dist = {src: 0.0}
-    km = {src: 0.0}
-    pq = [(0.0, src)]
-    while pq:
-        d, n = heapq.heappop(pq)
-        if d > dist.get(n, INF):
-            continue
-        kn = km[n]
-        for m, w, k in adj[n]:
-            nd = d + w
-            if nd < dist.get(m, INF):
-                dist[m] = nd
-                km[m] = kn + k
-                heapq.heappush(pq, (nd, m))
-    return km, dist
-
-
-def dijkstra_km(adj, src: str) -> dict[str, float]:
-    """Least-DISTANCE tree from src. Used only for the A5-free sensitivity."""
-    dist = {src: 0.0}
-    pq = [(0.0, src)]
-    while pq:
-        d, n = heapq.heappop(pq)
-        if d > dist.get(n, INF):
-            continue
-        for m, _w, k in adj[n]:
-            nd = d + k
-            if nd < dist.get(m, INF):
-                dist[m] = nd
-                heapq.heappush(pq, (nd, m))
-    return dist
-
-
-def displace(lon: float, lat: float, km: float, bearing_deg: float):
-    th = math.radians(bearing_deg)
-    dlat = km * math.cos(th) / 111.32
-    dlon = km * math.sin(th) / (111.32 * math.cos(math.radians(lat)))
-    return lon + dlon, lat + dlat
+# Routing (dijkstra_time_then_km, dijkstra_km, displace, the SWEEP_* grid) is imported from
+# pipeline/roads.py: the least-TIME tree carrying the km driven along that same path is the
+# construction p2_build_matrix.py uses for matrix.json's site_km, and A5's instruction that
+# km must never be recovered as minutes x speed holds because both read one function.
 
 
 # ------------------------------------------------------------------------ evaluation
@@ -510,7 +483,6 @@ def summarise(ev, parcels, weights, ep_only=None):
         w = [weights[i] for i in sel]
         km_any = [ev["km_any"][i] for i in sel]
         km_ind = [ev["km_ind"][i] for i in sel]
-        km_inc = [ev["km_inc"][i] for i in sel]
         km_port = [ev["km_port"][i] for i in sel]
         c_any = [ev["cost_any"][i] for i in sel]
         c_inc = [ev["cost_inc"][i] for i in sel]
@@ -583,23 +555,8 @@ def main():
     n = len(parcels)
     print(f"parcels: {n}  sites: {len(feats)}  nodes: {len(nodes)}")
 
-    site_key, site_info = {}, []
-    for f in feats:
-        lon, lat = f["geometry"]["coordinates"]
-        nid, err = snap(lon, lat)
-        p = f["properties"]
-        site_key[p["name"]] = len(site_info)
-        site_info.append({
-            "name": p["name"], "operator": p["operator"], "role": p["role"],
-            "status": p["status"], "district": p.get("district"),
-            "lon": lon, "lat": lat, "node": nid, "snap_km": round(err, 2),
-        })
-
-    parcel_nodes, parcel_snap = [], []
-    for p in parcels:
-        nid, err = snap(p["lon"], p["lat"])
-        parcel_nodes.append(nid)
-        parcel_snap.append(err)
+    site_key, site_info = snap_sites(feats, snap)
+    parcel_nodes, parcel_snap = snap_parcels(parcels, snap)
 
     tree_cache: dict[str, list[float]] = {}
     min_cache: dict[str, list[float]] = {}
@@ -740,13 +697,20 @@ def main():
          "The cartage cost of losing the seven sites that went from the pre-2019 network "
          "to the current one - the six closed in June 2019 plus Nunjikompita, since gone "
          "dormant - holding OWNERSHIP constant, because both states are incumbent-only "
-         "and no gateway effect is mixed in. READ IT AS AN UPPER BOUND. Only two of the "
-         "six 2019 sites (Minnipa and Kyancutta) were operating the year before; the "
-         "other four are in the group the operator described as 'not open the year prior' "
-         "(Stock Journal, 6 June 2019). Treating all six as open overstates the pre-2019 "
-         "network by four sites, understates state D's bill, and therefore overstates "
-         "this delta. Pulling the other way, Cowell and Mangalo were receiving grain "
-         "pre-2019 and are missing from sites.geojson entirely, which understates it"),
+         "and no gateway effect is mixed in. **READ IT AS A BRACKET, NOT AN UPPER "
+         "BOUND.** An earlier revision printed +$0.22/t as an upper bound; that is "
+         "falsified by this repo's own roster audit and has been corrected. Two errors "
+         "pull in opposite directions and neither is resolved. Only two of the six 2019 "
+         "sites (Minnipa and Kyancutta) were operating the year before; the other four "
+         "are in the group the operator described as 'not open the year prior' (Stock "
+         "Journal, 6 June 2019), so treating all six as open overstates the pre-2019 "
+         "network by four sites and **overstates** this delta. Pulling the other way, "
+         "Cowell and Mangalo were receiving grain pre-2019 and are missing from "
+         "`sites.geojson` entirely (`docs/roster_audit_2026-08.md` §5); restoring them "
+         f"takes the EP figure to **+$0.452/t**, which **understates** it. The defensible "
+         f"bracket for EP is therefore roughly **+${D_TO_C_BRACKET_EP[0]:.2f} to "
+         f"+${D_TO_C_BRACKET_EP[1]:.2f}/t**, and no single figure in this row should be "
+         "quoted as a bound in either direction until the roster is completed"),
         ("C_no_independent", "A_lucky_bay_only",
          "WHAT THE GATEWAY IS WORTH in cartage actually paid: the change in the bill "
          "when the peninsula's one independent point is added to the network. This is "
@@ -765,12 +729,19 @@ def main():
     ]
     deltas = []
     for frm, to, why in LADDER:
-        deltas.append({
+        row = {
             "from": frm, "to": to, "why": why,
             "d_m1_bill_aud_per_t": delta(frm, to, "m1_bill_aud_per_t"),
             "d_m4_port_aud_per_t": delta(frm, to, "m4_port_aud_per_t"),
             "d_m2_toll_aud_per_t": delta(frm, to, "m2_toll_aud_per_t"),
-        })
+        }
+        if (frm, to) == ("D_pre_2019", "C_no_independent"):
+            row["d_m1_bracket_aud_per_t"] = {"EP": list(D_TO_C_BRACKET_EP)}
+            row["d_m1_bracket_source"] = (
+                "docs/r9_cartage_findings.md (roster audit): four 2019 sites not open the "
+                "year prior pull it down; Cowell and Mangalo restored at town coordinates "
+                "give +$0.452/t")
+        deltas.append(row)
 
     # ------------------------------------------------- sensitivity 1: A5-free routing
     km_of_site_dist = {i: km_vector(s["node"], "dist") for i, s in enumerate(site_info)}
@@ -796,7 +767,6 @@ def main():
             lb_variants.append({"offset_km": d, "bearing_deg": b, "node": nid,
                                 "snap_km": round(err, 2), "km": km_vector(nid)})
 
-    idx_a = [site_key[nm] for nm in STATES["A_lucky_bay_only"]["names"]]
     lb_rows = []
     for v in lb_variants:
         r = sweep_eval(evals["A_lucky_bay_only"]["km_inc"], [v["km"]], parcels, weights)
@@ -1141,7 +1111,10 @@ def write_md(out, summaries, STATES, evals, deltas, lb_env, a11_env, sens_leastd
       f"{sA['WEP']['share_over_250km_ceiling']*100:.1f} % of WEP production is further "
       "from Lucky Bay than the published schedule's 250 km ceiling, so above that the "
       "rate is extrapolated. Over the WEP production the schedule can actually price, the "
-      f"toll is ${sA['WEP']['m2_toll_within_schedule_aud_per_t']:.2f}/t.")
+      # None when no WEP cell has an independent haul inside the 250 km ceiling; every
+      # other reader of this key already goes through _m, and this one must too or the
+      # .md dies after the .json is written and the two artefacts diverge.
+      f"toll is {_m(sA['WEP']['m2_toll_within_schedule_aud_per_t'], '${:.2f}/t', 'not priceable: no WEP production lies inside the schedule')}.")
     a("")
     a(f"3. **Where it does show up is the direct-to-port run.** For a grower carting "
       f"straight to an export port, Lucky Bay takes EEP from "
@@ -1225,7 +1198,15 @@ def write_md(out, summaries, STATES, evals, deltas, lb_env, a11_env, sens_leastd
     a("")
     a("---")
     a("")
-    a("## M1 - the bill growers actually pay, A$/t")
+    a("## M1 - marginal cartage to the nearest receival point of any owner, A$/t")
+    a("")
+    a("> **Not \"the bill growers actually pay.\"** An earlier revision of this page carried that")
+    a("> heading and it was wrong. These are ESCOSA *marginal* dollars — the extra running cost of")
+    a("> extra kilometres — and at this measure's own mean haul of 21.1 km they understate a")
+    a("> delivered cartage price by roughly 7x, because on a short haul the fixed costs the")
+    a("> marginal rate excludes (loading, turnaround, waiting, driver time) dominate. Read the")
+    a("> LEVELS in this table as a floor of unknown depth. Read the DELTAS between states as the")
+    a("> result: they move only 2-9 % across cost functions, whereas the levels move 7x.")
     a("")
     a("Tonne-weighted mean marginal cartage to the nearest receival point of any owner. "
       "This is the measure that is defined at **all four** states, including pre-2019 "
@@ -1383,11 +1364,13 @@ def write_md(out, summaries, STATES, evals, deltas, lb_env, a11_env, sens_leastd
         a("")
         a(f"{dl['why']}.")
         a("")
-        a("| District | delta M1 (the bill) | delta M4 (port run) | delta M2 (the toll) |")
+        a("| District | delta M1 (marginal, floor) | delta M4 (port run) | delta M2 (the toll) |")
         a("|---|---|---|---|")
         for d in ("EP",) + DISTRICTS:
             nm = "**EP (all)**" if d == "EP" else d
-            a(f"| {nm} | {_m(dl['d_m1_bill_aud_per_t'][d], '{:+.2f}')} | "
+            br = dl.get("d_m1_bracket_aud_per_t", {}).get(d)
+            note = f" *(bracket {br[0]:+.2f} to {br[1]:+.2f})*" if br else ""
+            a(f"| {nm} | {_m(dl['d_m1_bill_aud_per_t'][d], '{:+.2f}')}{note} | "
               f"{_m(dl['d_m4_port_aud_per_t'][d], '{:+.2f}')} | "
               f"{_m(dl['d_m2_toll_aud_per_t'][d], '{:+.2f}')} |")
         a("")

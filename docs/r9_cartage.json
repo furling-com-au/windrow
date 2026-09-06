@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-31",
+  "generated": "2026-09-06",
   "tier": "Tier 2 geometry x Tier 1 published rate. No simulation, no fitted parameter, no calibrated knob.",
   "reproduce": "PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe pipeline/r9_cartage.py",
   "rate": {
@@ -17,7 +17,7 @@
     "base_year": "2018-19 A$ (nominal, deliberately not indexed - A18)",
     "application": "one-way loaded kilometres; band selected by the whole distance; no cumulative tiering; empty return not added",
     "verify": ".venv/Scripts/python.exe pipeline/r9_escosa_rate_check.py   # VERDICT: PASS",
-    "marginal_floor": "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the additional cost of travelling further once the truck is on the road. Truck ownership, loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA says so. At EP's ~144 km average site-to-port haul the same rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t - the marginal rate is roughly half a delivered cartage price. A grower reading '$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, not the extra cost of running the extra trips.",
+    "marginal_floor": "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the additional cost of travelling further once the truck is on the road. Truck ownership, loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA says so. The size of that gap depends on haul length, and this note must be read at the haul length of the measure it governs. At EP's ~144 km site-to-port haul the same rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t - about half a delivered price. But M1's mean haul is **21.1 km, not 144 km**, and on a haul that short the excluded fixed costs dominate: there the marginal rate understates a delivered price by roughly **7x, not 2x**. Calibrating this note at 144 km against a 21 km measure understated the shortfall by about 3.5x and has been corrected. A grower reading '$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, not the extra cost of running the extra trips.",
     "ceiling_km": 250.0,
     "provenance_is_not_uniform": "ESCOSA footnote 289 traces the <=50 km $0.12 to a public AEGIC document but the 50-250 km $0.11 to unpublished 'AEGIC advice'. Most EP hauls to an independent point fall in the second band, so the weaker-provenance rate carries most of the dollars on this page.",
     "not_ep_specific": "The schedule is South Australia-wide and the case study behind it is the upper Central region (Gladstone catchment, 16-53 km hauls), not the Eyre Peninsula. No EP-specific $/t-km schedule was found. EP arguments cut both ways and neither is quantified."
@@ -229,7 +229,7 @@
         "m1_p50_aud_per_t": 2.86,
         "m1_p90_aud_per_t": 5.12,
         "m4_port_aud_per_t": 13.47,
-        "m4_port_km": 121.9,
+        "m4_port_km": 122.0,
         "incumbent_aud_per_t": 3.03,
         "independent_level_aud_per_t": 32.93,
         "independent_level_km": 299.3,
@@ -248,12 +248,12 @@
       },
       "EEP": {
         "tonnes_weight": 945206.0,
-        "m1_bill_aud_per_t": 2.71,
+        "m1_bill_aud_per_t": 2.72,
         "m1_km": 22.7,
         "m1_p50_aud_per_t": 2.52,
         "m1_p90_aud_per_t": 4.86,
-        "m4_port_aud_per_t": 9.97,
-        "m4_port_km": 90.1,
+        "m4_port_aud_per_t": 9.98,
+        "m4_port_km": 90.2,
         "incumbent_aud_per_t": 3.14,
         "independent_level_aud_per_t": 9.98,
         "independent_level_km": 90.2,
@@ -327,7 +327,7 @@
         "m1_p50_aud_per_t": 2.86,
         "m1_p90_aud_per_t": 5.12,
         "m4_port_aud_per_t": 13.47,
-        "m4_port_km": 121.9,
+        "m4_port_km": 122.0,
         "incumbent_aud_per_t": 3.03,
         "independent_level_aud_per_t": 18.78,
         "independent_level_km": 170.4,
@@ -346,15 +346,15 @@
       },
       "EEP": {
         "tonnes_weight": 945206.0,
-        "m1_bill_aud_per_t": 2.68,
+        "m1_bill_aud_per_t": 2.69,
         "m1_km": 22.4,
-        "m1_p50_aud_per_t": 2.51,
+        "m1_p50_aud_per_t": 2.52,
         "m1_p90_aud_per_t": 4.84,
-        "m4_port_aud_per_t": 9.97,
-        "m4_port_km": 90.1,
+        "m4_port_aud_per_t": 9.98,
+        "m4_port_km": 90.2,
         "incumbent_aud_per_t": 3.14,
         "independent_level_aud_per_t": 4.74,
-        "independent_level_km": 41.1,
+        "independent_level_km": 41.2,
         "m2_toll_aud_per_t": 1.6,
         "m2_toll_p50_aud_per_t": 1.28,
         "m2_toll_p90_aud_per_t": 5.63,
@@ -401,7 +401,7 @@
         "m1_p50_aud_per_t": 2.28,
         "m1_p90_aud_per_t": 4.86,
         "m4_port_aud_per_t": 13.54,
-        "m4_port_km": 122.6,
+        "m4_port_km": 122.7,
         "incumbent_aud_per_t": 2.66,
         "independent_level_aud_per_t": null,
         "m2_toll_aud_per_t": null,
@@ -425,9 +425,9 @@
         "m1_bill_aud_per_t": 3.14,
         "m1_km": 26.9,
         "m1_p50_aud_per_t": 2.6,
-        "m1_p90_aud_per_t": 6.26,
+        "m1_p90_aud_per_t": 6.27,
         "m4_port_aud_per_t": 19.83,
-        "m4_port_km": 180.2,
+        "m4_port_km": 180.3,
         "incumbent_aud_per_t": 3.14,
         "independent_level_aud_per_t": null,
         "m2_toll_aud_per_t": null,
@@ -455,7 +455,7 @@
         "m1_p50_aud_per_t": 2.08,
         "m1_p90_aud_per_t": 4.37,
         "m4_port_aud_per_t": 13.54,
-        "m4_port_km": 122.6,
+        "m4_port_km": 122.7,
         "incumbent_aud_per_t": 2.44,
         "independent_level_aud_per_t": null,
         "m2_toll_aud_per_t": null,
@@ -476,13 +476,13 @@
       },
       "EEP": {
         "tonnes_weight": 945206.0,
-        "m1_bill_aud_per_t": 2.94,
+        "m1_bill_aud_per_t": 2.95,
         "m1_km": 25.2,
         "m1_p50_aud_per_t": 2.23,
-        "m1_p90_aud_per_t": 6.26,
+        "m1_p90_aud_per_t": 6.27,
         "m4_port_aud_per_t": 19.83,
-        "m4_port_km": 180.2,
-        "incumbent_aud_per_t": 2.94,
+        "m4_port_km": 180.3,
+        "incumbent_aud_per_t": 2.95,
         "independent_level_aud_per_t": null,
         "m2_toll_aud_per_t": null,
         "m2_undefined_why": "There is no non-Bunge receival point anywhere in this state. The toll is not a large number, it is not a number: there is no alternative to price at any premium. Compare this state on M1 and M4, which are defined at every state."
@@ -506,11 +506,11 @@
     {
       "from": "D_pre_2019",
       "to": "C_no_independent",
-      "why": "The cartage cost of losing the seven sites that went from the pre-2019 network to the current one - the six closed in June 2019 plus Nunjikompita, since gone dormant - holding OWNERSHIP constant, because both states are incumbent-only and no gateway effect is mixed in. READ IT AS AN UPPER BOUND. Only two of the six 2019 sites (Minnipa and Kyancutta) were operating the year before; the other four are in the group the operator described as 'not open the year prior' (Stock Journal, 6 June 2019). Treating all six as open overstates the pre-2019 network by four sites, understates state D's bill, and therefore overstates this delta. Pulling the other way, Cowell and Mangalo were receiving grain pre-2019 and are missing from sites.geojson entirely, which understates it",
+      "why": "The cartage cost of losing the seven sites that went from the pre-2019 network to the current one - the six closed in June 2019 plus Nunjikompita, since gone dormant - holding OWNERSHIP constant, because both states are incumbent-only and no gateway effect is mixed in. **READ IT AS A BRACKET, NOT AN UPPER BOUND.** An earlier revision printed +$0.22/t as an upper bound; that is falsified by this repo's own roster audit and has been corrected. Two errors pull in opposite directions and neither is resolved. Only two of the six 2019 sites (Minnipa and Kyancutta) were operating the year before; the other four are in the group the operator described as 'not open the year prior' (Stock Journal, 6 June 2019), so treating all six as open overstates the pre-2019 network by four sites and **overstates** this delta. Pulling the other way, Cowell and Mangalo were receiving grain pre-2019 and are missing from `sites.geojson` entirely (`docs/roster_audit_2026-08.md` \u00a75); restoring them takes the EP figure to **+$0.452/t**, which **understates** it. The defensible bracket for EP is therefore roughly **+$0.12 to +$0.47/t**, and no single figure in this row should be quoted as a bound in either direction until the roster is completed",
       "d_m1_bill_aud_per_t": {
         "EP": 0.22,
         "WEP": 0.48,
-        "EEP": 0.2,
+        "EEP": 0.19,
         "LEP": 0.03
       },
       "d_m4_port_aud_per_t": {
@@ -524,7 +524,14 @@
         "WEP": null,
         "EEP": null,
         "LEP": null
-      }
+      },
+      "d_m1_bracket_aud_per_t": {
+        "EP": [
+          0.12,
+          0.47
+        ]
+      },
+      "d_m1_bracket_source": "docs/r9_cartage_findings.md (roster audit): four 2019 sites not open the year prior pull it down; Cowell and Mangalo restored at town coordinates give +$0.452/t"
     },
     {
       "from": "C_no_independent",
@@ -533,13 +540,13 @@
       "d_m1_bill_aud_per_t": {
         "EP": -0.14,
         "WEP": 0.0,
-        "EEP": -0.43,
+        "EEP": -0.42,
         "LEP": 0.0
       },
       "d_m4_port_aud_per_t": {
         "EP": -3.38,
         "WEP": -0.46,
-        "EEP": -9.86,
+        "EEP": -9.85,
         "LEP": -0.05
       },
       "d_m2_toll_aud_per_t": {
@@ -585,7 +592,7 @@
       "d_m4_port_aud_per_t": {
         "EP": -3.38,
         "WEP": -0.46,
-        "EEP": -9.86,
+        "EEP": -9.85,
         "LEP": -0.05
       },
       "d_m2_toll_aud_per_t": {
@@ -786,7 +793,7 @@
           "by_district_toll": {
             "WEP": 29.72,
             "EEP": 6.66,
-            "LEP": 14.54
+            "LEP": 14.55
           }
         },
         {
@@ -826,7 +833,7 @@
           "offset_km": 2.5,
           "bearing_deg": 180,
           "m2_toll_aud_per_t": 16.45,
-          "m1_bill_aud_per_t": 2.51,
+          "m1_bill_aud_per_t": 2.52,
           "by_district_toll": {
             "WEP": 29.86,
             "EEP": 6.8,
@@ -841,7 +848,7 @@
           "by_district_toll": {
             "WEP": 29.84,
             "EEP": 6.78,
-            "LEP": 14.66
+            "LEP": 14.67
           }
         },
         {
@@ -852,7 +859,7 @@
           "by_district_toll": {
             "WEP": 29.79,
             "EEP": 6.73,
-            "LEP": 14.61
+            "LEP": 14.62
           }
         },
         {
@@ -862,7 +869,7 @@
           "m1_bill_aud_per_t": 2.5,
           "by_district_toll": {
             "WEP": 29.6,
-            "EEP": 6.54,
+            "EEP": 6.55,
             "LEP": 14.43
           }
         },
@@ -914,7 +921,7 @@
           "offset_km": 5.0,
           "bearing_deg": 180,
           "m2_toll_aud_per_t": 16.45,
-          "m1_bill_aud_per_t": 2.51,
+          "m1_bill_aud_per_t": 2.52,
           "by_district_toll": {
             "WEP": 29.86,
             "EEP": 6.8,
@@ -929,7 +936,7 @@
           "by_district_toll": {
             "WEP": 29.84,
             "EEP": 6.78,
-            "LEP": 14.66
+            "LEP": 14.67
           }
         },
         {
@@ -939,7 +946,7 @@
           "m1_bill_aud_per_t": 2.5,
           "by_district_toll": {
             "WEP": 29.6,
-            "EEP": 6.54,
+            "EEP": 6.55,
             "LEP": 14.43
           }
         },
@@ -979,7 +986,7 @@
             2.05
           ],
           "LEP": [
-            8.31,
+            8.32,
             9.49
           ]
         }
@@ -1058,7 +1065,7 @@
   },
   "caveats": {
     "cartage_is_half_the_decision": "CARTAGE IS HALF OF A DELIVERY DECISION. Growers deliver where PRICE MINUS CARTAGE is best. This project has no price data - 13 days of off-season cash bids and nothing else (data/SOURCES.md, operator-cash-prices-api). Every figure on this page is one side of that ledger. A toll of $X/t says the independent must be worth $X/t more at the weighbridge before the load moves; it does NOT say whether it was, and nothing here is a total grower benefit or loss.",
-    "marginal_is_a_floor": "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the additional cost of travelling further once the truck is on the road. Truck ownership, loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA says so. At EP's ~144 km average site-to-port haul the same rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t - the marginal rate is roughly half a delivered cartage price. A grower reading '$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, not the extra cost of running the extra trips.",
+    "marginal_is_a_floor": "THESE ARE MARGINAL DOLLARS AND THEREFORE A FLOOR. ESCOSA's rate is explicitly the additional cost of travelling further once the truck is on the road. Truck ownership, loading, queueing, turnaround and driver time are outside it BY DESIGN, and ESCOSA says so. The size of that gap depends on haul length, and this note must be read at the haul length of the measure it governs. At EP's ~144 km site-to-port haul the same rate gives $15.84/t against a 2026 commercial rate card's $29.90/t and a 2026 SA budget guide's $35.00/t - about half a delivered price. But M1's mean haul is **21.1 km, not 144 km**, and on a haul that short the excluded fixed costs dominate: there the marginal rate understates a delivered price by roughly **7x, not 2x**. Calibrating this note at 144 km against a 21 km measure understated the shortfall by about 3.5x and has been corrected. A grower reading '$X/t more' here is reading the extra fuel-and-running cost of the extra kilometres, not the extra cost of running the extra trips.",
     "roster": "EVERY MEASURE ON THIS PAGE EXCEPT THE BARE INDEPENDENT LEVEL DEPENDS ON THE SITE ROSTER, AND THE ROSTER IS KNOWN INCOMPLETE. R0's threshold rows survive a roster defect because they are a function of the drive to the nearest INDEPENDENT point alone and every roster defect on record is incumbent-side. M1, M3 and M4 are not protected that way, and neither is the toll M2, because the toll is measured FROM the incumbent. docs/roster_audit_2026-08.md section 5: Tooligie (received 2022/23, 2023/24, 2024/25), Cowell (2017/18, 2018/19) and Mangalo (2018/19) are absent from sites.geojson altogether, and Cungena is tagged closed_2019 but received grain in 2022/23. THE DIRECTIONS ARE KNOWN AND ARE NOT SYMMETRIC. Missing incumbent sites raise the modelled cost to the nearest incumbent point, so: M1 levels are UPPER BOUNDS at every state; the toll M2 is a LOWER BOUND (a nearer real Bunge site would make the independent option relatively dearer); M3's catchment share is an UPPER BOUND. And the contamination is not even across states - Cowell and Mangalo bear on pre-2019 only, Tooligie on the 2023/24-attributed state and probably the current ones, Cungena on all three post-2019 states - so the state-to-state DELTAS carry it too. This is the single biggest defect in these numbers and it is not fixed here: fixing it means coordinates and capacities for three sites, and A4's capacity split entangles that with the calibration (roster_audit section 5).",
     "lucky_bay_coordinate": "STATE A RESTS ENTIRELY ON ONE COORDINATE. With both bunkers shut, Lucky Bay is the only independent receival point on the peninsula, so the toll at state A is a pure function of the road distance to a single point. That point is registered in sites.geojson at a TOWN/HAMLET node ('Lucky Bay, South Australia' hamlet node, facility adjoins hamlet) - the same precision class A11 gives Lock and Kimba a <=5 km tolerance for, and it is registered in no assumption. It is swept here rather than asserted: the site is displaced 0 / 2.5 / 5 km on eight bearings, RE-SNAPPED to the road graph and RE-ROUTED with a fresh Dijkstra, and the envelope is published beside every state-A figure.",
     "bunker_closure_unsourced": "THE SEASON LABELS ARE ATTRIBUTIONS AND ONE OF THEM IS UNSOURCED. The four states are defined by their CONTENT - which points exist - and every number here follows from that content alone. The attribution of state A to 2025/26 rests on the claim that both T-Ports bunkers were closed for that season, and that claim has no source in this repo: there is no tports.com/harvest entry in data/SOURCES.md, no cached page under data/raw/, no retrieval date, and for KIMBA no closure evidence at all (its status field is set with a notes field reading only 'Built for 2021 harvest'). The only record is a hand-typed note on LOCK in pipeline/manual_sites.json citing a live read of tports.com/harvest on 2026-08-19 - the same off-season live read that docs/roster_audit_2026-08.md section 1 identifies as the root cause of four wrongly closed Bunge sites. Read A and B as 'Lucky Bay alone' and 'Lucky Bay plus both bunkers'. Do not publish either season label until the page is archived and registered.",

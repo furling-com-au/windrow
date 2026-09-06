@@ -47,9 +47,15 @@ number for a network state that was never applied — the defect class of #20 an
 1. a name matching no site in the bundle **throws**;
 2. `forceOpen` on a site with an empty segregation list **throws**. `chooseSite` skips any
    site whose `accepts[c]` is false, so such a site would sit in the network looking open
-   and receive zero tonnes all season. This is the normal case, not an edge one: all five
-   dormant Bunge sites and all six closed-2019 sites carry `commodities: []`. Reopening
+   and receive zero tonnes all season. This is the normal case, not an edge one: the
+   dormant Bunge site and all six closed-2019 sites carry `commodities: []`. Reopening
    any of them needs an assumed segregation list in the **data** first (A12-style).
+   *(Amended 2026-09-06: the check now applies to every open non-port site, not only the
+   `forceOpen` path. When this document was written the A12 roster correction had
+   reopened four Bunge sites by `status` with exactly this empty list, so the engine
+   opened them, routed nothing to them, and seeded them carry-in — the defect this rule
+   describes, reached by the other door. Every arm in the grid below was run against
+   that network; see A12 in `data/ASSUMPTIONS.md`.)*
 
 `forceClosed` beats `forceOpen`, so the result never depends on list order.
 
@@ -180,6 +186,20 @@ Ran the full season × bunker-state grid, with both states **forced explicitly**
 | 2024/25 | closed | 1.503 | 0.221 | 79.57 % | **−0.3 %** (state matches assumed) |
 | 2025/26 | open | 2.058 | 0.604 | 70.79 % | counterfactual arm |
 | 2025/26 | closed | 2.244 | 0.418 | 77.19 % | **−0.2 %** (state matches observed) |
+
+> **Addendum 2026-09-06 — this table was run on a roster that had not actually changed.**
+> The four Bunge sites the A12 correction reopened (Penong, Darke Peak, Buckleboo,
+> Elliston) carried an empty segregation list, so the engine opened them and routed
+> nothing to them (A12, "Corrected again"). With the assumed lists in place the same grid
+> at the same fitted vector reads: 2022/23 open 2.649 Mt (−18.9 % vs observed, was
+> −34.5 %); 2023/24 open 1.954 Mt (**+4.8 %**, was −0.4 %); 2024/25 closed 1.533 Mt
+> (**+1.7 %**, was −0.3 %); 2025/26 closed 2.342 Mt (**+4.1 %**, was −0.2 %). The
+> near-zero errors above were the fitted vector reproducing the roster it was fitted on;
+> the vector has not been refitted since, so those three matched arms now sit 2–5 % high.
+> The bunker effect at frozen parameters is essentially unchanged (2023/24 +160 kt / +6.17
+> pp, 2024/25 +109 kt / +5.75 pp, 2025/26 +178 kt / +6.13 pp), and nothing about the
+> verdict moves: it rests on the observed straddle, which is model-free. Full run in the
+> repo history at this commit (`npx tsx packages/sim/scripts/r5_validate.ts`).
 
 2022/23 is unusable and is reported only for completeness: its bundle carries no vessel
 program, so the ports never outload, the network jams and the season truncates

@@ -1,5 +1,12 @@
 {
   "_comment": "Hand-compiled site facts with per-fact sources (research pass 2026-08-19). Coordinates for T-Ports/closed sites are TOWN-level (Nominatim/OSM); operator API provides facility-level for Bunge sites. capacity_t values: only where published. Commodity codes: WH wheat, BA barley, CA canola, LE lentils, FB faba beans.",
+  "assumed_segregations_2025_26": {
+    "_source": "The live segregations table was read OFF-SEASON (2026-08-19), when a site between harvests correctly lists nothing, so these five Bunge sites carry [] in segregations_2025_26. Four of them are named receiving 2025/26 grain in Bunge's own weekly reports (A12), so the engine must open them - and an open site with no list receives nothing. The list is ASSUMED: wheat and barley, the two segregations every EP country site in the same table carries. Kept to two on purpose: a third would also make the site a general receiver of minor crops in the engine. Replace with the in-season table when the 2026/27 harvest read is taken.",
+    "PENONG": ["WH", "BA"],
+    "DARKE PEAK": ["WH", "BA"],
+    "BUCKLEBOO": ["WH", "BA"],
+    "ELLISTON": ["WH", "BA"]
+  },
   "segregations_2025_26": {
     "_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
     "PORT LINCOLN": ["WH", "BA", "CA"],
@@ -52,6 +59,8 @@
       "operator": "T-Ports",
       "role": "upcountry",
       "status": "closed_2025_26_season",
+      "closed_seasons": ["2024/25", "2025/26"],
+      "closed_seasons_source": "2025/26: published, tports.com/harvest ('Site closed for 25/26 season'; in-season Wayback snapshot 2026-01-14). 2024/25: ASSUMED - A15 (unverified; drought crop too small to fill the bunkers).",
       "lat": -33.5673, "lon": 135.7555,
       "coord_precision": "town",
       "coord_source": "Nominatim/OSM town node; exact pad unpublished",
@@ -67,6 +76,8 @@
       "operator": "T-Ports",
       "role": "upcountry",
       "status": "closed_2025_26_season",
+      "closed_seasons": ["2024/25", "2025/26"],
+      "closed_seasons_source": "2025/26: published, tports.com/harvest ('Site closed for 25/26 season'; in-season Wayback snapshot 2026-01-14). 2024/25: ASSUMED - A15 (unverified; drought crop too small to fill the bunkers).",
       "lat": -33.1403, "lon": 136.4168,
       "coord_precision": "town",
       "coord_source": "Nominatim/OSM town node; facility 'east of Kimba township' per Grain Central",

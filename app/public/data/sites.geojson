@@ -103,8 +103,11 @@
     "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/1436f217-8ded-4bc6-989e-a91301835864 (retrieved 2026-08-19)",
-    "commodities_2025_26": [],
-    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "ASSUMED (A12): The live segregations table was read OFF-SEASON (2026-08-19), when a site between harvests correctly lists nothing, so these five Bunge sites carry [] in segregations_2025_26. Four of them are named receiving 2025/26 grain in Bunge's own weekly reports (A12), so the engine must open them - and an open site with no list receives nothing. The list is ASSUMED: wheat and barley, the two segregations every EP country site in the same table carries. Kept to two on purpose: a third would also make the site a general receiver of minor crops in the engine. Replace with the in-season table when the 2026/27 harvest read is taken.",
     "capacity_t": 72700,
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
@@ -330,8 +333,11 @@
     "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/4a6f63f5-00d4-46e4-9fc8-a9130183585f (retrieved 2026-08-19)",
-    "commodities_2025_26": [],
-    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "ASSUMED (A12): The live segregations table was read OFF-SEASON (2026-08-19), when a site between harvests correctly lists nothing, so these five Bunge sites carry [] in segregations_2025_26. Four of them are named receiving 2025/26 grain in Bunge's own weekly reports (A12), so the engine must open them - and an open site with no list receives nothing. The list is ASSUMED: wheat and barley, the two segregations every EP country site in the same table carries. Kept to two on purpose: a third would also make the site a general receiver of minor crops in the engine. Replace with the in-season table when the 2026/27 harvest read is taken.",
     "capacity_t": 166200,
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
@@ -646,8 +652,11 @@
     "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/b89e1868-2309-47b6-b26b-a9130183585f (retrieved 2026-08-19)",
-    "commodities_2025_26": [],
-    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "ASSUMED (A12): The live segregations table was read OFF-SEASON (2026-08-19), when a site between harvests correctly lists nothing, so these five Bunge sites carry [] in segregations_2025_26. Four of them are named receiving 2025/26 grain in Bunge's own weekly reports (A12), so the engine must open them - and an open site with no list receives nothing. The list is ASSUMED: wheat and barley, the two segregations every EP country site in the same table carries. Kept to two on purpose: a third would also make the site a general receiver of minor crops in the engine. Replace with the in-season table when the 2026/27 harvest read is taken.",
     "capacity_t": 166200,
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
@@ -683,8 +692,11 @@
     "status": "active_2025_26",
     "coord_precision": "facility",
     "coord_source": "operator API mobilews.viterra.com.au/api/Sites/c90de8a9-a1c7-4c0a-91ad-a9130183585f (retrieved 2026-08-19)",
-    "commodities_2025_26": [],
-    "commodities_source": "https://www.bunge.com.au/agriculture/delivering-to-sa-vic-sites/segregations-and-opening-hours (live table read 2026-08-19)",
+    "commodities_2025_26": [
+     "WH",
+     "BA"
+    ],
+    "commodities_source": "ASSUMED (A12): The live segregations table was read OFF-SEASON (2026-08-19), when a site between harvests correctly lists nothing, so these five Bunge sites carry [] in segregations_2025_26. Four of them are named receiving 2025/26 grain in Bunge's own weekly reports (A12), so the engine must open them - and an open site with no list receives nothing. The list is ASSUMED: wheat and barley, the two segregations every EP country site in the same table carries. Kept to two on purpose: a third would also make the site a general receiver of minor crops in the engine. Replace with the in-season table when the 2026/27 harvest read is taken.",
     "capacity_t": 72700,
     "capacity_provenance": "estimated (not published): A4 method - long-run district receivals share (mean PIRSA district production 2022/23-2025/26) allocated across that district's Bunge upcountry sites, scaled so all 21 of them total 2.54 Mt (max Western season receivals 3.27 Mt - published Western port storage 0.73 Mt)",
     "region": "western",
@@ -974,9 +986,15 @@
     "region": "western",
     "sources": [
      "https://tports.com/lucky-bay/",
-     "https://tports.com/harvest/"
+     "https://tports.com/harvest/",
+     "https://web.archive.org/web/20260114125403/https://tports.com/harvest/"
     ],
-    "notes": "'Site closed for 25/26 season' per tports.com/harvest (2026-08-19); operated prior seasons from 2019",
+    "notes": "'Site closed for 25/26 season' per tports.com/harvest; operated prior seasons from 2019. Read live 2026-08-19 and 2026-08-31, and confirmed IN SEASON on the Internet Archive snapshot of 14 January 2026 (mid-harvest), where Lucky Bay and Wallaroo carry 'By Appt.' hours and live segregations while Lock and Kimba carry the closure line and none.",
+    "closed_seasons": [
+     "2024/25",
+     "2025/26"
+    ],
+    "closed_seasons_source": "2025/26: published, tports.com/harvest ('Site closed for 25/26 season'; in-season Wayback snapshot 2026-01-14). 2024/25: ASSUMED - A15 (unverified; drought crop too small to fill the bunkers).",
     "nearest_osm_silo_m": 220,
     "operating_seasons": [],
     "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",
@@ -1012,9 +1030,15 @@
     "sources": [
      "https://tports.com/lucky-bay/",
      "https://tports.com/harvest/",
-     "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/"
+     "https://www.graincentral.com/news/t-ports-adds-bunker-site-at-kimba-extra-storage-at-lock/",
+     "https://web.archive.org/web/20260114125403/https://tports.com/harvest/"
     ],
-    "notes": "Built for 2021 harvest; 'Site closed for 25/26 season' per tports.com/harvest (verified 2026-08-31, same wording the page carries for Lock). Until 2026-08-31 this entry carried the closed_2025_26_season status with NO closure evidence recorded - only Lock's quote had been transcribed - while every 2025/26 finding in docs/r0_choice_geometry.md depended on both bunkers being closed.",
+    "notes": "Built for 2021 harvest; 'Site closed for 25/26 season' per tports.com/harvest, on the same line the page carries for Lock (verified 2026-08-31). Confirmed IN SEASON on the Internet Archive snapshot of 14 January 2026 (mid-harvest) - the closure is not an off-season page state. Until 2026-08-31 this entry carried the closed_2025_26_season status with NO closure evidence recorded - only Lock's quote had been transcribed - while every 2025/26 finding in docs/r0_choice_geometry.md depended on both bunkers being closed.",
+    "closed_seasons": [
+     "2024/25",
+     "2025/26"
+    ],
+    "closed_seasons_source": "2025/26: published, tports.com/harvest ('Site closed for 25/26 season'; in-season Wayback snapshot 2026-01-14). 2024/25: ASSUMED - A15 (unverified; drought crop too small to fill the bunkers).",
     "nearest_osm_silo_m": 440,
     "operating_seasons": [],
     "operating_seasons_source": "operator weekly harvest reports (data/processed/receivals_notes.jsonl); positive evidence only - absence of a mention is NOT evidence of closure",

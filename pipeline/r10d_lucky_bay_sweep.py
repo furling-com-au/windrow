@@ -30,13 +30,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from wlib import PROCESSED  # noqa: E402
-from r8_choice_geometry import (  # noqa: E402
-    APP_DATA, INCUMBENT_OPERATORS, build_graph, make_snapper, network_states,
-    parcel_weights, wmean, wshare,
+from roads import (  # noqa: E402
+    build_graph, dijkstra_time_then_km, displace, make_snapper, snap_parcels, snap_sites,
+    sweep_grid,
 )
-from r9_cartage import cartage_aud_per_t as P, dijkstra_time_then_km, displace  # noqa: E402
+from r8_choice_geometry import (  # noqa: E402
+    APP_DATA, INCUMBENT_OPERATORS, network_states, parcel_weights, wmean, wshare,
+)
+from r9_cartage import cartage_aud_per_t as P  # noqa: E402
 
 INF = float("inf")
+CLAIM_AUD = 15.0
 
 
 def main():
@@ -47,15 +51,8 @@ def main():
     w, _a, _b = parcel_weights(parcels)
     n = len(parcels)
 
-    sk, si = {}, []
-    for f in feats:
-        lon, lat = f["geometry"]["coordinates"]
-        nid, _e = snap(lon, lat)
-        p = f["properties"]
-        sk[p["name"]] = len(si)
-        si.append({"name": p["name"], "operator": p["operator"], "node": nid,
-                   "lon": lon, "lat": lat})
-    pn = [snap(p["lon"], p["lat"])[0] for p in parcels]
+    sk, si = snap_sites(feats, snap)
+    pn, _snap_km = snap_parcels(parcels, snap)
 
     def kv(nid):
         t, _ = dijkstra_time_then_km(adj, nid)
@@ -73,9 +70,10 @@ def main():
           f"'town', registered in NO assumption)")
     print("cfg              snap   max_vsPort  catch_mean  catch_share  max_vsBunge  dM1_EP")
     rows = []
-    for mag in (0.0, 2.5, 5.0):
-        for br in ([0] if mag == 0 else range(0, 360, 45)):
-            lo, la = displace(lo0, la0, mag, br)
+    # the same 17-configuration grid r8, r8a and r9 sweep (roads.SWEEP_*), not a local copy
+    for mag, br in sweep_grid():
+            lo, la = (lo0, la0) if br is None else displace(lo0, la0, mag, br)
+            br = br or 0
             nid, serr = snap(lo, la)
             kLB = kv(nid)
             sav_port = [P(kport[j])[0] - P(min(kLB[j], kport[j]))[0] for j in range(n)]
@@ -95,12 +93,24 @@ def main():
     print()
     for k, name in enumerate(labels):
         v = [r[k] for r in rows]
-        print(f"ENVELOPE over 17 configs  {name:<40} {min(v):8.3f} .. {max(v):8.3f}")
+        print(f"ENVELOPE over {len(rows)} configs  {name:<40} {min(v):8.3f} .. {max(v):8.3f}")
     print()
-    print("READ: the two findings the verdict rests on are both coordinate-robust. The")
-    print("'up to' figure on the direct-to-port reading never falls below $18.72/t (clears")
-    print("$15 at every configuration) and the 'up to' figure on the nearest-Bunge-point")
-    print("reading never rises above $6.65/t (fails $15 at every configuration).")
+    # The conclusion is DERIVED from the envelope just printed, never typed: a literal
+    # "$18.72" here survived every input change silently until 2026-09-06.
+    port_floor = min(r[0] for r in rows)   # 'up to' vs nearest Bunge port, worst config
+    bunge_ceiling = max(r[3] for r in rows)  # 'up to' vs nearest Bunge point, best config
+    port_clears = port_floor >= CLAIM_AUD
+    bunge_fails = bunge_ceiling < CLAIM_AUD
+    robust = port_clears and bunge_fails
+    print(f"READ: the two findings the verdict rests on are "
+          f"{'both coordinate-robust' if robust else 'NOT both coordinate-robust'}. The")
+    print(f"'up to' figure on the direct-to-port reading never falls below ${port_floor:.2f}/t "
+          f"({'clears' if port_clears else 'DOES NOT clear'}")
+    print(f"${CLAIM_AUD:.0f} at every configuration) and the 'up to' figure on the "
+          f"nearest-Bunge-point")
+    print(f"reading never rises above ${bunge_ceiling:.2f}/t "
+          f"({'fails' if bunge_fails else 'REACHES'} ${CLAIM_AUD:.0f} at "
+          f"{'every' if bunge_fails else 'some'} configuration).")
 
 
 if __name__ == "__main__":

@@ -123,6 +123,11 @@ def main():
         vj = json.loads(fpath.read_text(encoding="utf-8"))
         matched = 0
         used: set[tuple[str, str]] = set()
+        # Idempotent: drop any names a previous run left, or a visit that no longer matches
+        # keeps a stale candidate forever (one did, until 2026-09-06).
+        for visit in vj["port_lincoln_berth_visits"]:
+            for k in ("name_candidate", "stem_volume_t", "stem_commodity"):
+                visit.pop(k, None)
         for visit in vj["port_lincoln_berth_visits"]:
             t0 = datetime.fromisoformat(visit["arrive"]).date()
             best = None

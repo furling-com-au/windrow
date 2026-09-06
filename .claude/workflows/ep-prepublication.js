@@ -17,7 +17,9 @@ Repo: the Windrow EP grain supply-chain simulation (cwd is the repo root).
 The draft under review is ${DRAFT}.
 Supporting material: docs/analysis_plan_ep_competition.md (esp. section 3 "claims ladder"
 and section 6 "What we must not claim"), docs/gate_findings.md, docs/r0_choice_geometry.md,
-docs/r5_validation.md, docs/r1_r4_findings.md, data/SOURCES.md, data/ASSUMPTIONS.md.
+docs/r5_validation.md, data/SOURCES.md, data/ASSUMPTIONS.md. docs/r1_r4_findings.md exists
+ONLY if the gate returned GO/PARTIAL and ep-runs was run; the recorded verdict is NO-GO, so
+if it is absent do not hunt for it and do not treat R1-R4 (Tier 3) results as existing.
 
 This piece names a real, large company (Bunge, formerly Viterra) in a competition context
 and will be read by that company's lawyers, by Grain Producers SA, and possibly by the

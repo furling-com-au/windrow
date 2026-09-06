@@ -27,6 +27,10 @@ export interface BundleSite {
    *  before issue #20 still loads; absent means "assume estimated". */
   capacity_estimated?: boolean;
   commodities: string[];
+  /** Seasons ("2024/25") in which this site did not operate; the engine closes it for
+   *  any season listed. Carried from pipeline/manual_sites.json with its source. Optional
+   *  so a bundle built before 2026-09-06 still loads; absent means "never closed". */
+  closed_seasons?: string[];
 }
 
 export interface BundleCluster {
@@ -190,11 +194,11 @@ export interface Params {
   /** Which sites operate, overriding the engine's own open/closed rule (R5/R0/R3).
    *
    *  Without this the network state is not a parameter at all: `Sim.init()` decides
-   *  "open" per site from the bundle's static `status` string plus a HARDCODED match on
-   *  the season string (`season === "2025/26" || "2024/25"` closes the two T-Ports
-   *  bunkers, A15). That conflates two different things wearing one label — which
-   *  demand/weather/observed bundle to load, and which sites exist — so a run cannot ask
-   *  "this season's crop against a different network" without editing the engine.
+   *  "open" per site from the bundle's `status` string plus the site's `closed_seasons`
+   *  list (A15; a literal season-string match in the engine until 2026-09-06). That
+   *  conflates two different things wearing one label — which demand/weather/observed
+   *  bundle to load, and which sites exist — so a run cannot ask "this season's crop
+   *  against a different network" without editing the data.
    *
    *  Names are matched against `BundleSite.name` exactly, and an unmatched name THROWS:
    *  a typo that silently did nothing would produce a plausible-looking number for a

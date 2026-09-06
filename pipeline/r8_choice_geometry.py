@@ -69,7 +69,6 @@ Writes docs/r0_choice_geometry.md and docs/r0_choice_geometry.json.
 """
 from __future__ import annotations
 
-import heapq
 import json
 import math
 import sys
@@ -81,15 +80,23 @@ import polars as pl
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from wlib import PROCESSED, ROOT
+# Routing is shared with p2_build_matrix.py (the engine's matrix) and r9/r10 through
+# pipeline/roads.py, so A5 speeds, the snapper and Dijkstra exist exactly once. The names
+# are re-exported here because r8a/r9/r10 historically imported them from this module.
+from roads import (  # noqa: F401
+    SPEED_KMH,
+    SWEEP_BEARINGS_DEG,
+    SWEEP_OFFSET_KM,
+    build_graph,
+    dijkstra_minutes,
+    displace,
+    make_snapper,
+    snap_parcels,
+    snap_sites,
+)
 
 APP_DATA = ROOT / "app" / "public" / "data"
 DOCS = ROOT / "docs"
-
-# A5 road speeds by OSM class, loaded grain truck. Identical to p2_build_matrix.py.
-SPEED_KMH = {
-    "trunk": 90.0, "primary": 90.0, "secondary": 80.0,
-    "tertiary": 70.0, "unclassified": 60.0, "residential": 40.0,
-}
 
 INCUMBENT = "Bunge (ex-Viterra)"
 # The pre-2019 operator. Same corporate lineage as INCUMBENT (Viterra -> Bunge
@@ -105,7 +112,6 @@ GAP_THRESHOLDS_MIN = (30, 60, 90)
 # quoting the 90-min multiple on its own is the single most favourable framing available
 # and must never appear without the sweep beside it.
 SWEEP_MIN = (30, 45, 60, 75, 90, 105, 120)
-CART_RANGE_MIN = SWEEP_MIN
 # NOT designated a priori and NOT privileged - see THRESHOLD_STATUS. This is simply the
 # row the headline sentence quotes (the middle of the published grid). Every other row of
 # the sweep is published beside it and carries equal standing.
@@ -126,8 +132,10 @@ HEADLINE_STATE = "s2025_26"
 # 2023/24 column is recomputed from the displaced coordinates - re-snapped and re-routed,
 # not scaled.
 A11_SITES = ("Lock (T-Ports bunker)", "Kimba (T-Ports bunker)")
-A11_OFFSET_KM = (0.0, 2.5, 5.0)
-A11_BEARINGS_DEG = (0, 45, 90, 135, 180, 225, 270, 315)
+# The grid is declared once, in roads.py, and shared with r8a/r9/r10d so that "the same
+# 17 configurations" is true by construction rather than by four separate literals.
+A11_OFFSET_KM = SWEEP_OFFSET_KM
+A11_BEARINGS_DEG = SWEEP_BEARINGS_DEG
 # "Favours the result" is defined explicitly so the reader can check the labelling: the
 # trajectory claim is helped by a LOWER 2023/24 baseline (a bigger multiple against a
 # fixed 2025/26 level), so the most-favourable direction is the one that minimises the
@@ -311,62 +319,7 @@ WEIGHT_SEASONS = ("2022/23", "2023/24", "2024/25", "2025/26")
 
 
 # --------------------------------------------------------------------------- routing
-def build_graph():
-    g = json.loads((PROCESSED / "roads.graph.json").read_text(encoding="utf-8"))
-    nodes = g["nodes"]
-    adj: dict[str, list[tuple[str, float, float]]] = defaultdict(list)
-    for u, v, length_m, hw in g["edges"]:
-        km = length_m / 1000.0
-        minutes = km / SPEED_KMH.get(hw, 60.0) * 60.0
-        adj[u].append((v, minutes, km))
-        adj[v].append((u, minutes, km))
-    return nodes, adj
-
-
-def make_snapper(nodes):
-    cell = 0.05
-    grid: dict[tuple[int, int], list[str]] = defaultdict(list)
-    for nid, (lon, lat) in nodes.items():
-        grid[(int(lon / cell), int(lat / cell))].append(nid)
-
-    def nearest(lon: float, lat: float):
-        cx, cy = int(lon / cell), int(lat / cell)
-        best, bd = None, 1e18
-        for r in range(0, 8):
-            cands = []
-            for dx in range(-r, r + 1):
-                for dy in range(-r, r + 1):
-                    if max(abs(dx), abs(dy)) == r:
-                        cands += grid.get((cx + dx, cy + dy), [])
-            for nid in cands:
-                lo, la = nodes[nid]
-                d = (lo - lon) ** 2 + (la - lat) ** 2
-                if d < bd:
-                    bd, best = d, nid
-            if best is not None and r >= 1:
-                break
-        # straight-line snap error in km, so a bad snap can be seen rather than assumed
-        lo, la = nodes[best]
-        km = math.hypot((lo - lon) * math.cos(math.radians(lat)), la - lat) * 111.32
-        return best, km
-
-    return nearest
-
-
-def dijkstra_minutes(adj, src: str) -> dict[str, float]:
-    """Least-TIME tree from src. Same as p2_build_matrix.dijkstra, minutes only."""
-    dist = {src: 0.0}
-    pq = [(0.0, src)]
-    while pq:
-        d, n = heapq.heappop(pq)
-        if d > dist.get(n, 1e18):
-            continue
-        for m, w, _km in adj[n]:
-            nd = d + w
-            if nd < dist.get(m, 1e18):
-                dist[m] = nd
-                heapq.heappush(pq, (nd, m))
-    return dist
+# build_graph / make_snapper / dijkstra_minutes: see pipeline/roads.py (imported above).
 
 
 # ---------------------------------------------------------------------- network states
@@ -378,11 +331,13 @@ def network_states(feats):
     def st(f):
         return f["properties"]["status"]
 
-    active = [f for f in feats if st(f) == "active_2025_26"]          # 18 Bunge
-    dormant = [f for f in feats if st(f) == "dormant"]                # 5 Bunge
-    closed19 = [f for f in feats if st(f) == "closed_2019"]           # 6 ex-Viterra
-    tp_port = [f for f in feats if st(f) == "active"]                 # 1 T-Ports (Lucky Bay)
-    tp_bunkers = [f for f in feats if st(f) == "closed_2025_26_season"]  # 2 T-Ports bunkers
+    # No counts in these comments on purpose: the roster moved once already (four sites
+    # dormant -> active on 2026-08-31) and a stale "# 18 Bunge" reads as provenance.
+    active = [f for f in feats if st(f) == "active_2025_26"]          # Bunge, operating
+    dormant = [f for f in feats if st(f) == "dormant"]                # Bunge, idle
+    closed19 = [f for f in feats if st(f) == "closed_2019"]           # ex-Viterra, closed
+    tp_port = [f for f in feats if st(f) == "active"]                 # T-Ports Lucky Bay
+    tp_bunkers = [f for f in feats if st(f) == "closed_2025_26_season"]  # T-Ports bunkers
 
     # Counts are read off the data, never hard-coded: the roster was corrected on
     # 2026-08-31 (4 sites moved dormant -> active) and a hard-coded "18 active" silently
@@ -496,20 +451,8 @@ def main():
     print("district mean production (t):", {k: round(v) for k, v in dist_t.items()})
 
     # snap every site once; route once from each site node; reuse across all states
-    site_key = {}
-    site_info = []
-    worst_snap = 0.0
-    for f in feats:
-        lon, lat = f["geometry"]["coordinates"]
-        nid, err = snap(lon, lat)
-        worst_snap = max(worst_snap, err)
-        p = f["properties"]
-        site_key[p["name"]] = len(site_info)
-        site_info.append({
-            "name": p["name"], "operator": p["operator"], "role": p["role"],
-            "status": p["status"], "district": p.get("district"),
-            "lon": lon, "lat": lat, "node": nid, "snap_km": round(err, 2),
-        })
+    site_key, site_info = snap_sites(feats, snap)
+    worst_snap = max(s["snap_km"] for s in site_info)
     print(f"worst site snap-to-road distance: {worst_snap:.2f} km")
 
     trees = {}
@@ -517,12 +460,7 @@ def main():
         if s["node"] not in trees:
             trees[s["node"]] = dijkstra_minutes(adj, s["node"])
 
-    parcel_nodes = []
-    parcel_snap = []
-    for p in parcels:
-        nid, err = snap(p["lon"], p["lat"])
-        parcel_snap.append(err)
-        parcel_nodes.append(nid)
+    parcel_nodes, parcel_snap = snap_parcels(parcels, snap)
     worst_psnap = max(parcel_snap)
     print(f"worst parcel snap-to-road distance: {worst_psnap:.2f} km")
 
@@ -540,7 +478,6 @@ def main():
         idx = [site_key[f["properties"]["name"]] for f in sdef["sites"]]
         inc = [i for i in idx if site_info[i]["operator"] in INCUMBENT_OPERATORS]
         ind = [i for i in idx if site_info[i]["operator"] not in INCUMBENT_OPERATORS]
-        n_ops = len({site_info[i]["operator"] for i in idx} - set())
         # collapse the two incumbent tags into one owner for the operator count
         owners = {("INCUMBENT" if site_info[i]["operator"] in INCUMBENT_OPERATORS
                    else site_info[i]["operator"]) for i in idx}
@@ -762,13 +699,7 @@ def main():
     # coordinate (not a scaling of minutes - that would be a different, weaker sweep), and
     # recompute the published rows. The 2025/26 state contains neither bunker, so its rows
     # are recomputed under every displacement too, to DEMONSTRATE rather than assert that
-    # the headline does not depend on A11.
-    def displace(lon: float, lat: float, km: float, bearing_deg: float):
-        th = math.radians(bearing_deg)
-        dlat = km * math.cos(th) / 111.32
-        dlon = km * math.sin(th) / (111.32 * math.cos(math.radians(lat)))
-        return lon + dlon, lat + dlat
-
+    # the headline does not depend on A11. `displace` is roads.displace, shared with r9.
     def minutes_from(nid: str) -> list[float]:
         if nid not in trees:
             trees[nid] = dijkstra_minutes(adj, nid)
@@ -1197,7 +1128,7 @@ def write_md(o):
     w("")
     w(f"Method: {o['speed_sensitivity']['method']}")
     w("")
-    w(f"Share of production with **no independent point within R minutes**, by travel speed:")
+    w("Share of production with **no independent point within R minutes**, by travel speed:")
     w("")
     w("| Travel speeds | " + " | ".join(f"{r} min" for r in SWEEP_MIN) + " |")
     w("|---|" + "---|" * len(SWEEP_MIN))

@@ -1,6 +1,6 @@
 # R0 — Ownership choice-set geometry, Eyre Peninsula
 
-Generated 2026-08-31 by `pipeline/r8_choice_geometry.py`.
+Generated 2026-09-06 by `pipeline/r8_choice_geometry.py`.
 
 **Tier 2 (geometry): roads + site locations only. No simulation, no fitted parameter, no calibrated knob.**
 
@@ -27,7 +27,7 @@ What it *does* depend on is A5 road speeds, which are assumed. At the headline t
 
 | 2025/26 — no independent receival point within R minutes | 30 min | 45 min | 60 min | 75 min | 90 min | 105 min | 120 min |
 |---|---|---|---|---|---|---|---|
-| ×0.85 travel speeds | 98.2 % | 95.0 % | 91.4 % | 85.7 % | 77.2 % | 67.3 % | 55.7 % |
+| ×0.85 travel speeds | 98.3 % | 95.0 % | 91.4 % | 85.7 % | 77.2 % | 67.3 % | 55.7 % |
 | **×1.00 (published A5) — the headline row** | 97.1 % | 93.2 % | 87.4 % | 78.2 % | **66.8 %** | 53.2 % | 39.5 % |
 | ×1.15 travel speeds | 96.1 % | 90.8 % | 82.1 % | 69.7 % | 54.5 % | 38.9 % | 27.8 % |
 
@@ -79,11 +79,11 @@ Share of production with **no independent point within R minutes**, by travel sp
 | Travel speeds | 30 min | 45 min | 60 min | 75 min | 90 min | 105 min | 120 min |
 |---|---|---|---|---|---|---|---|
 | _2023/24_ |  |  |  |  |  |  |  |
-| &nbsp;&nbsp;x0.85 | 87.4 % | 74.4 % | 59.8 % | 46.8 % | 31.3 % | 20.7 % | 16.9 % |
+| &nbsp;&nbsp;x0.85 | 87.5 % | 74.4 % | 59.8 % | 46.8 % | 31.3 % | 20.7 % | 16.9 % |
 | &nbsp;&nbsp;x1.00 (published A5) | 83.6 % | 66.3 % | 50.0 % | 32.9 % | 20.3 % | 16.5 % | 13.9 % |
 | &nbsp;&nbsp;x1.15 | 78.7 % | 59.1 % | 39.4 % | 23.1 % | 16.7 % | 13.8 % | 10.6 % |
 | _2025/26_ |  |  |  |  |  |  |  |
-| &nbsp;&nbsp;x0.85 | 98.2 % | 95.0 % | 91.4 % | 85.7 % | 77.2 % | 67.3 % | 55.7 % |
+| &nbsp;&nbsp;x0.85 | 98.3 % | 95.0 % | 91.4 % | 85.7 % | 77.2 % | 67.3 % | 55.7 % |
 | &nbsp;&nbsp;x1.00 (published A5) | 97.1 % | 93.2 % | 87.4 % | 78.2 % | 66.8 % | 53.2 % | 39.5 % |
 | &nbsp;&nbsp;x1.15 | 96.1 % | 90.8 % | 82.1 % | 69.7 % | 54.5 % | 38.9 % | 27.8 % |
 
@@ -101,7 +101,7 @@ At the 90-minute threshold the headline row reads 31.3 % → 77.2 % at x0.85 spe
 | &nbsp;&nbsp;same row, ×0.85 travel speeds | _undefined_ | 31.3 % | 77.2 % |
 | &nbsp;&nbsp;same row, **×1.00 (A5 as published)** | _undefined_ | 20.3 % | 66.8 % |
 | &nbsp;&nbsp;same row, ×1.15 travel speeds | _undefined_ | 16.7 % | 54.5 % |
-| Nearest independent >60 min beyond nearest Bunge (**gap row — not roster-invariant, see the note below**) | _undefined_ | 33.0 % (**32.8 %–38.4 %**) | 77.3 % (A11-independent) |
+| Nearest independent >60 min beyond nearest Bunge (**gap row — not roster-invariant, see the note below**) | _undefined_ | 33.0 % (**32.8 %–38.5 %**) | 77.3 % (A11-independent) |
 | &nbsp;&nbsp;same row, ×0.85 travel speeds | _undefined_ | 42.8 % | 84.5 % |
 | &nbsp;&nbsp;same row, **×1.00 (A5 as published)** | _undefined_ | 33.0 % | 77.3 % |
 | &nbsp;&nbsp;same row, ×1.15 travel speeds | _undefined_ | 22.3 % | 69.7 % |
@@ -125,11 +125,11 @@ A11 gives the Lock and Kimba T-Ports bunker coordinates a <=5 km tolerance (town
 |---|---|---|---|---|---|
 | **0 km** — published coordinates | — (as published) | 20.3 % | 33.0 % | 66.8 % | 3.29× |
 | **2.5 km** — most favourable | 180°, 0° | 19.9 % | 32.8 % | 66.8 % | 3.35× |
-| **2.5 km** — least favourable | 45°, 0° | 21.8 % | 33.9 % | 66.8 % | 3.06× |
+| **2.5 km** — least favourable | 45°, 0° | 21.8 % | 34.0 % | 66.8 % | 3.06× |
 | **5 km** — most favourable | 180°, 0° | 20.5 % | 33.5 % | 66.8 % | 3.25× |
-| **5 km** — least favourable | 0°, 0° | 24.6 % | 38.4 % | 66.8 % | 2.72× |
+| **5 km** — least favourable | 0°, 0° | 24.6 % | 38.5 % | 66.8 % | 2.72× |
 
-The extremes above are selected on the 90-minute threshold row. The gap column shows that same configuration's gap value, not the gap row's own extreme; across the whole sweep the 2023/24 gap >60 min row runs 32.8 %–38.4 % against a published 33.0 %.
+The extremes above are selected on the 90-minute threshold row. The gap column shows that same configuration's gap value, not the gap row's own extreme; across the whole sweep the 2023/24 gap >60 min row runs 32.8 %–38.5 % against a published 33.0 %.
 
 **Range over the whole sweep.** The 2023/24 90-minute row runs 19.9 %–24.6 % against a published 20.3 %; the multiple runs 2.72×–3.35× against a published 3.29×. The 2025/26 row is 66.8 % at every one of the 129 configurations. Neither Lock nor Kimba is a receival point in this state - both bunkers are closed for 2025/26 (published, tports.com/harvest) - so no displacement of either can reach it. Computed under all 129 configurations rather than asserted.
 
@@ -218,7 +218,7 @@ Ladder B only. The per-district Ladder A columns (`wmean_nearest_min`, `share_on
 |---|---|---|---|
 | WEP | 118.5 | 61.7 % | 62.8 % |
 | LEP | 69.3 | 6.8 % | 39.0 % |
-| EEP | 32.4 | 0.0 % | 0.0 % |
+| EEP | 32.5 | 0.0 % | 0.0 % |
 
 **2025/26**
 
@@ -316,10 +316,10 @@ Tonne-weighted over EP grain production. "Points within R" counts receival point
 | 99th pct drive to nearest point (min) | 58.3 | 43.8 | 43.8 |
 | Mean points within 30 min | 2.07 | 1.83 | 1.7 |
 | Mean points within 45 min | 4.06 | 3.57 | 3.3 |
-| Mean points within 60 min | 6.23 | 5.48 | 4.99 |
+| Mean points within 60 min | 6.23 | 5.47 | 4.99 |
 | Share with **at most one** point within 30 min | 35.8 % | 41.8 % | 48.3 % |
-| Share with **at most one** point within 45 min | 9.5 % | 10.5 % | 12.0 % |
-| Share with **at most one** point within 60 min | 3.2 % | 2.4 % | 2.4 % |
+| Share with **at most one** point within 45 min | 9.5 % | 10.6 % | 12.1 % |
+| Share with **at most one** point within 60 min | 3.3 % | 2.4 % | 2.4 % |
 | Share whose 2nd-nearest point is >30 min beyond the 1st | 4.3 % | 7.0 % | 7.0 % |
 | Share whose 2nd-nearest point is >60 min beyond the 1st | 0.0 % | 0.0 % | 0.0 % |
 | Share whose 2nd-nearest point is >90 min beyond the 1st | 0.0 % | 0.0 % | 0.0 % |
