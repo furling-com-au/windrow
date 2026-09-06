@@ -22,18 +22,19 @@ Reproduce
 from __future__ import annotations
 
 import json
-import math
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from wlib import PROCESSED  # noqa: E402
-from r8_choice_geometry import (  # noqa: E402
-    APP_DATA, INCUMBENT_OPERATORS, build_graph, make_snapper, network_states,
-    parcel_weights, wmean, wshare,
+from roads import (  # noqa: E402
+    build_graph, dijkstra_time_then_km, make_snapper, snap_parcels, snap_sites,
 )
-from r9_cartage import cartage_aud_per_t, dijkstra_time_then_km  # noqa: E402
+from r8_choice_geometry import (  # noqa: E402
+    APP_DATA, INCUMBENT_OPERATORS, network_states, parcel_weights, wmean, wshare,
+)
+from r9_cartage import cartage_aud_per_t  # noqa: E402
 
 INF = float("inf")
 P = cartage_aud_per_t
@@ -47,15 +48,8 @@ def main():
     weights, _dt, _dh = parcel_weights(parcels)
     n = len(parcels)
 
-    site_key, site_info = {}, []
-    for f in feats:
-        lon, lat = f["geometry"]["coordinates"]
-        nid, err = snap(lon, lat)
-        p = f["properties"]
-        site_key[p["name"]] = len(site_info)
-        site_info.append({"name": p["name"], "operator": p["operator"], "role": p["role"],
-                          "status": p["status"], "lon": lon, "lat": lat, "node": nid})
-    parcel_nodes = [snap(p["lon"], p["lat"])[0] for p in parcels]
+    site_key, site_info = snap_sites(feats, snap)
+    parcel_nodes, _snap_km = snap_parcels(parcels, snap)
 
     cache = {}
 
@@ -112,8 +106,8 @@ def main():
     }
     best_any = [max(v[i] for v in readings.values()) for i in range(n)]
     print()
-    print(f"BEST GROWER READING AT EACH CELL, taken cell-by-cell (an upper envelope over "
-          f"all four grower readings simultaneously):")
+    print("BEST GROWER READING AT EACH CELL, taken cell-by-cell (an upper envelope over "
+          "all four grower readings simultaneously):")
     print(f"   tonne-weighted EP mean ${wmean(weights, best_any):.2f}/t")
     print(f"   EP max            ${max(best_any):.2f}/t")
     for thr in (15.0, 10.0, 5.0, 0.0):
@@ -136,8 +130,8 @@ def main():
     sel = [i for i in range(n) if in_catch[i]]
     w = [weights[i] for i in sel]
     print()
-    print(f"LUCKY BAY'S OWN CATCHMENT (state A: cells where Lucky Bay is the fewest-km point "
-          f"of any owner)")
+    print("LUCKY BAY'S OWN CATCHMENT (state A: cells where Lucky Bay is the fewest-km point "
+          "of any owner)")
     print(f"   {wshare(weights, in_catch) * 100:.1f}% of EP production, {len(sel)} of {n} cells")
     if sel:
         for name, v in readings.items():
@@ -181,7 +175,7 @@ def main():
     # ------------------------------------------------ what $15 requires
     print()
     print("WHAT $15/t REQUIRES, AND WHAT THE PENINSULA OFFERS")
-    print(f"   $15/t at ESCOSA's 50-250 km band rate ($0.11/t-km, one way) = 136.4 km saved.")
+    print("   $15/t at ESCOSA's 50-250 km band rate ($0.11/t-km, one way) = 136.4 km saved.")
     print(f"   Longest one-way haul from any EP production cell to its nearest Bunge point: "
           f"{max(inc_near[i][0] for i in range(n)):.1f} km")
     print(f"   Tonne-weighted mean haul to nearest Bunge point: "

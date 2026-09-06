@@ -40,22 +40,25 @@ Reproduce
 from __future__ import annotations
 
 import json
-import math
-import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from wlib import PROCESSED  # noqa: E402
-from r8_choice_geometry import (  # noqa: E402
-    APP_DATA, INCUMBENT_OPERATORS, build_graph, make_snapper, network_states,
-    parcel_weights, wmean, wshare,
+from roads import (  # noqa: E402
+    build_graph, dijkstra_time_then_km, make_snapper, snap_parcels, snap_sites,
 )
-from r9_cartage import cartage_aud_per_t, dijkstra_time_then_km  # noqa: E402
+from r8_choice_geometry import (  # noqa: E402
+    APP_DATA, INCUMBENT_OPERATORS, network_states, parcel_weights, wmean, wshare,
+)
+from r9_cartage import cartage_aud_per_t  # noqa: E402
+# The PDF path is anchored to the repo and pdftotext's absence is a clean exit there; a
+# cwd-relative path here silently produced an empty extraction and three FAIL rows when
+# the script was run from anywhere but the repo root (code review 2026-09-06).
+from r9_escosa_rate_check import PDF, pdf_text  # noqa: E402
 
 INF = float("inf")
-PDF = Path("data/raw/reference/escosa_grain_supply_chain_2019.pdf")
 
 # Published, 2017-18 A$/tonne, ESCOSA 2019 Appendix E / Table 4.5 / Table F.1.
 PUBLISHED = {
@@ -68,11 +71,9 @@ PUBLISHED = {
 }
 
 
-def verify_pdf():
+def verify_pdf() -> bool:
     """Fail loudly if the cached PDF no longer contains what is quoted above."""
-    txt = subprocess.run(["pdftotext", "-layout", str(PDF), "-"],
-                         capture_output=True, text=True, encoding="utf-8",
-                         errors="replace").stdout
+    txt = pdf_text()  # exits 2 if the PDF or pdftotext is missing
     need = ["Freight to port                 $8.46    $8.25",
             "Cummins to Port Lincoln--rail                $46.16   $50.82",
             "Poochera to Thevenard--road                  $57.75   $63.76"]
@@ -93,8 +94,11 @@ def verify_pdf():
 
 
 def main():
-    print("PDF / arithmetic verification of the published EP freight-to-port figures")
-    verify_pdf()
+    print(f"PDF / arithmetic verification of the published EP freight-to-port figures ({PDF.name})")
+    if not verify_pdf():
+        # The module docstring promises the script fails if the transcription drifts.
+        # Until 2026-09-06 the verdict was printed and then ignored, exit code 0.
+        sys.exit(1)
 
     nodes, adj = build_graph()
     snap = make_snapper(nodes)
@@ -103,15 +107,8 @@ def main():
     weights, _a, _b = parcel_weights(parcels)
     n = len(parcels)
 
-    site_key, site_info = {}, []
-    for f in feats:
-        lon, lat = f["geometry"]["coordinates"]
-        nid, _e = snap(lon, lat)
-        p = f["properties"]
-        site_key[p["name"]] = len(site_info)
-        site_info.append({"name": p["name"], "operator": p["operator"], "role": p["role"],
-                          "node": nid})
-    parcel_nodes = [snap(p["lon"], p["lat"])[0] for p in parcels]
+    site_key, site_info = snap_sites(feats, snap)
+    parcel_nodes, _snap_km = snap_parcels(parcels, snap)
 
     trees = {}
 
@@ -135,10 +132,10 @@ def main():
               f"   -> ${rate:.4f}/t-km   (ESCOSA marginal on the same km: ${esc:5.2f}/t)")
     road_rate = [r for k, _km, r in implied if "road" in k][0]
     print(f"   The ROAD pathway (Poochera->Thevenard) implies ${road_rate:.4f}/t-km, against")
-    print(f"   ESCOSA's marginal $0.11-0.12/t-km. The marginal schedule is therefore a fair")
-    print(f"   proxy for the incumbent's own published ROAD line-haul charge on EP, and the")
-    print(f"   'marginal dollars are a floor' caveat bites much harder on the GROWER's short")
-    print(f"   cart leg than on this long line haul.")
+    print("   ESCOSA's marginal $0.11-0.12/t-km. The marginal schedule is therefore a fair")
+    print("   proxy for the incumbent's own published ROAD line-haul charge on EP, and the")
+    print("   'marginal dollars are a floor' caveat bites much harder on the GROWER's short")
+    print("   cart leg than on this long line haul.")
 
     # ------------------------------------------------ every EP site's line haul, both ways
     ports = [site_key["Port Lincoln"], site_key["Thevenard"]]

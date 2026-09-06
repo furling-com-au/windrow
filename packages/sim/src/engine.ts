@@ -391,9 +391,12 @@ export class Sim {
       const isPort = s.role === "port";
       let open = true;
       if (s.status === "dormant") open = false;
-      // T-Ports Lock & Kimba bunkers: closed 2025/26 (documented) and assumed not
-      // operated in drought 2024/25 (A15 - unverified, crop too small to fill them)
-      if (isTports && !isPort && (season === "2025/26" || season === "2024/25")) open = false;
+      // Per-season closures are DATA on the site record (pipeline/manual_sites.json ->
+      // sites.geojson -> matrix.json). Today that is the two T-Ports bunkers: 2025/26
+      // published, 2024/25 assumed (A15). Until 2026-09-06 this was a literal match on
+      // the season string in here, so a 2026/27 bundle silently reopened them and A15
+      // could only be revised by editing engine code.
+      if (s.closed_seasons?.includes(season)) open = false;
       // ...and the network-state override wins over both of the rules above. forceClosed
       // beats forceOpen for a site named in both, so the result never depends on order.
       if (forceOpen.has(s.name)) open = true;
@@ -408,19 +411,21 @@ export class Sim {
         // sites with 3+ segregations act as general receivers for minor "other" crops
         if (s.commodities.length >= 3) accepts[COMMODITIES.indexOf("other")] = true;
       }
-      // A forced-open site with no segregation list accepts NOTHING (`chooseSite` skips
-      // any site where `accepts[c]` is false), so it would sit in the network looking
-      // open and receive zero tonnes for the whole season — a counterfactual that
-      // silently did not happen. The five dormant Bunge sites and the six closed-2019
-      // ex-Viterra sites all carry `commodities: []` in the bundle, so this is the
-      // normal case, not an edge one: reopening any of them needs an assumed
-      // segregation list in the DATA first (A12-style), which is why this throws rather
-      // than guessing one here.
-      if (forceOpen.has(s.name) && !accepts.some(Boolean)) {
+      // An OPEN site with no segregation list accepts NOTHING (`chooseSite` skips any
+      // site where `accepts[c]` is false), so it would sit in the network looking open,
+      // receive zero tonnes for the whole season, and still be seeded carry-in stock by
+      // capacity share below — a silent wrong number, whichever rule opened it. Dormant
+      // and closed-2019 sites carry `commodities: []` in the bundle, so this is the
+      // normal case, not an edge one: opening any of them needs an assumed segregation
+      // list in the DATA first (A12-style), which is why this throws rather than
+      // guessing one here. It applied only to `forceOpen` until 2026-09-06, while the
+      // status path shipped four such sites (the A12 roster correction) unchecked.
+      if (open && !isPort && !accepts.some(Boolean)) {
+        const how = forceOpen.has(s.name) ? "networkState.forceOpen names" : "the bundle opens";
         throw new Error(
-          `networkState.forceOpen names "${s.name}", which carries no commodities in this ` +
-            `bundle and would therefore accept nothing. Give it a segregation list in the ` +
-            `bundle (see A12) before reopening it.`,
+          `${how} "${s.name}", which carries no commodities in this bundle and would ` +
+            `therefore accept nothing. Give it a segregation list in the bundle (see A12) ` +
+            `before opening it.`,
         );
       }
       const name = s.name;

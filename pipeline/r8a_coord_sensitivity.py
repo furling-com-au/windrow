@@ -35,16 +35,12 @@ _spec = importlib.util.spec_from_file_location("r8_choice_geometry", R8_PATH)
 r8 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(r8)
 
-OFFSETS_KM = (0.0, 2.5, 5.0)
-BEARINGS_DEG = (0, 45, 90, 135, 180, 225, 270, 315)
+# The grid and the displacement are r8's own (pipeline/roads.py), not a second copy: this
+# script's claim is that it runs the IDENTICAL grid r8 does, so it must not declare one.
+OFFSETS_KM = r8.SWEEP_OFFSET_KM
+BEARINGS_DEG = r8.SWEEP_BEARINGS_DEG
+displace = r8.displace
 INF = float("inf")
-
-
-def displace(lon, lat, km, bearing_deg):
-    """Same formula as r8's local displace()."""
-    th = math.radians(bearing_deg)
-    return (lon + km * math.sin(th) / (111.32 * math.cos(math.radians(lat))),
-            lat + km * math.cos(th) / 111.32)
 
 
 def main():
@@ -85,7 +81,7 @@ def main():
 
     # ---------------------------------------------------------------- CHECK 1: Lucky Bay
     ind25 = independent("s2025_26")
-    print(f"CHECK 1 - Lucky Bay coordinate sensitivity of the 2025/26 headline")
+    print("CHECK 1 - Lucky Bay coordinate sensitivity of the 2025/26 headline")
     print(f"  2025/26 independent points: {[f['properties']['name'] for f in ind25]}")
     lb = [f for f in ind25 if "Lucky Bay" in f["properties"]["name"]][0]
     rest = [f for f in ind25 if f is not lb]

@@ -16,7 +16,6 @@ Outputs (app/public/data/):
 """
 from __future__ import annotations
 
-import heapq
 import json
 import math
 import sys
@@ -25,12 +24,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from wlib import PROCESSED, ROOT
+from roads import SPEED_KMH, dijkstra, load_graph, make_snapper  # A5 lives in roads.py
 
 APP_DATA = ROOT / "app" / "public" / "data"
-SPEED_KMH = {  # A5
-    "trunk": 90.0, "primary": 90.0, "secondary": 80.0,
-    "tertiary": 70.0, "unclassified": 60.0, "residential": 40.0,
-}
 PORT_NAMES = {"Port Lincoln", "Thevenard", "Lucky Bay (T-Ports port)"}
 CLUSTER_DEG = 0.12  # ~12 km
 N_CANDIDATES = 8
@@ -63,59 +59,11 @@ def simplify(points: list[list[float]], tol_deg: float = 0.004) -> list[list[flo
 
 
 def main():
-    g = json.loads((PROCESSED / "roads.graph.json").read_text(encoding="utf-8"))
-    nodes = g["nodes"]
-    edges = g["edges"]
-    geometry = g["geometry"]
-    adj: dict[str, list[tuple[str, float, float, int]]] = defaultdict(list)
-    for ei, (u, v, length_m, hw) in enumerate(edges):
-        km = length_m / 1000.0
-        minutes = km / SPEED_KMH.get(hw, 60.0) * 60.0
-        adj[u].append((v, minutes, km, ei))
-        adj[v].append((u, minutes, km, ei))
-
-    cell = 0.05
-    grid: dict[tuple[int, int], list[str]] = defaultdict(list)
-    for nid, (lon, lat) in nodes.items():
-        grid[(int(lon / cell), int(lat / cell))].append(nid)
+    nodes, edges, geometry, adj = load_graph()
+    snap = make_snapper(nodes)
 
     def nearest(lon: float, lat: float) -> str:
-        cx, cy = int(lon / cell), int(lat / cell)
-        best, bd = None, 1e18
-        for r in range(0, 8):
-            cands = []
-            for dx in range(-r, r + 1):
-                for dy in range(-r, r + 1):
-                    if max(abs(dx), abs(dy)) == r:
-                        cands += grid.get((cx + dx, cy + dy), [])
-            for nid in cands:
-                lo, la = nodes[nid]
-                d = (lo - lon) ** 2 + (la - lat) ** 2
-                if d < bd:
-                    bd, best = d, nid
-            if best is not None and r >= 1:
-                break
-        return best
-
-    def dijkstra(src: str):
-        """Least-TIME tree. `kms` is the network distance along that same chosen path --
-        not a shortest-distance tree -- so minutes and km always describe one route."""
-        dist = {src: 0.0}
-        kms = {src: 0.0}
-        prev: dict[str, tuple[str, int]] = {}
-        pq = [(0.0, src)]
-        while pq:
-            d, n = heapq.heappop(pq)
-            if d > dist.get(n, 1e18):
-                continue
-            for m, w, km, ei in adj[n]:
-                nd = d + w
-                if nd < dist.get(m, 1e18):
-                    dist[m] = nd
-                    kms[m] = kms[n] + km
-                    prev[m] = (n, ei)
-                    heapq.heappush(pq, (nd, m))
-        return dist, prev, kms
+        return snap(lon, lat)[0]
 
     def path_polyline(prev, src: str, dst: str) -> list[list[float]]:
         if dst not in prev and dst != src:
@@ -126,7 +74,7 @@ def main():
             p, ei = prev[n]
             seg = geometry[ei]
             # orient segment from p -> n
-            u, v = edges[ei][0], edges[ei][1]
+            u = edges[ei][0]
             s = seg if u == p else seg[::-1]
             pts = s[:-1] + pts if pts else s
             n = p
@@ -154,14 +102,31 @@ def main():
                 # published figure: the engine's capacity lever moves only those.
                 "capacity_estimated": bool(p.get("capacity_estimated")),
                 "commodities": p.get("commodities_2025_26") or [],
+                # Seasons in which the site did not operate (data, not engine code): the
+                # engine closes a site for any season listed here. Empty = open whenever
+                # its status is not dormant.
+                "closed_seasons": p.get("closed_seasons") or [],
             }
+        )
+    # A site the engine will treat as open must accept something. `chooseSite` skips any
+    # site whose segregation list is empty, so an open site with `commodities: []` sits in
+    # the network looking open and receives zero tonnes all season - and takes carry-in
+    # stock by capacity share it could never have received. This is exactly how the four
+    # A12-corrected sites shipped on 2026-08-31 (status active, no segregations): fail
+    # the build here, so the data gets an assumed list (A12) rather than the engine a guess.
+    bad = [s["name"] for s in sites
+           if s["role"] != "port" and s["status"] != "dormant" and not s["commodities"]]
+    if bad:
+        raise SystemExit(
+            f"sites open in some season but with no segregations: {', '.join(bad)}. "
+            "Give each an (assumed, A12-style) commodity list in pipeline/manual_sites.json."
         )
     print(f"routing sites: {len(sites)}")
     site_nodes = [nearest(s["lon"], s["lat"]) for s in sites]
-    site_results = [dijkstra(nd) for nd in site_nodes]
+    site_results = [dijkstra(adj, nd) for nd in site_nodes]  # (minutes, km, prev)
     n = len(sites)
     site_minutes = [[round(site_results[i][0].get(site_nodes[j], -1.0), 1) for j in range(n)] for i in range(n)]
-    site_km = [[round(site_results[i][2].get(site_nodes[j], -1.0), 2) for j in range(n)] for i in range(n)]
+    site_km = [[round(site_results[i][1].get(site_nodes[j], -1.0), 2) for j in range(n)] for i in range(n)]
 
     # clusters from parcels
     pj = json.loads((APP_DATA / "parcels.json").read_text(encoding="utf-8"))
@@ -204,11 +169,11 @@ def main():
         chosen = {si for _, si in times[:N_CANDIDATES]} | set(port_idx)
         cluster_site_minutes[str(ci)] = {str(si): round(t, 1) for t, si in times if si in chosen}
         cluster_site_km[str(ci)] = {
-            str(si): round(site_results[si][2].get(cn, -1.0), 2) for _, si in times if si in chosen
+            str(si): round(site_results[si][1].get(cn, -1.0), 2) for _, si in times if si in chosen
         }
         for t, si in times:
             if si in chosen:
-                poly = path_polyline(site_results[si][1], site_nodes[si], cn)
+                poly = path_polyline(site_results[si][2], site_nodes[si], cn)
                 if poly:
                     paths_cs[f"{ci}-{si}"] = [[round(x, 4), round(y, 4)] for x, y in poly]
 
@@ -217,7 +182,7 @@ def main():
         for pi in port_idx:
             if si == pi:
                 continue
-            poly = path_polyline(site_results[pi][1], site_nodes[pi], site_nodes[si])
+            poly = path_polyline(site_results[pi][2], site_nodes[pi], site_nodes[si])
             if poly:
                 paths_ss[f"{si}-{pi}"] = [[round(x, 4), round(y, 4)] for x, y in poly]
 

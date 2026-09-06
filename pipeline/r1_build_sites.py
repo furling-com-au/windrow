@@ -70,6 +70,12 @@ def _named_as_site(sentence: str, name: str) -> bool:
     return False
 
 
+def manual_assumed_segregations() -> dict:
+    """The A12 assumed segregation lists for sites the off-season read left empty."""
+    manual = json.loads((ROOT / "pipeline" / "manual_sites.json").read_text(encoding="utf-8"))
+    return manual.get("assumed_segregations_2025_26", {"_source": "none recorded"})
+
+
 def annotate_operating_seasons(features: list[dict]) -> None:
     """Attach `operating_seasons` (+ a quote) to every feature, and correct any Bunge site
     tagged dormant that the operator's own 2025/26 reports show receiving grain.
@@ -107,6 +113,7 @@ def annotate_operating_seasons(features: list[dict]) -> None:
                         evidence.setdefault((full, season), f"[{week}] {sent.strip()[:180]}")
 
     corrected = []
+    assumed = manual_assumed_segregations()
     for f in features:
         p = f["properties"]
         seasons = sorted(s for s, st in per.items() if p["name"] in st)
@@ -124,6 +131,20 @@ def annotate_operating_seasons(features: list[dict]) -> None:
             p["status_provenance"] = (
                 "corrected: off-season segregations read listed none, but the operator's "
                 f"own 2025/26 weekly report names it receiving - {p['operating_evidence']}"
+            )
+            # A site the engine opens must accept something, or it sits in the network
+            # looking open, receives nothing, and soaks up carry-in by capacity share
+            # (code review 2026-09-06). The off-season read gives no list, so the list is
+            # ASSUMED, recorded as such, and comes from the data file - never guessed here.
+            key = p["name"].upper()
+            if key not in assumed:
+                raise SystemExit(
+                    f"{p['name']} is reopened by A12 but pipeline/manual_sites.json has no "
+                    f"assumed_segregations_2025_26 entry for it; add one (with a source)."
+                )
+            p["commodities_2025_26"] = list(assumed[key])
+            p["commodities_source"] = (
+                f"ASSUMED (A12): {assumed['_source']}"
             )
             corrected.append(p["name"])
         elif p["status"] == "closed_2019" and any(s >= "2020/21" for s in seasons):
@@ -302,6 +323,11 @@ def main():
             "sources": s["sources"],
             "notes": s.get("notes"),
         }
+        # Per-season closures travel with the site as DATA (A15). The engine reads this
+        # list; until 2026-09-06 it matched the season string in code instead.
+        if s.get("closed_seasons"):
+            props["closed_seasons"] = s["closed_seasons"]
+            props["closed_seasons_source"] = s.get("closed_seasons_source")
         if silos and s["capacity_t"]:
             nd = min(dist_m(s["lat"], s["lon"], p[0], p[1]) for p in silos)
             props["nearest_osm_silo_m"] = round(nd)

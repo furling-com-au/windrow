@@ -22,3 +22,6 @@ Thumbs.db
 
 # Claude Code agent worktrees (local scratch copies of the repo)
 .claude/worktrees/
+
+# Playwright run artefacts
+app/test-results/

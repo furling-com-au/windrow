@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { CORRIDORS, corridorShare } from "../src/corridors";
 import { DAY_TICKS, Sim, gfdiFullyCured } from "../src/engine";
@@ -379,10 +382,10 @@ describe("harvest-ban fire danger (A7)", () => {
  * Cover for the R5 network-state override.
  *
  * Before this, which sites operate was not a parameter at all: `Sim.init()` derived it
- * from the bundle's static `status` string plus a hardcoded season-string match
- * (`season === "2025/26" || "2024/25"` closes the two T-Ports bunkers, A15). A run could
- * not be placed at a different network state without editing the engine, which is what
- * R5's retrospective test and R3's rationalisation scenario both need.
+ * from the bundle's static `status` string plus each site's `closed_seasons` list (A15;
+ * a hardcoded season-string match in the engine until 2026-09-06). A run could not be
+ * placed at a different network state without editing the data, which is what R5's
+ * retrospective test and R3's rationalisation scenario both need.
  *
  * The three things asserted here are the three ways this could quietly produce a wrong
  * number rather than an error:
@@ -403,9 +406,12 @@ describe("network-state override (R5)", () => {
       console.warn("real bundle not present; skipping");
       return;
     }
-    // 2025/26 already closes both bunkers via the season match, so forcing them closed
-    // must reproduce the baseline event log byte for byte — the check that the override
-    // changes the network state and nothing else.
+    // 2025/26 already closes both bunkers via their `closed_seasons` data, so forcing
+    // them closed must reproduce the baseline event log byte for byte — the check that
+    // the override changes the network state and nothing else.
+    for (const s of bundle.matrix.sites) {
+      if (BUNKERS.includes(s.name)) expect(s.closed_seasons).toContain("2025/26");
+    }
     const base = new Sim(bundle, defaultParams(), 42).run(365);
     const restated = new Sim(
       bundle,
@@ -435,7 +441,7 @@ describe("network-state override (R5)", () => {
   it("throws rather than reopening a site that would accept nothing", () => {
     const b = tinyBundle();
     b.matrix.sites[0]!.status = "dormant";
-    b.matrix.sites[0]!.commodities = []; // the five dormant Bunge sites all look like this
+    b.matrix.sites[0]!.commodities = []; // dormant and closed-2019 Bunge sites all look like this
     const name = b.matrix.sites[0]!.name;
     expect(() => new Sim(b, { ...defaultParams(), networkState: { forceOpen: [name] } }, 7)).toThrow(
       /carries no commodities/,
@@ -443,6 +449,47 @@ describe("network-state override (R5)", () => {
     // give it a segregation list and the same reopen is fine
     b.matrix.sites[0]!.commodities = ["WH"];
     expect(() => new Sim(b, { ...defaultParams(), networkState: { forceOpen: [name] } }, 7)).not.toThrow();
+  });
+
+  it("throws on a bundle that opens a site with no segregations, not just on forceOpen", () => {
+    // The 2026-08-31 roster fix shipped four sites exactly like this: status active,
+    // commodities []. They looked open on the map, received nothing, and took carry-in.
+    const b = tinyBundle();
+    b.matrix.sites[0]!.status = "active_2025_26";
+    b.matrix.sites[0]!.commodities = [];
+    expect(() => new Sim(b, defaultParams(), 7)).toThrow(/the bundle opens .* carries no commodities/);
+    // a dormant site with no list is fine: it is not open
+    b.matrix.sites[0]!.status = "dormant";
+    expect(() => new Sim(b, defaultParams(), 7)).not.toThrow();
+  });
+
+  it("closes a site for the seasons its data lists, and only those", () => {
+    const b = tinyBundle();
+    b.matrix.sites[0]!.closed_seasons = ["2024/25", "2025/26"];
+    b.season = "2025/26";
+    expect(new Sim(b, defaultParams(), 7).sites[0]!.open).toBe(false);
+    b.season = "2023/24";
+    expect(new Sim(b, defaultParams(), 7).sites[0]!.open).toBe(true);
+    // ...and the override still wins over the data
+    expect(
+      new Sim(b, { ...defaultParams(), networkState: { forceClosed: [b.matrix.sites[0]!.name] } }, 7).sites[0]!.open,
+    ).toBe(false);
+  });
+});
+
+describe("bundle consistency", () => {
+  it("ships the pipeline's sites.geojson byte for byte (p2_build_misc was run after r1)", () => {
+    const root = fileURLToPath(new URL("../../../", import.meta.url));
+    const processed = join(root, "data", "processed", "sites.geojson");
+    const served = join(root, "app", "public", "data", "sites.geojson");
+    if (!existsSync(processed) || !existsSync(served)) {
+      console.warn("sites.geojson copies not present; skipping");
+      return;
+    }
+    // The served copy is a plain shutil.copy of the processed one. They diverged once
+    // (2026-08-31 to 2026-09-06) when the processed file was edited and the copy step
+    // not re-run, so the public bundle shipped stale provenance for Lock and Kimba.
+    expect(readFileSync(served).equals(readFileSync(processed))).toBe(true);
   });
 
   it("lets forceClosed win over forceOpen, so the result never depends on list order", () => {

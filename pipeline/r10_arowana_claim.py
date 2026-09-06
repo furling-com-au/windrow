@@ -70,18 +70,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from wlib import PROCESSED  # noqa: E402
+from roads import (  # noqa: E402
+    build_graph,
+    dijkstra_km,
+    dijkstra_time_then_km,
+    make_snapper,
+    snap_parcels,
+    snap_sites,
+)
 from r8_choice_geometry import (  # noqa: E402
     APP_DATA,
     DOCS,
     INCUMBENT_OPERATORS,
-    build_graph,
-    make_snapper,
     network_states,
     parcel_weights,
     wmean,
     wshare,
 )
-from r9_cartage import cartage_aud_per_t, dijkstra_km, dijkstra_time_then_km  # noqa: E402
+from r9_cartage import cartage_aud_per_t  # noqa: E402
 
 INF = float("inf")
 CLAIM_AUD = 15.0
@@ -150,7 +156,7 @@ def main():
     snap = make_snapper(nodes)
     feats = json.loads((PROCESSED / "sites.geojson").read_text(encoding="utf-8"))["features"]
     parcels = json.load(open(APP_DATA / "parcels.json", encoding="utf-8"))["parcels"]
-    weights, dist_t, _ = parcel_weights(parcels)
+    weights, _dist_t, _ = parcel_weights(parcels)
     n = len(parcels)
     print(f"parcels: {n}  sites: {len(feats)}  nodes: {len(nodes)}")
     print(f"CLAIM UNDER TEST: 'road freight savings ... of up to ${CLAIM_AUD:.0f} per tonne'")
@@ -158,22 +164,8 @@ def main():
     for k, v in BREAKEVEN_KM.items():
         print(f"   {k:<18} {v:6.1f} km one-way")
 
-    site_key, site_info = {}, []
-    for f in feats:
-        lon, lat = f["geometry"]["coordinates"]
-        nid, err = snap(lon, lat)
-        p = f["properties"]
-        site_key[p["name"]] = len(site_info)
-        site_info.append({
-            "name": p["name"], "operator": p["operator"], "role": p["role"],
-            "status": p["status"], "district": p.get("district"),
-            "lon": lon, "lat": lat, "node": nid, "snap_km": round(err, 2),
-        })
-
-    parcel_nodes = []
-    for p in parcels:
-        nid, _err = snap(p["lon"], p["lat"])
-        parcel_nodes.append(nid)
+    site_key, site_info = snap_sites(feats, snap)
+    parcel_nodes, _snap_km = snap_parcels(parcels, snap)
     cell_ids = [f"{p['district']} cell lon {p['lon']:.3f} lat {p['lat']:.3f}" for p in parcels]
 
     cache: dict[str, list[float]] = {}
@@ -200,8 +192,6 @@ def main():
         LB = site_key["Lucky Bay (T-Ports port)"]
         PL = site_key["Port Lincoln"]
         TH = site_key["Thevenard"]
-        LOCKB = site_key["Lock (T-Ports bunker)"]
-        KIMBAB = site_key["Kimba (T-Ports bunker)"]
 
         def idxs(names):
             return [site_key[nm] for nm in names]
@@ -232,16 +222,9 @@ def main():
         # nearest incumbent site -> its own nearest Bunge port (the OPERATOR's line haul)
         inc_choice = [nearest(inc_A, pi)[1] for pi in range(n)]
 
-        # site -> port line-haul km, routed on the same graph
+        # site -> port line-haul km, routed on the same graph: run trees from the two
+        # ports once and read each site's node off them
         linehaul = {}
-        for i in set(inc_choice):
-            if i is None:
-                continue
-            v = km_vector(site_info[i]["node"], mode)
-            # distance from that site to Port Lincoln / Thevenard: route from the site and
-            # read off the port's node. Cheapest: run the tree from the port instead.
-            linehaul[i] = None
-        # run trees from the two ports once and read site nodes off them
         port_trees = {}
         for pidx in inc_ports:
             if mode == "time":
@@ -354,7 +337,7 @@ def main():
             "site_info": site_info, "cell_ids": cell_ids,
         }
 
-    published, aux = run("time")
+    published, _aux = run("time")
     leastdist, _ = run("dist")
 
     # ---------------------------------------------------------------------- reporting

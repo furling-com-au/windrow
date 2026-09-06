@@ -100,7 +100,7 @@
             "share_saving_le_0": 0.8621
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": -29.41,
+            "tonne_weighted_mean_aud_per_t": -29.42,
             "tonne_weighted_mean_saved_km": -134.7,
             "max_aud_per_t": -12.84,
             "max_saved_km": -59.7,
@@ -220,7 +220,7 @@
         },
         "escosa_return": {
           "EP": {
-            "tonne_weighted_mean_aud_per_t": -33.11,
+            "tonne_weighted_mean_aud_per_t": -33.12,
             "tonne_weighted_mean_saved_km": -151.4,
             "max_aud_per_t": 13.11,
             "max_saved_km": 59.7,
@@ -256,7 +256,7 @@
             "share_saving_le_0": 0.8621
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": -29.53,
+            "tonne_weighted_mean_aud_per_t": -29.54,
             "tonne_weighted_mean_saved_km": -135.3,
             "max_aud_per_t": -12.84,
             "max_saved_km": -59.7,
@@ -362,8 +362,8 @@
             "share_saving_le_0": 0.0031
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": -8.79,
-            "tonne_weighted_mean_saved_km": -80.6,
+            "tonne_weighted_mean_aud_per_t": -8.78,
+            "tonne_weighted_mean_saved_km": -80.5,
             "max_aud_per_t": 4.09,
             "max_saved_km": 37.2,
             "max_cell": "LEP cell lon 136.480 lat -33.988",
@@ -413,7 +413,7 @@
           },
           "LEP": {
             "tonne_weighted_mean_aud_per_t": -17.71,
-            "tonne_weighted_mean_saved_km": -80.6,
+            "tonne_weighted_mean_saved_km": -80.5,
             "max_aud_per_t": 8.18,
             "max_saved_km": 37.2,
             "max_cell": "LEP cell lon 136.480 lat -33.988",
@@ -462,8 +462,8 @@
             "share_saving_le_0": 0.0031
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": -8.06,
-            "tonne_weighted_mean_saved_km": -80.6,
+            "tonne_weighted_mean_aud_per_t": -8.05,
+            "tonne_weighted_mean_saved_km": -80.5,
             "max_aud_per_t": 3.72,
             "max_saved_km": 37.2,
             "max_cell": "LEP cell lon 136.480 lat -33.988",
@@ -568,7 +568,7 @@
             "share_saving_le_0": 0.0
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": 46.9,
+            "tonne_weighted_mean_aud_per_t": 46.89,
             "tonne_weighted_mean_saved_km": 213.2,
             "max_aud_per_t": 67.01,
             "max_saved_km": 304.6,
@@ -587,7 +587,7 @@
             "max_aud_per_t": 41.25,
             "max_saved_km": 412.5,
             "max_cell": "EEP cell lon 137.091 lat -33.677",
-            "share_saving_ge_15": 0.6765,
+            "share_saving_ge_15": 0.6762,
             "share_saving_ge_10": 0.7429,
             "share_saving_ge_5": 0.7671,
             "share_saving_gt_0": 0.7918,
@@ -623,7 +623,7 @@
             "max_aud_per_t": 30.46,
             "max_saved_km": 304.6,
             "max_cell": "LEP cell lon 136.480 lat -33.988",
-            "share_saving_ge_15": 0.895,
+            "share_saving_ge_15": 0.8943,
             "share_saving_ge_10": 0.9952,
             "share_saving_ge_5": 1.0,
             "share_saving_gt_0": 1.0,
@@ -958,8 +958,8 @@
             "share_saving_ge_15": 0.0765,
             "share_saving_ge_10": 0.1902,
             "share_saving_ge_5": 0.3312,
-            "share_saving_gt_0": 0.4429,
-            "share_saving_le_0": 0.5571
+            "share_saving_gt_0": 0.443,
+            "share_saving_le_0": 0.557
           },
           "WEP": {
             "tonne_weighted_mean_aud_per_t": -17.03,
@@ -970,8 +970,8 @@
             "share_saving_ge_15": 0.0,
             "share_saving_ge_10": 0.0004,
             "share_saving_ge_5": 0.0387,
-            "share_saving_gt_0": 0.3262,
-            "share_saving_le_0": 0.6738
+            "share_saving_gt_0": 0.3264,
+            "share_saving_le_0": 0.6736
           },
           "EEP": {
             "tonne_weighted_mean_aud_per_t": 11.44,
@@ -1000,7 +1000,7 @@
         },
         "escosa_return": {
           "EP": {
-            "tonne_weighted_mean_aud_per_t": -8.16,
+            "tonne_weighted_mean_aud_per_t": -8.15,
             "tonne_weighted_mean_saved_km": -37.1,
             "max_aud_per_t": 52.27,
             "max_saved_km": 237.6,
@@ -1008,8 +1008,8 @@
             "share_saving_ge_15": 0.2394,
             "share_saving_ge_10": 0.3312,
             "share_saving_ge_5": 0.3623,
-            "share_saving_gt_0": 0.4429,
-            "share_saving_le_0": 0.5571
+            "share_saving_gt_0": 0.443,
+            "share_saving_le_0": 0.557
           },
           "WEP": {
             "tonne_weighted_mean_aud_per_t": -34.13,
@@ -1020,8 +1020,8 @@
             "share_saving_ge_15": 0.0037,
             "share_saving_ge_10": 0.0387,
             "share_saving_ge_5": 0.1376,
-            "share_saving_gt_0": 0.3262,
-            "share_saving_le_0": 0.6738
+            "share_saving_gt_0": 0.3264,
+            "share_saving_le_0": 0.6736
           },
           "EEP": {
             "tonne_weighted_mean_aud_per_t": 23.0,
@@ -1058,8 +1058,8 @@
             "share_saving_ge_15": 0.0521,
             "share_saving_ge_10": 0.1795,
             "share_saving_ge_5": 0.3254,
-            "share_saving_gt_0": 0.4429,
-            "share_saving_le_0": 0.5571
+            "share_saving_gt_0": 0.443,
+            "share_saving_le_0": 0.557
           },
           "WEP": {
             "tonne_weighted_mean_aud_per_t": -15.52,
@@ -1070,8 +1070,8 @@
             "share_saving_ge_15": 0.0,
             "share_saving_ge_10": 0.0004,
             "share_saving_ge_5": 0.0264,
-            "share_saving_gt_0": 0.3262,
-            "share_saving_le_0": 0.6738
+            "share_saving_gt_0": 0.3264,
+            "share_saving_le_0": 0.6736
           },
           "EEP": {
             "tonne_weighted_mean_aud_per_t": 10.46,
@@ -1112,7 +1112,7 @@
             "max_saved_km": 245.8,
             "max_cell": "EEP cell lon 136.270 lat -32.828",
             "share_saving_ge_15": 0.3885,
-            "share_saving_ge_10": 0.5768,
+            "share_saving_ge_10": 0.5771,
             "share_saving_ge_5": 0.9413,
             "share_saving_gt_0": 0.9413,
             "share_saving_le_0": 0.0587
@@ -1148,7 +1148,7 @@
             "max_saved_km": 117.2,
             "max_cell": "LEP cell lon 136.426 lat -33.989",
             "share_saving_ge_15": 0.0,
-            "share_saving_ge_10": 0.1174,
+            "share_saving_ge_10": 0.1181,
             "share_saving_ge_5": 0.9621,
             "share_saving_gt_0": 0.9621,
             "share_saving_le_0": 0.0379
@@ -1161,7 +1161,7 @@
             "max_aud_per_t": 54.07,
             "max_saved_km": 245.8,
             "max_cell": "EEP cell lon 136.270 lat -32.828",
-            "share_saving_ge_15": 0.7592,
+            "share_saving_ge_15": 0.7595,
             "share_saving_ge_10": 0.9413,
             "share_saving_ge_5": 0.9413,
             "share_saving_gt_0": 0.9413,
@@ -1192,12 +1192,12 @@
             "share_saving_le_0": 0.0
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": 14.42,
+            "tonne_weighted_mean_aud_per_t": 14.43,
             "tonne_weighted_mean_saved_km": 65.6,
             "max_aud_per_t": 25.79,
             "max_saved_km": 117.2,
             "max_cell": "LEP cell lon 136.426 lat -33.989",
-            "share_saving_ge_15": 0.4897,
+            "share_saving_ge_15": 0.4905,
             "share_saving_ge_10": 0.9621,
             "share_saving_ge_5": 0.9621,
             "share_saving_gt_0": 0.9621,
@@ -1211,7 +1211,7 @@
             "max_aud_per_t": 24.58,
             "max_saved_km": 245.8,
             "max_cell": "EEP cell lon 136.270 lat -32.828",
-            "share_saving_ge_15": 0.2702,
+            "share_saving_ge_15": 0.2703,
             "share_saving_ge_10": 0.4805,
             "share_saving_ge_5": 0.8151,
             "share_saving_gt_0": 0.9413,
@@ -1223,7 +1223,7 @@
             "max_aud_per_t": 24.58,
             "max_saved_km": 245.8,
             "max_cell": "WEP cell lon 135.959 lat -33.150",
-            "share_saving_ge_15": 0.3019,
+            "share_saving_ge_15": 0.302,
             "share_saving_ge_10": 0.55,
             "share_saving_ge_5": 0.8464,
             "share_saving_gt_0": 0.8464,
@@ -1264,7 +1264,7 @@
       "by_rate": {
         "escosa_oneway": {
           "EP": {
-            "tonne_weighted_mean_aud_per_t": -15.7,
+            "tonne_weighted_mean_aud_per_t": -15.71,
             "tonne_weighted_mean_saved_km": -144.2,
             "max_aud_per_t": 6.56,
             "max_saved_km": 59.7,
@@ -1818,7 +1818,7 @@
             "share_saving_le_0": 0.0
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": 46.33,
+            "tonne_weighted_mean_aud_per_t": 46.32,
             "tonne_weighted_mean_saved_km": 210.6,
             "max_aud_per_t": 65.69,
             "max_saved_km": 298.6,
@@ -1837,7 +1837,7 @@
             "max_aud_per_t": 39.76,
             "max_saved_km": 397.6,
             "max_cell": "EEP cell lon 137.091 lat -33.677",
-            "share_saving_ge_15": 0.6778,
+            "share_saving_ge_15": 0.6775,
             "share_saving_ge_10": 0.7457,
             "share_saving_ge_5": 0.7687,
             "share_saving_gt_0": 0.7931,
@@ -1873,7 +1873,7 @@
             "max_aud_per_t": 29.86,
             "max_saved_km": 298.6,
             "max_cell": "LEP cell lon 136.480 lat -33.988",
-            "share_saving_ge_15": 0.9267,
+            "share_saving_ge_15": 0.926,
             "share_saving_ge_10": 0.9952,
             "share_saving_ge_5": 1.0,
             "share_saving_gt_0": 1.0,
@@ -2130,7 +2130,7 @@
             "share_saving_le_0": 0.6785
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": -16.74,
+            "tonne_weighted_mean_aud_per_t": -16.75,
             "tonne_weighted_mean_saved_km": -77.2,
             "max_aud_per_t": -3.62,
             "max_saved_km": -16.5,
@@ -2208,8 +2208,8 @@
             "share_saving_ge_15": 0.0673,
             "share_saving_ge_10": 0.1919,
             "share_saving_ge_5": 0.3327,
-            "share_saving_gt_0": 0.4434,
-            "share_saving_le_0": 0.5566
+            "share_saving_gt_0": 0.4435,
+            "share_saving_le_0": 0.5565
           },
           "WEP": {
             "tonne_weighted_mean_aud_per_t": -16.0,
@@ -2220,8 +2220,8 @@
             "share_saving_ge_15": 0.0,
             "share_saving_ge_10": 0.0004,
             "share_saving_ge_5": 0.0441,
-            "share_saving_gt_0": 0.3279,
-            "share_saving_le_0": 0.6721
+            "share_saving_gt_0": 0.3281,
+            "share_saving_le_0": 0.6719
           },
           "EEP": {
             "tonne_weighted_mean_aud_per_t": 11.44,
@@ -2250,7 +2250,7 @@
         },
         "escosa_return": {
           "EP": {
-            "tonne_weighted_mean_aud_per_t": -7.37,
+            "tonne_weighted_mean_aud_per_t": -7.36,
             "tonne_weighted_mean_saved_km": -33.5,
             "max_aud_per_t": 52.57,
             "max_saved_km": 239.0,
@@ -2258,11 +2258,11 @@
             "share_saving_ge_15": 0.2541,
             "share_saving_ge_10": 0.3327,
             "share_saving_ge_5": 0.3828,
-            "share_saving_gt_0": 0.4434,
-            "share_saving_le_0": 0.5566
+            "share_saving_gt_0": 0.4435,
+            "share_saving_le_0": 0.5565
           },
           "WEP": {
-            "tonne_weighted_mean_aud_per_t": -32.08,
+            "tonne_weighted_mean_aud_per_t": -32.07,
             "tonne_weighted_mean_saved_km": -145.9,
             "max_aud_per_t": 29.01,
             "max_saved_km": 131.8,
@@ -2270,8 +2270,8 @@
             "share_saving_ge_15": 0.0108,
             "share_saving_ge_10": 0.0441,
             "share_saving_ge_5": 0.209,
-            "share_saving_gt_0": 0.3279,
-            "share_saving_le_0": 0.6721
+            "share_saving_gt_0": 0.3281,
+            "share_saving_le_0": 0.6719
           },
           "EEP": {
             "tonne_weighted_mean_aud_per_t": 22.98,
@@ -2308,8 +2308,8 @@
             "share_saving_ge_15": 0.0507,
             "share_saving_ge_10": 0.1816,
             "share_saving_ge_5": 0.329,
-            "share_saving_gt_0": 0.4434,
-            "share_saving_le_0": 0.5566
+            "share_saving_gt_0": 0.4435,
+            "share_saving_le_0": 0.5565
           },
           "WEP": {
             "tonne_weighted_mean_aud_per_t": -14.59,
@@ -2320,8 +2320,8 @@
             "share_saving_ge_15": 0.0,
             "share_saving_ge_10": 0.0004,
             "share_saving_ge_5": 0.039,
-            "share_saving_gt_0": 0.3279,
-            "share_saving_le_0": 0.6721
+            "share_saving_gt_0": 0.3281,
+            "share_saving_le_0": 0.6719
           },
           "EEP": {
             "tonne_weighted_mean_aud_per_t": 10.45,
@@ -2411,7 +2411,7 @@
             "max_aud_per_t": 52.1,
             "max_saved_km": 236.8,
             "max_cell": "EEP cell lon 136.270 lat -32.828",
-            "share_saving_ge_15": 0.7621,
+            "share_saving_ge_15": 0.7624,
             "share_saving_ge_10": 0.9424,
             "share_saving_ge_5": 0.9424,
             "share_saving_gt_0": 0.9424,
@@ -2442,12 +2442,12 @@
             "share_saving_le_0": 0.0
           },
           "LEP": {
-            "tonne_weighted_mean_aud_per_t": 14.21,
+            "tonne_weighted_mean_aud_per_t": 14.22,
             "tonne_weighted_mean_saved_km": 64.6,
             "max_aud_per_t": 25.79,
             "max_saved_km": 117.2,
             "max_cell": "LEP cell lon 136.426 lat -33.989",
-            "share_saving_ge_15": 0.4957,
+            "share_saving_ge_15": 0.4964,
             "share_saving_ge_10": 0.9631,
             "share_saving_ge_5": 0.9631,
             "share_saving_gt_0": 0.9631,
@@ -2473,7 +2473,7 @@
             "max_aud_per_t": 23.68,
             "max_saved_km": 236.8,
             "max_cell": "WEP cell lon 135.959 lat -33.150",
-            "share_saving_ge_15": 0.3019,
+            "share_saving_ge_15": 0.302,
             "share_saving_ge_10": 0.5517,
             "share_saving_ge_5": 0.8486,
             "share_saving_gt_0": 0.8486,

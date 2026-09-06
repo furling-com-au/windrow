@@ -460,6 +460,30 @@ harvest curve.
   week ending 2025-11-23). This is the same off-season trap already recorded for the cash-
   price board, which lists zero EP sites outside harvest. Only Nunjikompita remains
   dormant, on weak evidence: last named 2023/24, no mention since.
+- **Corrected again 2026-09-06: the reopening was a no-op to the engine.** The four sites
+  came back as `active_2025_26` but kept the off-season read's empty segregation list, and
+  the engine routes a truck only to a site that accepts its commodity. So they sat on the
+  map as open, received zero tonnes all season, and were still seeded ~19 % of the A17
+  upcountry carry-in by capacity share (478,800 t of the 2,462,700 t open-Bunge pool), which
+  they then line-hauled to port. The "<1 %" sensitivity above was therefore measured on a
+  roster that had not actually changed. Fix: each reopened site now carries an **assumed**
+  segregation list from `pipeline/manual_sites.json` → `assumed_segregations_2025_26`
+  (wheat and barley, the two every EP country site in the same table carries; kept to two
+  so the engine does not also make them general receivers of minor crops), recorded on
+  the feature as `commodities_source: "ASSUMED (A12): …"`. Two guards now make the state
+  unrepresentable: `p2_build_matrix.py` fails the build if any non-dormant, non-port site
+  has no segregations, and `Sim.init()` throws if any OPEN non-port site accepts nothing
+  (the check that until now covered only the `networkState.forceOpen` path). Replace the
+  assumed lists with the in-season table at the 2026/27 harvest read.
+- **Sensitivity, re-measured on the roster that actually changed (2026-09-06, baseline
+  2025/26, seed 42, fitted vector unchanged):** Bunge receivals 2.248 → 2.342 Mt (+4.2 %),
+  Lucky Bay 0.413 → 0.319 Mt (−23 %), road truck-km −7.7 %, peak site queue 102 → 72
+  trucks. The movement is where the geometry says it should be: Buckleboo and Darke Peak
+  are EEP sites competing with Lucky Bay for the same cells. **The fitted vector in
+  `calibrated.json` predates this and was fitted with those four sites effectively closed;
+  the baseline now overshoots the observed 2025/26 Bunge cumulative by ~4 % where it
+  matched before.** A refit is the next step and has NOT been done here (see A24 for what
+  the residual carries). Nothing on the published Tier-2 page reads the engine.
 - **Sensitivity**: measured, not asserted. Re-running the v1 scenario set on the corrected
   roster moves every headline by <1 % except two queue figures (road closure +5.3 %, Lucky
   Bay −2.4 %); every ranking and direction of effect is unchanged, so the fitted parameter
@@ -497,6 +521,16 @@ harvest curve.
   arithmetically implausible.
 - **Sensitivity**: without this, the sim under-delivers Bunge receivals ~8-10 % in
   2024/25.
+- **Where it lives (since 2026-09-06)**: as data, not engine code. Both bunker entries in
+  `pipeline/manual_sites.json` carry `closed_seasons: ["2024/25", "2025/26"]` with a
+  `closed_seasons_source` naming which season is published and which is this assumption;
+  `r1_build_sites.py` writes it to `sites.geojson`, `p2_build_matrix.py` to `matrix.json`,
+  and `Sim.init()` closes a site for any season in its list. Until then the engine matched
+  the season string literally (`season === "2025/26" || "2024/25"`), so a 2026/27 bundle
+  silently reopened both bunkers and this entry could only be revised by editing the
+  engine and its test. Revising A15 is now a one-line data edit. Note the 2026/27 live
+  season is NOT in the list: whether T-Ports opens the bunkers in 2026/27 is unknown (the
+  operator is for sale), and the engine treats them as open there, as it always did.
 - **Upgrade path**: T-Ports/operator confirmation of 2024/25 site operations.
 
 ## A16 — AIS-derived Lucky Bay vessel counts are an upper bound

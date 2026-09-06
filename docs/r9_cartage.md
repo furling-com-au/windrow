@@ -1,6 +1,6 @@
 # R9 - What the independent gateway is worth to growers, in cartage dollars
 
-Generated 2026-08-31 by `pipeline/r9_cartage.py`.
+Generated 2026-09-06 by `pipeline/r9_cartage.py`.
 
 **Tier 2 (geometry over road distances and site locations) x Tier 1 (a published rate schedule). No simulation, no fitted parameter, no calibrated knob. Nothing here reads `packages/sim/src/calibrated.json`, `engine.ts` or `matrix.json`.**
 
@@ -25,11 +25,11 @@ PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe pipeline/r9_cartage.py
 
 ## The answer, in three lines
 
-1. **In cartage that growers actually pay, the gateway is worth very little, and that is the finding.** Adding the peninsula's one independent receival point to the network cuts the tonne-weighted EP cartage bill by **$0.14/t** ($2.66 -> $2.52), because only **4.5 %** of EP production has it as the closest place to tip a load. In EEP, where that share is 13.8 %, the cut is $0.43/t. In WEP and LEP it is zero to the cent.
+1. **In cartage that growers actually pay, the gateway is worth very little, and that is the finding.** Adding the peninsula's one independent receival point to the network cuts the tonne-weighted EP cartage bill by **$0.14/t** ($2.66 -> $2.52), because only **4.5 %** of EP production has it as the closest place to tip a load. In EEP, where that share is 13.8 %, the cut is $0.42/t. In WEP and LEP it is zero to the cent.
 
 2. **What it is worth is an option, and the option has a price.** To take a load to the independent point instead of the nearest Bunge site costs a grower **$16.48/t** on average across EP - **$29.89/t** in WEP, **$6.84/t** in EEP, **$14.72/t** in LEP. That is the price premium the independent has to beat, per tonne, before the load is worth moving. With the two inland bunkers open it is **$8.36/t** EP-wide (WEP $15.75, EEP $1.60, LEP $8.61). With no independent point at all it is not a larger number - it is **not a number**, because there is nothing to deliver to at any premium. **The WEP figure is mostly not a citation**: 62.8 % of WEP production is further from Lucky Bay than the published schedule's 250 km ceiling, so above that the rate is extrapolated. Over the WEP production the schedule can actually price, the toll is $17.83/t.
 
-3. **Where it does show up is the direct-to-port run.** For a grower carting straight to an export port, Lucky Bay takes EEP from $19.83/t to $9.97/t - a 9.86 A$/t difference, the largest single figure on this page, and the one place where the gateway changes a real cartage bill rather than an option price.
+3. **Where it does show up is the direct-to-port run.** For a grower carting straight to an export port, Lucky Bay takes EEP from $19.83/t to $9.98/t - a 9.85 A$/t difference, the largest single figure on this page, and the one place where the gateway changes a real cartage bill rather than an option price.
 
 All figures marginal, one-way loaded, 2018-19 A$, unindexed. **None of them is a grower benefit**: this project has no price data, and cartage is one side of a two-sided decision. Read the three notes above before quoting any of it.
 
@@ -116,7 +116,7 @@ Tonne-weighted mean marginal cartage to the nearest receival point of any owner.
 |---|---|---|---|---|
 | **EP (all)** | $2.52 | $2.51 | $2.66 | $2.44 |
 | WEP (Western Eyre Peninsula) | $3.03 | $3.03 | $3.03 | $2.55 |
-| EEP (Eastern Eyre Peninsula) | $2.71 | $2.68 | $3.14 | $2.94 |
+| EEP (Eastern Eyre Peninsula) | $2.72 | $2.69 | $3.14 | $2.95 |
 | LEP (Lower Eyre Peninsula) | $1.96 | $1.96 | $1.96 | $1.93 |
 
 Mean one-way kilometres behind those dollars:
@@ -157,7 +157,7 @@ Coordinate envelopes on those tolls (site displaced <=5 km on eight bearings, re
 | **EP (all)** | $15.75 - $16.57 | $8.34 - $8.87 |
 | WEP | $29.16 - $29.98 | $15.42 - $16.63 |
 | EEP | $6.11 - $6.92 | $1.54 - $2.05 |
-| LEP | $13.98 - $14.81 | $8.31 - $9.49 |
+| LEP | $13.98 - $14.81 | $8.32 - $9.49 |
 
 **STATE A RESTS ENTIRELY ON ONE COORDINATE. With both bunkers shut, Lucky Bay is the only independent receival point on the peninsula, so the toll at state A is a pure function of the road distance to a single point. That point is registered in sites.geojson at a TOWN/HAMLET node ('Lucky Bay, South Australia' hamlet node, facility adjoins hamlet) - the same precision class A11 gives Lock and Kimba a <=5 km tolerance for, and it is registered in no assumption. It is swept here rather than asserted: the site is displaced 0 / 2.5 / 5 km on eight bearings, RE-SNAPPED to the road graph and RE-ROUTED with a fresh Dijkstra, and the envelope is published beside every state-A figure.**
 
@@ -219,7 +219,7 @@ Cartage to the nearest **export port** of any owner. On EP that is Port Lincoln 
 |---|---|---|---|---|
 | **EP (all)** | $10.16 | $10.16 | $13.54 | $13.54 |
 | WEP (Western Eyre Peninsula) | $13.47 | $13.47 | $13.93 | $13.93 |
-| EEP (Eastern Eyre Peninsula) | $9.97 | $9.97 | $19.83 | $19.83 |
+| EEP (Eastern Eyre Peninsula) | $9.98 | $9.98 | $19.83 | $19.83 |
 | LEP (Lower Eyre Peninsula) | $7.85 | $7.85 | $7.90 | $7.90 |
 
 ---
@@ -230,41 +230,31 @@ Signed A$/t, positive = costs more. Each row is one step of a ladder; the last r
 
 ### D -> C: pre-2019 -> no independent point at all
 
-The cartage cost of losing the seven sites that went from the pre-2019 network to the current one - the six closed in June 2019 plus Nunjikompita, since gone dormant - holding OWNERSHIP constant, because both states are incumbent-only and no gateway effect is mixed in. **READ IT AS A BRACKET, NOT AN UPPER BOUND.** An earlier revision printed +$0.22/t as an
-upper bound; that is falsified by this repo's own roster audit and has been corrected. Two
-errors pull in opposite directions and neither is resolved. Only two of the six 2019 sites
-(Minnipa and Kyancutta) were operating the year before; the other four are in the group the
-operator described as 'not open the year prior' (Stock Journal, 6 June 2019), so treating
-all six as open overstates the pre-2019 network by four sites and **overstates** this delta.
-Pulling the other way, Cowell and Mangalo were receiving grain pre-2019 and are missing from
-`sites.geojson` entirely (`docs/roster_audit_2026-08.md` §5); restoring them takes the EP
-figure to **+$0.452/t**, which **understates** it. The defensible bracket for EP is therefore
-roughly **+$0.12 to +$0.47/t**, and no single figure in this row should be quoted as a bound
-in either direction until the roster is completed.
+The cartage cost of losing the seven sites that went from the pre-2019 network to the current one - the six closed in June 2019 plus Nunjikompita, since gone dormant - holding OWNERSHIP constant, because both states are incumbent-only and no gateway effect is mixed in. **READ IT AS A BRACKET, NOT AN UPPER BOUND.** An earlier revision printed +$0.22/t as an upper bound; that is falsified by this repo's own roster audit and has been corrected. Two errors pull in opposite directions and neither is resolved. Only two of the six 2019 sites (Minnipa and Kyancutta) were operating the year before; the other four are in the group the operator described as 'not open the year prior' (Stock Journal, 6 June 2019), so treating all six as open overstates the pre-2019 network by four sites and **overstates** this delta. Pulling the other way, Cowell and Mangalo were receiving grain pre-2019 and are missing from `sites.geojson` entirely (`docs/roster_audit_2026-08.md` §5); restoring them takes the EP figure to **+$0.452/t**, which **understates** it. The defensible bracket for EP is therefore roughly **+$0.12 to +$0.47/t**, and no single figure in this row should be quoted as a bound in either direction until the roster is completed.
 
 | District | delta M1 (marginal, floor) | delta M4 (port run) | delta M2 (the toll) |
 |---|---|---|---|
 | **EP (all)** | +0.22 *(bracket +0.12 to +0.47)* | +0.00 | - |
 | WEP | +0.48 | +0.00 | - |
-| EEP | +0.20 | +0.00 | - |
+| EEP | +0.19 | +0.00 | - |
 | LEP | +0.03 | +0.00 | - |
 
 ### C -> A: no independent point at all -> Lucky Bay only
 
 WHAT THE GATEWAY IS WORTH in cartage actually paid: the change in the bill when the peninsula's one independent point is added to the network. This is the delta the task asks for, and the honest answer is that it is small, concentrated in EEP, and zero in WEP and LEP - because outside EEP nobody's nearest place to tip a load changes.
 
-| District | delta M1 (the bill) | delta M4 (port run) | delta M2 (the toll) |
+| District | delta M1 (marginal, floor) | delta M4 (port run) | delta M2 (the toll) |
 |---|---|---|---|
 | **EP (all)** | -0.14 | -3.38 | - |
 | WEP | +0.00 | -0.46 | - |
-| EEP | -0.43 | -9.86 | - |
+| EEP | -0.42 | -9.85 | - |
 | LEP | +0.00 | -0.05 | - |
 
 ### A -> B: Lucky Bay only -> Lucky Bay + Lock + Kimba bunkers
 
 What reopening the two inland bunkers would be worth on top of Lucky Bay. Note the shape: the toll roughly halves while the bill does not move, because the bunkers sit beside Bunge's own Lock and Kimba sites (see the co-location table). They add a buyer, not a destination.
 
-| District | delta M1 (the bill) | delta M4 (port run) | delta M2 (the toll) |
+| District | delta M1 (marginal, floor) | delta M4 (port run) | delta M2 (the toll) |
 |---|---|---|---|
 | **EP (all)** | -0.01 | +0.00 | -8.12 |
 | WEP | +0.00 | +0.00 | -14.14 |
@@ -275,11 +265,11 @@ What reopening the two inland bunkers would be worth on top of Lucky Bay. Note t
 
 Pre-2019 to now, end to end. CONTAMINATED - it mixes the 2019 closures, the arrival of T-Ports and two different roster-defect sets. Decompose it with the two rows above rather than quoting it.
 
-| District | delta M1 (the bill) | delta M4 (port run) | delta M2 (the toll) |
+| District | delta M1 (marginal, floor) | delta M4 (port run) | delta M2 (the toll) |
 |---|---|---|---|
 | **EP (all)** | +0.08 | -3.38 | - |
 | WEP | +0.48 | -0.46 | - |
-| EEP | -0.23 | -9.86 | - |
+| EEP | -0.23 | -9.85 | - |
 | LEP | +0.03 | -0.05 | - |
 
 ---

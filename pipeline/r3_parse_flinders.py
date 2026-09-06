@@ -189,9 +189,15 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"  WARN bulk-break {f.name}: {e}")
     # wide-layout files repeat earlier months of the same year -> keep the row from the
-    # latest source file per (year, month, port, commodity); files iterated in date order
-    ships = pl.DataFrame(ship_rows).unique(
-        subset=["year", "month", "port", "commodity"], keep="last"
+    # latest source file per (year, month, port, commodity); files iterated in date order.
+    # maintain_order matters twice over: without it polars' "last" is whichever duplicate
+    # the hash table yields (so the VALUE kept was not reliably the latest file's), and the
+    # output row order changed between identical builds, which p2_build_observed and
+    # p2_build_live carried straight into the committed observed_*.json arrays.
+    ships = (
+        pl.DataFrame(ship_rows)
+        .unique(subset=["year", "month", "port", "commodity"], keep="last", maintain_order=True)
+        .sort(["port", "year", "month", "commodity"])
     )
     ships.write_parquet(PROCESSED / "port_shipments_monthly.parquet")
     flagged = ships.filter(pl.col("qa_flag") != "").height
