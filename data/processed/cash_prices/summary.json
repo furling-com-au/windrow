@@ -295,6 +295,21 @@
     "Canola": 625.31,
     "Wheat": 274.04
    }
+  },
+  "2026-09-10": {
+   "bids": 160,
+   "sites": 25,
+   "buyers": [
+    "Bunge Australia",
+    "Inghams Enterprises"
+   ],
+   "epBids": 0,
+   "medianPerT": {
+    "Barley": 233.37,
+    "Canola": 627.53,
+    "Lentils": 532.5,
+    "Wheat": 273.38
+   }
   }
  }
 }
