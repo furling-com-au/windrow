@@ -462,6 +462,17 @@
     "Lentils": 540.0,
     "Wheat": 265.94
    }
+  },
+  "2026-09-22": {
+   "bids": 14,
+   "sites": 7,
+   "buyers": [
+    "DSL Pacific Pty Ltd"
+   ],
+   "epBids": 0,
+   "medianPerT": {
+    "Lentils": 540.0
+   }
   }
  }
 }
