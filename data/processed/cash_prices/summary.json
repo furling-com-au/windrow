@@ -563,6 +563,22 @@
     "Lentils": 540.0,
     "Wheat": 264.95
    }
+  },
+  "2026-09-29": {
+   "bids": 146,
+   "sites": 29,
+   "buyers": [
+    "Bunge Australia",
+    "DSL Pacific Pty Ltd",
+    "Inghams Enterprises"
+   ],
+   "epBids": 2,
+   "medianPerT": {
+    "Barley": 224.41,
+    "Faba Beans": 375.05,
+    "Lentils": 540.0,
+    "Wheat": 261.97
+   }
   }
  }
 }
