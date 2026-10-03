@@ -622,6 +622,21 @@
     "Faba Beans": 375.05,
     "Wheat": 266.94
    }
+  },
+  "2026-10-03": {
+   "bids": 175,
+   "sites": 32,
+   "buyers": [
+    "Bunge Australia",
+    "Inghams Enterprises"
+   ],
+   "epBids": 8,
+   "medianPerT": {
+    "Barley": 248.0,
+    "Canola": 785.0,
+    "Faba Beans": 375.05,
+    "Wheat": 266.94
+   }
   }
  }
 }
