@@ -650,6 +650,13 @@
     "Faba Beans": 375.05,
     "Wheat": 266.94
    }
+  },
+  "2026-10-05": {
+   "bids": 0,
+   "sites": 0,
+   "buyers": [],
+   "epBids": 0,
+   "medianPerT": {}
   }
  }
 }
