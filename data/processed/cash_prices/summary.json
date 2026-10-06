@@ -657,6 +657,21 @@
    "buyers": [],
    "epBids": 0,
    "medianPerT": {}
+  },
+  "2026-10-06": {
+   "bids": 121,
+   "sites": 25,
+   "buyers": [
+    "ADM Trading Australia",
+    "Inghams Enterprises"
+   ],
+   "epBids": 0,
+   "medianPerT": {
+    "Barley": 218.46,
+    "Canola": 801.0,
+    "Faba Beans": 377.55,
+    "Wheat": 266.94
+   }
   }
  }
 }
