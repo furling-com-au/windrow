@@ -793,6 +793,19 @@
     "Faba Beans": 372.6,
     "Wheat": 263.96
    }
+  },
+  "2026-10-16": {
+   "bids": 118,
+   "sites": 25,
+   "buyers": [
+    "Inghams Enterprises"
+   ],
+   "epBids": 0,
+   "medianPerT": {
+    "Barley": 213.49,
+    "Faba Beans": 367.64,
+    "Wheat": 255.01
+   }
   }
  }
 }
