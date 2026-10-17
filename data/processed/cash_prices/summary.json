@@ -806,6 +806,22 @@
     "Faba Beans": 367.64,
     "Wheat": 255.01
    }
+  },
+  "2026-10-17": {
+   "bids": 128,
+   "sites": 29,
+   "buyers": [
+    "ADM Trading Australia",
+    "Inghams Enterprises"
+   ],
+   "epBids": 1,
+   "medianPerT": {
+    "Barley": 213.49,
+    "Canola": 785.0,
+    "Faba Beans": 367.64,
+    "Lentils": 551.0,
+    "Wheat": 255.01
+   }
   }
  }
 }
