@@ -878,6 +878,21 @@
     "Lentils": 548.99,
     "Wheat": 284.93
    }
+  },
+  "2026-10-25": {
+   "bids": 143,
+   "sites": 43,
+   "buyers": [
+    "Bunge Australia",
+    "Cargill Australia",
+    "Inghams Enterprises"
+   ],
+   "epBids": 27,
+   "medianPerT": {
+    "Barley": 229.02,
+    "Faba Beans": 355.31,
+    "Wheat": 262.88
+   }
   }
  }
 }
