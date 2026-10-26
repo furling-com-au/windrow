@@ -893,6 +893,26 @@
     "Faba Beans": 355.31,
     "Wheat": 262.88
    }
+  },
+  "2026-10-26": {
+   "bids": 779,
+   "sites": 52,
+   "buyers": [
+    "Advantage Grain",
+    "Bunge Australia",
+    "CBH Grain",
+    "Cargill Australia",
+    "Inghams Enterprises",
+    "JK International"
+   ],
+   "epBids": 240,
+   "medianPerT": {
+    "Barley": 0.0,
+    "Canola": 736.22,
+    "Faba Beans": 355.31,
+    "Lentils": 545.0,
+    "Wheat": 241.0
+   }
   }
  }
 }
