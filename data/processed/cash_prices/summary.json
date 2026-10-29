@@ -958,6 +958,29 @@
     "Lentils": 545.0,
     "Wheat": 262.43
    }
+  },
+  "2026-10-29": {
+   "bids": 995,
+   "sites": 55,
+   "buyers": [
+    "ADM Trading Australia",
+    "Advantage Grain",
+    "Bunge Australia",
+    "Bunge Western Australia",
+    "CBH Grain",
+    "Cargill Australia",
+    "Inghams Enterprises",
+    "JK International",
+    "Robinson Grain"
+   ],
+   "epBids": 289,
+   "medianPerT": {
+    "Barley": 179.85,
+    "Canola": 732.95,
+    "Faba Beans": 352.34,
+    "Lentils": 542.0,
+    "Wheat": 260.44
+   }
   }
  }
 }
