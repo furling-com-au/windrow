@@ -1612,6 +1612,34 @@
     "Lentils": 554.0,
     "Wheat": 276.23
    }
+  },
+  "2026-11-24": {
+   "bids": 1315,
+   "sites": 55,
+   "buyers": [
+    "ADM Group Australia Pty Ltd",
+    "Advantage Grain",
+    "Allied Pinnacle Pty Ltd",
+    "Bunge Australia",
+    "Bunge Western Australia",
+    "CHS Broadbent",
+    "Cargill Australia",
+    "DSL Pacific Pty Ltd",
+    "Flexi Grain (FXG Group Pty Ltd)",
+    "Inghams Enterprises",
+    "JK International",
+    "Riverhaven Enterprises Pty Ltd",
+    "Robinson Grain",
+    "Saputo Dairy Australia"
+   ],
+   "epBids": 359,
+   "medianPerT": {
+    "Barley": 0.0,
+    "Canola": 738.28,
+    "Faba Beans": 357.32,
+    "Lentils": 548.0,
+    "Wheat": 0.0
+   }
   }
  }
 }
